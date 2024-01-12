@@ -3,6 +3,7 @@ import type {} from '@mui/lab/themeAugmentation'
 declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions {
     red?: PaletteColorOptions
+    rating?: PaletteColorOptions
   }
 }
 
@@ -33,6 +34,10 @@ export const red = {
   300: '#fc825e',
   100: '#fec9b9',
   50: '#fbe8e6',
+}
+
+export const rating = {
+  900: '#e79667',
 }
 
 const buttonStyleOverrides = {
@@ -116,8 +121,8 @@ let theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#226987',
-      light: '#00496F',
+      main: '#00496F',
+      light: '#226987',
     },
     secondary: {
       main: '#c0e3df',
@@ -133,8 +138,12 @@ let theme = createTheme({
     error: {
       main: '#e42d00',
     },
+    info: {
+      main: '#2b9bcc',
+    },
     grey: { ...grey },
     red: { ...red },
+    rating: { ...rating },
   },
   components: {
     MuiButton: {
