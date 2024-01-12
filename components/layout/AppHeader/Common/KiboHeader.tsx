@@ -211,7 +211,18 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
             <MegaMenu categoryTree={categoriesTree} onBackdropToggle={setIsBackdropOpen} />
           </Box>
         )}
-        <Box display="flex" gap={2}>
+        <Box
+          component={'section'}
+          sx={{
+            ...kiboHeaderStyles.logoStyles,
+          }}
+        >
+          <Link href="/">
+            <KiboLogo />
+          </Link>
+        </Box>
+
+        <Box display="flex" flex={1} justifyContent={'flex-end'} gap={2}>
           {shouldShowSearchIconInSmallHeader && (
             <HeaderAction
               icon={SearchIcon}

@@ -121,20 +121,23 @@ const ProductCard = (props: ProductCardProps) => {
                   </Box>
                 ) : null}
                 {/* Badge End */}
-                {isShowWishlistIcon && (
-                  <Box
-                    className="wishlist-button-container"
-                    ml={'auto'}
-                    textAlign={'right'}
-                    onClick={handleAddOrRemoveWishlistItem}
-                  >
-                    {isInWishlist ? (
-                      <FavoriteRounded sx={{ color: 'red.900' }} />
-                    ) : (
-                      <FavoriteBorderRounded sx={{ color: 'grey.600' }} />
-                    )}
-                  </Box>
-                )}
+                <Box
+                  className="wishlist-button-container"
+                  ml={'auto'}
+                  textAlign={'right'}
+                  onClick={handleAddOrRemoveWishlistItem}
+                  minHeight={'4rem'}
+                >
+                  {isShowWishlistIcon && (
+                    <>
+                      {isInWishlist ? (
+                        <FavoriteRounded sx={{ color: 'red.900' }} />
+                      ) : (
+                        <FavoriteBorderRounded sx={{ color: 'grey.600' }} />
+                      )}
+                    </>
+                  )}
+                </Box>
               </Box>
               <CardMedia
                 className="product-image"
@@ -175,6 +178,7 @@ const ProductCard = (props: ProductCardProps) => {
                   icon={<StarRounded color="primary" data-testid="filled-rating" />}
                   emptyIcon={<StarRounded data-testid="empty-rating" />}
                   data-testid="product-rating"
+                  sx={{ ...ProductCardStyles.rating }}
                 />
                 {/* {isShowWishlistIcon && ( */}
                 <Box pt={2} textAlign={'center'} sx={{ opacity: 0 }} className="quick-actions">

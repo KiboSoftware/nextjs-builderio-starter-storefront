@@ -22,7 +22,7 @@ const styles = {
     },
   },
   smallLogo: {
-    width: 40,
+    width: 160,
     height: 40,
   },
 }

@@ -118,3 +118,12 @@ body {
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
+@font-face {
+  font-family: 'MetropolisRegular';
+  src: url('/fonts/metropolis.regular.otf');
+  format: ('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
