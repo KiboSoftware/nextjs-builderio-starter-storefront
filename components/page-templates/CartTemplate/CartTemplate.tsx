@@ -199,7 +199,7 @@ const CartTemplate = (props: CartTemplateProps) => {
             />
             <Box py={5}>
               <ProductRecommendations
-                title="You may also like"
+                title={t('you-may-also-like')}
                 query={cartGetters.getRelatedProducts(cartItems as CrCartItem[])}
               />
             </Box>
