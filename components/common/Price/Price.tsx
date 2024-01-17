@@ -24,7 +24,7 @@ const styles = {
     ':before': {
       content: "''",
       display: 'block',
-      width: '100%',
+      width: '90%',
       borderTopWidth: '1px',
       borderTopStyle: 'solid',
       borderTopColor: 'error.main',
@@ -38,7 +38,7 @@ const styles = {
 }
 
 const PriceTypography = (priceTypographyProps: PriceTypographyProps) => {
-  const { children, color, sx, variant = 'body2', fontWeight = 'bold' } = priceTypographyProps
+  const { children, color, sx, variant = 'body1', fontWeight = 'bold' } = priceTypographyProps
   return (
     <Typography
       variant={variant}
@@ -78,13 +78,15 @@ const PriceRangeTypography = ({ priceRange }: { priceRange: PriceRange }) => {
   const { lower, upper } = priceRange
 
   return (
-    <Box display="flex" alignItems="center" flexWrap={'wrap'} gap={0.5} data-testid="price-range">
+    <Box display="flex" alignItems="center" flexWrap={'wrap'} gap={1} data-testid="price-range">
       <Price
         variant="body2"
         price={lower?.price}
         {...(lower?.salePrice && { salePrice: lower?.salePrice })}
       />
-      <Typography variant="body2">-</Typography>
+      <Typography variant="body2" pt={'7%'}>
+        _
+      </Typography>
       <Price
         variant="body2"
         price={upper?.price}

@@ -191,7 +191,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
               {!isLoading && (
                 <FacetList
                   facetList={facetList}
-                  showSearchAndCount={false}
+                  showSearchAndCount={true}
                   onFilterByClose={handleFilterBy}
                   appliedFilters={appliedFilters}
                   onSelectedTileRemoval={handleSelectedTileRemoval}

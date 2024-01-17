@@ -21,6 +21,7 @@ const styles = {
       xs: 33,
       md: 78,
     },
+    paddingTop: 1.5,
   },
   smallLogo: {
     width: 160,
