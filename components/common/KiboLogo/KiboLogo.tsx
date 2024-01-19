@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box } from '@mui/material'
 import { StaticImageData } from 'next/image'
 
 import KiboImage from '../KiboImage/KiboImage'

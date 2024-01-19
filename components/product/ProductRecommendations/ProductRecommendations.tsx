@@ -15,8 +15,7 @@ import type { Product } from '@/lib/gql/types'
 
 export interface ProductRecommendationsProps {
   title: string
-  productCodes?: Array<string>
-  query?: string
+  productCodes: Array<string>
 }
 
 const ProductRecommendations = (props: ProductRecommendationsProps) => {
@@ -65,7 +64,6 @@ const ProductRecommendations = (props: ProductRecommendationsProps) => {
       }),
       isShowWishlistIcon: !productGetters.isVariationProduct(product),
       isATCLoading,
-      fulfillmentTypesSupported: product?.fulfillmentTypesSupported as string[],
       onAddOrRemoveWishlistItem: () => handleWishList(product as ProductCustom),
       onClickQuickViewModal: () => openProductQuickViewModal({ product: product as ProductCustom }),
       onClickAddToCart: (payload: any) => handleAddToCart(payload),

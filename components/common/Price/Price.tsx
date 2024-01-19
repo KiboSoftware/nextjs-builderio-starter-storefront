@@ -1,4 +1,4 @@
-import { Typography, Box, SxProps, Theme } from '@mui/material'
+import { Typography, Box, SxProps, Theme, Stack } from '@mui/material'
 
 import type { PriceOnly, PriceRange, SalePrice } from '@/lib/types'
 interface PriceProps extends PriceOnly, SalePrice, PriceStyles {
@@ -38,7 +38,7 @@ const styles = {
 }
 
 const PriceTypography = (priceTypographyProps: PriceTypographyProps) => {
-  const { children, color, sx, variant = 'body1', fontWeight = 'bold' } = priceTypographyProps
+  const { children, color, sx, variant = 'body2', fontWeight = 'bold' } = priceTypographyProps
   return (
     <Typography
       variant={variant}
@@ -56,7 +56,7 @@ const SalePriceTypography = (salePriceTypographyProps: SalePrice & PriceStyles) 
   const { price, salePrice, variant, fontWeight, color } = salePriceTypographyProps
 
   return (
-    <>
+    <Stack>
       <PriceTypography
         variant={variant}
         fontWeight={fontWeight}
@@ -70,7 +70,7 @@ const SalePriceTypography = (salePriceTypographyProps: SalePrice & PriceStyles) 
         {price}
       </PriceTypography>
       {salePrice && <PriceTypography>{salePrice}</PriceTypography>}
-    </>
+    </Stack>
   )
 }
 
@@ -78,10 +78,18 @@ const PriceRangeTypography = ({ priceRange }: { priceRange: PriceRange }) => {
   const { lower, upper } = priceRange
 
   return (
-    <Box display="flex" alignItems="center" gap={1} data-testid="price-range">
-      <Price price={lower?.price} {...(lower?.salePrice && { salePrice: lower?.salePrice })} />
+    <Box display="flex" alignItems="center" flexWrap={'wrap'} gap={0.5} data-testid="price-range">
+      <Price
+        variant="body2"
+        price={lower?.price}
+        {...(lower?.salePrice && { salePrice: lower?.salePrice })}
+      />
       <Typography variant="body2">-</Typography>
-      <Price price={upper?.price} {...(upper?.salePrice && { salePrice: upper?.salePrice })} />
+      <Price
+        variant="body2"
+        price={upper?.price}
+        {...(upper?.salePrice && { salePrice: upper?.salePrice })}
+      />
     </Box>
   )
 }
@@ -96,7 +104,7 @@ const Price = (props: PriceProps) => {
       ) : (
         <SalePriceTypography
           price={price}
-          salePrice={salePrice}
+          salePrice={price === salePrice ? undefined : salePrice}
           variant={variant}
           color={color}
           fontWeight={fontWeight}
