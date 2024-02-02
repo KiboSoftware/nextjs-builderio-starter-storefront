@@ -1,4 +1,5 @@
 import React from 'react'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import { CacheProvider, EmotionCache } from '@emotion/react'
 // eslint-disable-next-line import/order
@@ -54,6 +55,7 @@ const App = (props: KiboAppProps) => {
       <RQNotificationContextProvider>
         {getLayout(<Component {...pageProps} />)}
       </RQNotificationContextProvider>
+      <SpeedInsights />
     </CacheProvider>
   )
 }
