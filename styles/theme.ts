@@ -120,11 +120,11 @@ let theme = createTheme({
       light: '#C0E3DF',
     },
     secondary: {
-      main: '#c0e3df',
+      main: 'blue',
       light: '#FFFFFF',
     },
     text: {
-      primary: grey[900],
+      primary: 'red',
       secondary: grey[600],
     },
     warning: {
