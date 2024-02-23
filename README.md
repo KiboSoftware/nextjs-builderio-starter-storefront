@@ -3,6 +3,7 @@
 
 
 <p align="center">
+  
 This is a headless ecommerce starter kit for KiboCommerce platform using Next.JS and BuilderIO<br>
 
 </p>
