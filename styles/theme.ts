@@ -124,7 +124,7 @@ let theme = createTheme({
       light: '#FFFFFF',
     },
     text: {
-      primary: "#F8CA24",
+      primary: "#A020F0",
       secondary: grey[600],
     },
     warning: {
