@@ -1,0 +1,66 @@
+.btnContainer {
+  position: relative;
+  background-color: #ededed;
+  padding: 0 90px 0 34px;
+  min-height: 127px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  border-radius: 0 0 26px 0;
+}
+.btnContainer .linkText {
+  display: inline-block;
+  text-wrap: wrap;
+  font-size: 22px;
+  font-family: poppins;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 30px;
+  color: #30299a;
+  margin: 0;
+  margin-left: 40px;
+}
+.btnContainer .cornerDarkBtn {
+  width: 61px;
+  height: 63px;
+  font-size: 22px;
+  background: #30299a;
+  color: #ffffff;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px 0;
+}
+.btnContainer .cornerDarkBtn::before {
+  content: 'arrow_forward_ios';
+  font-family: 'Material Icons';
+  font-size: 22px;
+}
+.btnContainer:hover .cornerDarkBtn {
+  background-color: #4c47c4;
+}
+.btnContainer:hover {
+  box-shadow: 0px 15px 20px 0px rgba(0, 0, 0, 0.2);
+}
+.btnContainer:hover .linkText {
+  color: #4c47c4;
+}
+@media (max-width: 910px) {
+  .btnContainer {
+    min-height: 113px;
+    padding: 0 74px 0 30px;
+  }
+  .btnContainer .linkText {
+    font-size: 16px;
+    line-height: 24px;
+    margin-left: 20px;
+  }
+  .btnContainer .cornerDarkBtn {
+    width: 54px;
+    height: 56px;
+  }
+}

@@ -12,6 +12,7 @@ import 'next-i18next.config'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 
+import BuilderComponents from './builder-registry'
 import { DefaultLayout } from '@/components/layout'
 import { RQNotificationContextProvider } from '@/context'
 import createEmotionCache from '@/lib/createEmotionCache'
@@ -19,6 +20,8 @@ import type { NextPageWithLayout } from '@/lib/types'
 
 import '@/styles/global.css'
 import '@splidejs/react-splide/css'
+
+BuilderComponents()
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

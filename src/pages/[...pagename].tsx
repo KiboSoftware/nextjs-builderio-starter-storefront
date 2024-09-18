@@ -3,7 +3,6 @@ import '@builder.io/widgets'
 import getConfig from 'next/config'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-import BuilderComponents from './builder-registry'
 import getCategoryTree from '@/lib/api/operations/get-category-tree'
 import type { CategoryTreeResponse } from '@/lib/types'
 
@@ -13,7 +12,6 @@ const { publicRuntimeConfig } = getConfig()
 const apiKey = publicRuntimeConfig?.builderIO?.apiKey
 
 builder.init(apiKey)
-BuilderComponents()
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { locale } = context
