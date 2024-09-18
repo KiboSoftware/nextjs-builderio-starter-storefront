@@ -1,8 +1,13 @@
 import { Builder } from '@builder.io/react'
 
 import IconTextButton from '@/components/customComponent/iconAndTextButton'
+import Button from '@/components/customComponent/textButton'
 
 const BuilderComponents = () => {
+  Builder.registerComponent(Button, {
+    name: 'textButton',
+    inputs: [{ name: 'textButton', type: 'text' }],
+  })
   Builder.registerComponent(IconTextButton, {
     name: 'Icon And Text Button',
 
