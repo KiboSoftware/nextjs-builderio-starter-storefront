@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react'
 
 import { builder } from '@builder.io/react'
@@ -12,6 +13,7 @@ import 'next-i18next.config'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 
+import BuilderComponents from './builder-registry'
 import registerDesignToken from './registerDesignToken'
 import { DefaultLayout } from '@/components/layout'
 import { RQNotificationContextProvider } from '@/context'
@@ -25,6 +27,8 @@ const { publicRuntimeConfig } = getConfig()
 const apiKey = publicRuntimeConfig?.builderIO?.apiKey
 
 builder.init(apiKey) // Replace with your actual Builder.io API key
+
+BuilderComponents()
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -56,6 +60,10 @@ const App = (props: KiboAppProps) => {
         {pageProps?.metaData?.robots && (
           <meta name="robots" content={pageProps?.metaData?.robots} />
         )}
+        <style>
+          @import
+          url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        </style>
       </Head>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <RQNotificationContextProvider>
