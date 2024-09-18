@@ -13,6 +13,7 @@ import type { GetStaticPropsContext } from 'next'
 
 interface HomePageProps {
   page: any
+  themeSetting: any
 }
 
 const { publicRuntimeConfig } = getConfig()
@@ -381,11 +382,12 @@ export async function getStaticProps(context: GetStaticPropsContext) {
       },
     })
     .toPromise()
-
+  const themeSetting = await builder.get('theme-setting').promise()
   return {
     props: {
       page: page || null,
       categoriesTree,
+      themeSetting: themeSetting || null,
       ...(await serverSideTranslations(locale as string, ['common'])),
     },
     revalidate: serverRuntimeConfig.revalidate,
@@ -393,7 +395,8 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 }
 
 const Home: NextPageWithLayout<HomePageProps> = (props) => {
-  const { page } = props
+  const { page, themeSetting } = props
+  console.log('themeSetting', themeSetting)
   return (
     <>
       <BuilderComponent

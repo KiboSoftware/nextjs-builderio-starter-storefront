@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react'
 
+import { builder } from '@builder.io/react'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 // eslint-disable-next-line import/order
 import { AppProps } from 'next/app'
@@ -13,13 +14,19 @@ import Router from 'next/router'
 import NProgress from 'nprogress'
 
 import BuilderComponents from './builder-registry'
+import registerDesignToken from './registerDesignToken'
 import { DefaultLayout } from '@/components/layout'
 import { RQNotificationContextProvider } from '@/context'
 import createEmotionCache from '@/lib/createEmotionCache'
 import type { NextPageWithLayout } from '@/lib/types'
-
 import '@/styles/global.css'
-import '@splidejs/react-splide/css'
+
+registerDesignToken()
+
+const { publicRuntimeConfig } = getConfig()
+const apiKey = publicRuntimeConfig?.builderIO?.apiKey
+
+builder.init(apiKey) // Replace with your actual Builder.io API key
 
 BuilderComponents()
 
