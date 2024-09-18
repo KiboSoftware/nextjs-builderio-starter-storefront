@@ -1,6 +1,6 @@
 import { Builder } from '@builder.io/react'
 
-export function registerDesignToken() {
+const registerDesignToken = () => {
   Builder.register('editor.settings', {
     designTokensOptional: true,
     styleStrictMode: false,
@@ -78,3 +78,5 @@ export function registerDesignToken() {
     },
   })
 }
+
+export default registerDesignToken

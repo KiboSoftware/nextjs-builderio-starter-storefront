@@ -12,7 +12,7 @@ import 'next-i18next.config'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 
-import { registerDesignToken } from './registerDesignToken'
+import registerDesignToken from './registerDesignToken'
 import { DefaultLayout } from '@/components/layout'
 import { RQNotificationContextProvider } from '@/context'
 import createEmotionCache from '@/lib/createEmotionCache'
