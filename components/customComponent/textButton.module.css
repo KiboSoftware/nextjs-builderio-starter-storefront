@@ -6,10 +6,10 @@
     justify-content: space-between;
     text-decoration: none;
     color: #30299a; /* Dark purple color */
-    border-bottom: 1px solid #30299a; /* Dark purple line */
+    border-bottom: 1px solid #30299a; /* Dark purple underline */
     background: transparent;
     padding-bottom: 12px;
-    transition: border-bottom 1s ease-in-out;
+    transition: border-bottom 1s ease-in-out, color 0.3s ease-in-out;
   }
 
   .btnText {
@@ -19,57 +19,73 @@
     font-weight: 500;
     line-height: 30px;
     color: #30299a;
-    margin-right: 50px;
+    margin-right: 10px; /* Reduced margin for better alignment */
+    transition: color 0.3s ease-in-out;
+  }
+
+  .btnArrow {
+    display: flex; /* Flexbox for proper alignment */
+    align-items: center; /* Center the icons vertically */
+    justify-content: center;
+    width: 30px; /* Fixed width to prevent movement */
+    position: relative; /* Required for arrow animations */
   }
 
   /* Chevron icon */
   .btnArrow::before {
-    position: absolute;
-    top: 0;
-    right: 12px;
     content: 'chevron_right';
     font-family: 'Material Icons';
     font-size: 22px;
     color: #30299a; /* Dark purple color */
-    transition: transform 0.1s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
   }
 
   /* Arrow icon */
   .btnArrow::after {
-    position: absolute;
-    top: 0;
-    right: 0;
     content: 'arrow_forward';
     font-family: 'Material Icons';
     font-size: 22px;
     color: #4c47c4; /* Purple color */
+    position: absolute;
     opacity: 0;
-    transition: transform 1s ease-in-out;
+    transform: translateX(0); /* Start without horizontal movement */
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out; /* Slower transition for smoothness */
   }
 
   .btnContainer:hover {
-    color: #4c47c4; /* Purple color */
-    animation: moveAndGrow 0.3s ease-in-out;
+    color: #4c47c4; /* Change text to purple */
+    border-bottom-color: #4c47c4; /* Underline changes to purple */
+    animation: blinkUnderline 1s ease-in-out; /* Add blinking underline animation */
   }
+
   .btnContainer:hover .btnText {
     color: #4c47c4; /* Purple color */
   }
+
   .btnContainer:hover .btnArrow::before {
     opacity: 0;
   }
 
   .btnContainer:hover .btnArrow::after {
     opacity: 1;
+    transform: translateX(5px); /* Slide arrow slightly to the right */
   }
-  @keyframes moveAndGrow {
+
+  /* Animation for blinking underline */
+  @keyframes blinkUnderline {
     0% {
-      border: none;
+      border-bottom-color: #4c47c4; /* Dark purple at start */
+    }
+    50% {
+      border-bottom-color: #30299a; /* Blink at midpoint */
     }
     100% {
-      border-bottom: 1px solid #4c47c4;
+      border-bottom-color: #4c47c4; /* Return to dark purple */
     }
   }
 }
+
+/*For Mobile Device*/
 @media (max-width: 640px) {
   .btnContainer {
     display: flex;
