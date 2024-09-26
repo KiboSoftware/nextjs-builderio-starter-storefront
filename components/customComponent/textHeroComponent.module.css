@@ -24,7 +24,7 @@
   .paragraphText {
     width: 626px;
     height: 344px;
-    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    background-image: url('../../public/Center Text Hero Background (1).svg');
     border-radius: 5px;
     background-size: cover;
     background-position: center;
@@ -76,7 +76,7 @@
   .paragraphText {
     width: 400px;
     height: 280px;
-    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    background-image: url('../../public/Center Text Hero Background (1).svg');
     border-radius: 5px;
     background-size: contain;
     background-position: center;
@@ -108,7 +108,7 @@
 
   .paragraphText {
     padding: 18px;
-    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    background-image: url('../../public/Center Text Hero Background (1).svg');
     border-radius: 5px;
     background-size: contain;
     background-position: center;
