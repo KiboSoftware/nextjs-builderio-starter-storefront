@@ -1,0 +1,131 @@
+/*Text Hero Component for Desktop View*/
+@media (min-width: 1024px) {
+  .Container1 {
+    width: 100%;
+    max-width: 1366px;
+    height: 565px;
+  }
+  .imageContainer1,
+  .imageContainer2 {
+    width: 70%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .imageContainer1 {
+    left: 0;
+    z-index: 1;
+  }
+  .imageContainer2 {
+    right: 0;
+    z-index: 2;
+  }
+  .paragraphText {
+    width: 626px;
+    height: 344px;
+    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    border-radius: 5px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 3;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    padding: 48px;
+  }
+  .paragraphText p {
+    color: #30299a;
+    font-family: Poppins;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 42px;
+    text-align: center;
+    overflow: hidden;
+  }
+}
+
+/*Text Hero Component for Tablet View*/
+@media (min-width: 628px) and (max-width: 1024px) {
+  .Container1 {
+    height: 400px;
+    width: 100%;
+    position: relative;
+  }
+  .imageContainer1,
+  .imageContainer2 {
+    width: 70%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .imageContainer1 {
+    left: 0;
+    z-index: 1;
+  }
+  .imageContainer2 {
+    right: 0;
+    z-index: 2;
+  }
+  .paragraphText {
+    width: 400px;
+    height: 280px;
+    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    border-radius: 5px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 3;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  .paragraphText p {
+    color: #30299a;
+    font-family: Poppins;
+    font-size: 20px;
+    line-height: 32px;
+    text-align: center;
+  }
+}
+
+/*Text Hero Component for Mobile View*/
+@media (max-width: 627px) {
+  .imgContainer {
+    display: none;
+  }
+
+  .paragraphText {
+    padding: 18px;
+    background-image: url('../../public/Center\ Text\ Hero\ Background\ \(1\).svg');
+    border-radius: 5px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 300px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .paragraphText p {
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+    z-index: 1;
+  }
+}
