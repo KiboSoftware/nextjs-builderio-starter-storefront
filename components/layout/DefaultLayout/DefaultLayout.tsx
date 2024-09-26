@@ -73,7 +73,7 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
                 <Container maxWidth={'xl'} sx={{ py: 2, flex: '1 0 auto' }}>
                   {children}
                 </Container>
-                <Footer content={pageProps.footer} />
+                <Footer />
               </Stack>
             </HeaderContextProvider>
           </AuthContextProvider>
