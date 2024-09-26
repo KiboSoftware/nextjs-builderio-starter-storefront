@@ -5,11 +5,11 @@
     align-items: center;
     justify-content: space-between;
     text-decoration: none;
-    color: #30299a; /* Dark purple color */
-    border-bottom: 1px solid #30299a; /* Dark purple underline */
+    color: #30299a;
+    border-bottom: 1px solid #30299a;
     background: transparent;
     padding-bottom: 12px;
-    transition: border-bottom 1s ease-in-out, color 0.3s ease-in-out;
+    transition: border-bottom 0.3s ease-in-out, color 0.3s ease-in-out;
   }
 
   .btnText {
@@ -19,16 +19,16 @@
     font-weight: 500;
     line-height: 30px;
     color: #30299a;
-    margin-right: 10px; /* Reduced margin for better alignment */
+    margin-right: 10px;
     transition: color 0.3s ease-in-out;
   }
 
   .btnArrow {
-    display: flex; /* Flexbox for proper alignment */
-    align-items: center; /* Center the icons vertically */
+    display: flex;
+    align-items: center;
     justify-content: center;
-    width: 30px; /* Fixed width to prevent movement */
-    position: relative; /* Required for arrow animations */
+    width: 30px;
+    position: relative;
   }
 
   /* Chevron icon */
@@ -36,7 +36,7 @@
     content: 'chevron_right';
     font-family: 'Material Icons';
     font-size: 22px;
-    color: #30299a; /* Dark purple color */
+    color: #30299a;
     transition: opacity 0.3s ease-in-out;
   }
 
@@ -45,21 +45,22 @@
     content: 'arrow_forward';
     font-family: 'Material Icons';
     font-size: 22px;
-    color: #4c47c4; /* Purple color */
+    color: #4c47c4;
     position: absolute;
     opacity: 0;
     transform: translateX(0); /* Start without horizontal movement */
-    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out; /* Slower transition for smoothness */
+    transition: opacity 0.5s cubic-bezier(0.42, 0, 0.58, 1),
+      transform 0.5s cubic-bezier(0.42, 0, 0.58, 1);
   }
 
   .btnContainer:hover {
-    color: #4c47c4; /* Change text to purple */
-    border-bottom-color: #4c47c4; /* Underline changes to purple */
-    animation: blinkUnderline 1s ease-in-out; /* Add blinking underline animation */
+    color: #4c47c4;
+    border-bottom-color: #4c47c4;
+    animation: blinkUnderline 0.3s ease-in-out; /* Add underline animation */
   }
 
   .btnContainer:hover .btnText {
-    color: #4c47c4; /* Purple color */
+    color: #4c47c4;
   }
 
   .btnContainer:hover .btnArrow::before {
@@ -70,17 +71,33 @@
     opacity: 1;
     transform: translateX(5px); /* Slide arrow slightly to the right */
   }
+  .btnContainer:not(:hover) .btnArrow::before {
+    opacity: 1;
+  }
+
+  .btnContainer:not(:hover) .btnArrow::after {
+    opacity: 0;
+    transform: translateX(0); /* Move arrow back */
+    transition: opacity 0.5s cubic-bezier(0.42, 0, 0.58, 1),
+      transform 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+  }
 
   /* Animation for blinking underline */
   @keyframes blinkUnderline {
     0% {
-      border-bottom-color: #4c47c4; /* Dark purple at start */
+      border-bottom-color: #30299a;
+    }
+    20% {
+      border-bottom-color: #4c47c4;
     }
     50% {
-      border-bottom-color: #30299a; /* Blink at midpoint */
+      border-bottom-color: #4c47c4;
+    }
+    60% {
+      border-bottom-color: #30299a;
     }
     100% {
-      border-bottom-color: #4c47c4; /* Return to dark purple */
+      border-bottom-color: #30299a;
     }
   }
 }
