@@ -1,31 +1,57 @@
-/* eslint-disable import/order */
-import txtCss from '@/components/customComponent/textHeroComponent.module.css'
+import React from 'react'
+
+import { Box, Typography, useTheme, useMediaQuery } from '@mui/material'
 import Image from 'next/image'
-import Box from '@mui/material/Box'
 
-const TextHero = (props: any) => {
+import { TextHeroStyle } from './textHeroComponent.style'
+
+interface TextHeroProps {
+  FirstImage: string
+  SecondImage: string
+  paragraphText?: string
+}
+
+const TextHero: React.FC<TextHeroProps> = ({ FirstImage, SecondImage, paragraphText }) => {
+  const theme = useTheme()
+  const mdScreen = useMediaQuery(theme.breakpoints.up('md'))
+  const smScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'))
+
+  const truncatedText =
+    paragraphText && paragraphText.length > 160
+      ? `${paragraphText.substring(0, 160)}`
+      : paragraphText
+
   return (
-    <Box className={txtCss.Container1}>
-      <Box className={txtCss.imgContainer}>
-        {/* First Image */}
-        <Box className={txtCss.imageContainer1}>
-          <Image src={props.FirstImage} alt="First Image" fill />
-        </Box>
+    <Box sx={{ ...TextHeroStyle.container }}>
+      {(mdScreen || smScreen) && (
+        <>
+          {/* First Image */}
+          <Box sx={{ ...TextHeroStyle.image1 }}>
+            <Image src={FirstImage} alt="First Image" fill />
+          </Box>
 
-        {/* Second Image */}
-        <Box className={txtCss.imageContainer2}>
-          <Image src={props.SecondImage} alt="Second Image" fill />
-        </Box>
-      </Box>
+          {/* Second Image */}
+          <Box sx={{ ...TextHeroStyle.image2 }}>
+            <Image src={SecondImage} alt="Second Image" fill />
+          </Box>
+        </>
+      )}
 
-      {/* Paragraph with Rich Text and Normal Text */}
-      <Box className={txtCss.paragraphText}>
-        {props.paragraphText ? (
-          <p>
-            <span dangerouslySetInnerHTML={{ __html: props.paragraphText }} />
-          </p>
-        ) : (
-          ''
+      <Box
+        sx={{ ...TextHeroStyle.paragraphText }}
+        style={{
+          backgroundImage: `url('/Center Text Hero Background (1).svg')`,
+        }}
+      >
+        {truncatedText && (
+          <Typography
+            component="div"
+            sx={{ ...TextHeroStyle.paragraphTextP, color: '#30299a' }}
+            dangerouslySetInnerHTML={{ __html: truncatedText }}
+            style={{
+              color: '#30299a',
+            }}
+          />
         )}
       </Box>
     </Box>
