@@ -1,6 +1,8 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+// import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import { useTranslation } from 'next-i18next'
 
+import AccountIconSvg from '@/assets/icons/accountIcon.svg'
+import LoggedInAccountIconSvg from '@/assets/icons/accountIconLoggedin.svg'
 import { HeaderAction } from '@/components/common'
 import { useAuthContext } from '@/context'
 import type { IconProps } from '@/lib/types'
@@ -17,7 +19,7 @@ const AccountIcon = ({ size, isElementVisible, onAccountIconClick }: AccountIcon
     <HeaderAction
       title={isAuthenticated && user?.firstName ? `${t('hi')}, ${user?.firstName}` : ''}
       subtitle={isAuthenticated ? t('go-to-my-account') : t('log-in')}
-      icon={AccountCircleIcon}
+      icon={isAuthenticated ? LoggedInAccountIconSvg : AccountIconSvg}
       iconFontSize={size}
       isElementVisible={isElementVisible}
       onClick={onAccountIconClick}

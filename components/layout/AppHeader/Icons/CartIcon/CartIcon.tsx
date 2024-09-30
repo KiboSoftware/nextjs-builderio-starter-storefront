@@ -1,7 +1,7 @@
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
+import ShoppingCartIcon from '@/assets/icons/cartIcon.svg'
 import { HeaderAction } from '@/components/common'
 import { useGetCart } from '@/hooks'
 import { cartGetters } from '@/lib/getters'
