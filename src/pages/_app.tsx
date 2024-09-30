@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 
 import { builder } from '@builder.io/react'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-// eslint-disable-next-line import/order
 import { AppProps } from 'next/app'
 import getConfig from 'next/config'
 import Head from 'next/head'
@@ -20,6 +19,7 @@ import { DefaultLayout } from '@/components/layout'
 import { RQNotificationContextProvider } from '@/context'
 import createEmotionCache from '@/lib/createEmotionCache'
 import type { NextPageWithLayout } from '@/lib/types'
+
 import '@/styles/global.css'
 
 registerDesignToken()
@@ -51,6 +51,23 @@ const App = (props: KiboAppProps) => {
   const getLayout =
     Component.getLayout ?? ((page) => <DefaultLayout pageProps={pageProps}>{page}</DefaultLayout>)
   const pageTitle = `${siteTitle} | ${pageProps?.metaData?.title || defaultTitle}`
+
+
+  const [googleReCaptcha, setGoogleReCaptcha] = useState()
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const settings = await builder.get('theme-setting').promise()
+      setGoogleReCaptcha(settings.data?.googleReCaptcha)
+    }
+    fetchSettings()
+  }, [])
+  const recapchaScript = `https://www.google.com/recaptcha/api.js?render=${
+    (googleReCaptcha as any)?.accountCreationSiteKey
+  }`
+  const recapchaEnterpriseScript = `https://www.google.com/recaptcha/enterprise.js?render=${
+    (googleReCaptcha as any)?.accountCreationSiteKey
+  }`
 
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -93,6 +110,7 @@ const App = (props: KiboAppProps) => {
     return null // Or a loading spinner
   }
 
+
   return (
     <CacheProvider value={emotionCache}>
       <Head>
@@ -107,6 +125,8 @@ const App = (props: KiboAppProps) => {
           @import
           url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
         </style>
+        <script src={recapchaScript} async defer></script>
+        <script src={recapchaEnterpriseScript} async defer></script>
       </Head>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <RQNotificationContextProvider>

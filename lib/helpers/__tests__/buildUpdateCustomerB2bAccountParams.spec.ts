@@ -21,6 +21,8 @@ describe('[helpers] buildUpdateCustomerB2bAccountParams function', () => {
       firstName: firstName as string,
       lastName: lastName as string,
       emailAddress: emailAddress as string,
+      mailingList: emailAddress as unknown as boolean,
+      termsConditionCheck: emailAddress as unknown as boolean,
     }
 
     expect(
