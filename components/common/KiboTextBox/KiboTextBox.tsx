@@ -67,17 +67,30 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
 
   return (
     <FormControl variant="standard" error={error} required={required} {...rest} fullWidth>
-      <InputLabel shrink htmlFor="kibo-input">
+      <InputLabel
+        sx={{
+          // Override default styles for the KiboTextBox component
+          color: '#020027',
+          fontFamily: 'Poppins',
+          fontSize: '16px',
+          fontStyle: 'normal',
+          fontWeight: '300',
+          lineHeight: '25px',
+        }}
+        shrink
+        htmlFor="kibo-input"
+      >
         {label}
       </InputLabel>
       <KiboInput
         sx={{
-          borderColor: error ? 'error.main' : 'text.secondary',
+          borderColor: error ? 'error.main' : '#020027',
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderRadius: 1,
+          borderRadius: '5px',
           fontSize: { xs: '14px !important', md: '16px !important' },
           ...sx,
+          height: '32px',
         }}
         value={value}
         id={label}
