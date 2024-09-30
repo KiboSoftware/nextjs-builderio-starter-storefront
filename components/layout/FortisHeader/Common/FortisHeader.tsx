@@ -16,20 +16,19 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
-import { headerActionAreaStyles, kiboHeaderStyles, topHeaderStyles } from './KiboHeader.styles'
+import { headerActionAreaStyles, kiboHeaderStyles, topHeaderStyles } from './FortisHeader.styles'
 import { KiboLogo } from '@/components/common'
 import { AccountHierarchyFormDialog } from '@/components/dialogs'
 import {
   AccountIcon,
-  AccountRequestIcon,
   CartIcon,
   CheckoutHeader,
   HamburgerMenu,
   LoginDialog,
   MegaMenu,
   MobileHeader,
+  NavigationBar,
   SearchSuggestions,
-  StoreFinderIcon,
 } from '@/components/layout'
 import { useAuthContext, useHeaderContext, useModalContext } from '@/context'
 import { useCreateCustomerB2bAccountMutation, useGetCategoryTree } from '@/hooks'
@@ -62,6 +61,7 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
     <Box sx={{ ...headerActionAreaStyles.wrapper }} data-testid="header-action-area">
       <Container
         maxWidth="xl"
+        disableGutters
         sx={{
           ...topHeaderStyles.container,
           justifyContent: 'space-between',
@@ -75,30 +75,18 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
             />
           </Box>
         )}
-        {/* Logo */}
-        {/* <Box
-          component={'section'}
-          sx={{
-            ...kiboHeaderStyles.logoStyles,
-          }}
-        >
-          <Link href="/">
-            <KiboLogo />
-          </Link>
-        </Box> */}
 
         <Box display="flex" flex={1} justifyContent={'flex-end'} gap={2}>
-          {/* <StoreFinderIcon size={isHeaderSmall ? 'small' : 'medium'} /> */}
+          <Box
+            component={'span'}
+            sx={{ color: '#30299a', fontFamily: 'poppins', fontWeight: '400' }}
+          >
+            CONTACT
+          </Box>
           <AccountIcon
             size={isHeaderSmall ? 'small' : 'medium'}
             onAccountIconClick={onAccountIconClick}
           />
-          {/* <AccountRequestIcon
-            onClick={onAccountRequestClick}
-            isElementVisible={false}
-            iconProps={{ fontSize: isHeaderSmall ? 'small' : 'medium' }}
-            buttonText={t('b2b-account-request')}
-          /> */}
           <CartIcon size={isHeaderSmall ? 'small' : 'medium'} />
         </Box>
       </Container>
@@ -110,28 +98,6 @@ const StyledLink = styled(Link)(({ theme }: { theme: Theme }) => ({
   color: theme?.palette.common.black,
   fontSize: theme?.typography.body1.fontSize,
 }))
-
-const TopHeader = ({ navLinks }: { navLinks: NavigationLink[] }) => {
-  const { t } = useTranslation('common')
-
-  return (
-    <Box sx={{ ...topHeaderStyles.wrapper }} data-testid="top-bar">
-      <Container maxWidth="xl" sx={{ ...topHeaderStyles.container }}>
-        <Box display="flex" justifyContent="flex-end" alignItems="center" gap={5}>
-          {navLinks?.map((nav, index) => {
-            return (
-              <Box key={index}>
-                <StyledLink href={nav.link} passHref>
-                  {t(`${nav.text}`)}
-                </StyledLink>
-              </Box>
-            )
-          })}
-        </Box>
-      </Container>
-    </Box>
-  )
-}
 
 const KiboHeader = (props: KiboHeaderProps) => {
   const { navLinks, categoriesTree: initialCategoryTree, isSticky = true } = props
@@ -190,9 +156,9 @@ const KiboHeader = (props: KiboHeaderProps) => {
         <MobileHeader>
           <Collapse in={isMobileSearchPortalVisible}>
             <Box
-              height={'55px'}
-              minHeight={'55px'}
-              sx={{ display: { xs: 'block', md: 'none' }, px: 1, mt: 1 }}
+              height={'80px'}
+              minHeight={'80px'} //According to designs
+              sx={{ display: { xs: 'block', md: 'none' }, px: 1, mt: 1, padding: '18px' }}
             >
               <SearchSuggestions
                 isViewSearchPortal={isMobileSearchPortalVisible}
@@ -230,7 +196,7 @@ const KiboHeader = (props: KiboHeaderProps) => {
         <Backdrop open={isBackdropOpen} data-testid="backdrop" />
 
         <Box component={'section'} sx={{ ...kiboHeaderStyles.topBarStyles }}>
-          {getSection()}
+          <Container disableGutters>{getSection()}</Container>
         </Box>
 
         <Box
@@ -241,9 +207,11 @@ const KiboHeader = (props: KiboHeaderProps) => {
           data-testid="mega-menu-container"
         >
           {!isCheckoutPage && (
-            <Box sx={{ display: 'flex', width: '100%' }}>
-              <MegaMenu categoryTree={categoriesTree} onBackdropToggle={setIsBackdropOpen} />
-            </Box>
+            <Container disableGutters>
+              <Box sx={{ display: 'flex', width: '100%' }}>
+                <NavigationBar />
+              </Box>
+            </Container>
           )}
         </Box>
       </AppBar>

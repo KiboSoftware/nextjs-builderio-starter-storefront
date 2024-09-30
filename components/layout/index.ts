@@ -2,6 +2,9 @@ export { default as KiboHeader } from './AppHeader/Common/KiboHeader'
 export { default as MobileHeader } from './AppHeader/Mobile/MobileHeader'
 export { default as CheckoutHeader } from './AppHeader/Checkout/CheckoutHeader'
 
+export { default as FortisHeader } from './FortisHeader/Common/FortisHeader'
+export { default as NavigationBar } from './AppHeader/NavigationBar/NavigationBar'
+
 export { default as HamburgerMenu } from './HamburgerMenu/HamburgerMenu'
 export { default as CategoryNestedNavigation } from './CategoryNestedNavigation/CategoryNestedNavigation'
 export { default as LoginDialog } from './Login/LoginDialog/LoginDialog'
