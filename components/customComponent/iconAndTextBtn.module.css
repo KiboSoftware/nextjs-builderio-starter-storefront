@@ -1,7 +1,7 @@
 .btnContainer {
   position: relative;
   background-color: #ededed;
-  padding: 0 90px 0 34px;
+  padding: 12px 90px 12px 34px;
   min-height: 127px;
   flex-shrink: 0;
   display: flex;
@@ -52,7 +52,7 @@
 @media (max-width: 910px) {
   .btnContainer {
     min-height: 113px;
-    padding: 0 74px 0 30px;
+    padding: 12px 74px 12px 30px;
   }
   .btnContainer .linkText {
     font-size: 16px;
