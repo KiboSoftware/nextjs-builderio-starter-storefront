@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       : process.env.accountCreationSiteKey
     // Construct the API URL
     const url = `https://recaptchaenterprise.googleapis.com/v1beta1/projects/${projectId}/assessments?key=${apiKey}`
-    console.log('url', url)
+    // console.log('url', url)
     const requestData = {
       event: {
         token: responseKey,
