@@ -52,7 +52,6 @@ const App = (props: KiboAppProps) => {
     Component.getLayout ?? ((page) => <DefaultLayout pageProps={pageProps}>{page}</DefaultLayout>)
   const pageTitle = `${siteTitle} | ${pageProps?.metaData?.title || defaultTitle}`
 
-
   const [googleReCaptcha, setGoogleReCaptcha] = useState()
 
   useEffect(() => {
@@ -110,7 +109,6 @@ const App = (props: KiboAppProps) => {
     return null // Or a loading spinner
   }
 
-
   return (
     <CacheProvider value={emotionCache}>
       <Head>
@@ -124,6 +122,7 @@ const App = (props: KiboAppProps) => {
         <style>
           @import
           url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+          {/* font-family: "poppins" */}
         </style>
         <script src={recapchaScript} async defer></script>
         <script src={recapchaEnterpriseScript} async defer></script>

@@ -1,21 +1,35 @@
 import React from 'react'
 
 import SearchIcon from '@mui/icons-material/Search'
-import { Box } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
+import fortisLogo from '@/assets/fortisLogo.png'
 import { HeaderAction, KiboLogo } from '@/components/common'
 import { HamburgerIcon, StoreFinderIcon, CartIcon } from '@/components/layout'
 import { useHeaderContext } from '@/context'
 
 const MobileHeaderStyles = {
+  topBar: {
+    height: '8px',
+    width: '100%',
+    backgroundColor: '#E3E2FF',
+  },
   container: {
+    width: '100%',
     backgroundColor: 'common.white',
-    height: '55px',
+    height: '52px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    margin: '0px !important',
+  },
+  item: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0px !important',
   },
 }
 
@@ -25,14 +39,49 @@ const MobileHeader = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <>
-      <Box sx={MobileHeaderStyles.container} data-testid="mobile-header">
-        <HamburgerIcon
-          size="medium"
-          mobileIconColor="black"
-          isElementVisible={true}
-          data-testid="mobile-header-hamburger-icon"
-        />
+      <Grid container>
+        <Grid item xs={12} sx={MobileHeaderStyles.topBar}></Grid>
+        <Grid
+          item
+          xs={12}
+          container
+          spacing={2}
+          data-testid="mobile-header"
+          sx={MobileHeaderStyles.container}
+        >
+          <Grid item xs={1.5} sx={MobileHeaderStyles.item}>
+            <HeaderAction
+              title={t('search')}
+              icon={SearchIcon}
+              iconFontSize={'medium'}
+              mobileIconColor="#30299A"
+              onClick={() => toggleMobileSearchPortal()}
+              data-testid="mobile-header-search-icon"
+            />
+          </Grid>
+          <Grid item xs={1.5} sx={MobileHeaderStyles.item}>
+            <CartIcon size="medium" mobileIconColor="black" data-testid="mobile-header-cart-icon" />
+          </Grid>
+          <Grid item xs={6} sx={MobileHeaderStyles.item}>
+            <Link href="/" passHref>
+              <KiboLogo mobile logo={fortisLogo} />
+            </Link>
+          </Grid>
+          <Grid item xs={1.5} sx={MobileHeaderStyles.item}>
+            {/* Empty slot */}
+          </Grid>
+          <Grid item xs={1.5} sx={MobileHeaderStyles.item}>
+            <HamburgerIcon
+              size="medium"
+              mobileIconColor="#30299A"
+              isElementVisible={true}
+              data-testid="mobile-header-hamburger-icon"
+            />
+          </Grid>
+        </Grid>
+      </Grid>
 
+      {/* <Box sx={MobileHeaderStyles.container} data-testid="mobile-header">
         <HeaderAction
           title={t('search')}
           icon={SearchIcon}
@@ -42,19 +91,22 @@ const MobileHeader = ({ children }: { children?: React.ReactNode }) => {
           data-testid="mobile-header-search-icon"
         />
 
+        <CartIcon size="medium" mobileIconColor="black" data-testid="mobile-header-cart-icon" />
+
         <Box position="relative">
           <Link href="/" passHref>
             <KiboLogo small />
           </Link>
         </Box>
 
-        <StoreFinderIcon
+        <HamburgerIcon
           size="medium"
           mobileIconColor="black"
-          data-testid="mobile-header-store-icon"
+          isElementVisible={true}
+          data-testid="mobile-header-hamburger-icon"
         />
-        <CartIcon size="medium" mobileIconColor="black" data-testid="mobile-header-cart-icon" />
-      </Box>
+      </Box> */}
+
       {children}
     </>
   )
