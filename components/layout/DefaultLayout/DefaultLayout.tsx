@@ -8,7 +8,7 @@ import creditCardType from 'credit-card-type'
 import Router from 'next/router'
 
 import { GlobalFetchingIndicator } from '@/components/common'
-import { Footer, KiboHeader } from '@/components/layout'
+import { Footer, FortisHeader, KiboHeader } from '@/components/layout'
 import {
   AuthContextProvider,
   ModalContextProvider,
@@ -54,7 +54,21 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
             <HeaderContextProvider>
               <GlobalFetchingIndicator />
               <Stack sx={{ minHeight: '100vh' }}>
-                <KiboHeader
+                {/* <KiboHeader
+                  navLinks={[
+                    {
+                      link: '/order-status',
+                      text: 'order-status',
+                    },
+                    {
+                      link: '/wishlist',
+                      text: 'wishlist',
+                    },
+                  ]}
+                  categoriesTree={pageProps.categoriesTree || []}
+                  isSticky={true}
+                /> */}
+                <FortisHeader
                   navLinks={[
                     {
                       link: '/order-status',
@@ -73,7 +87,7 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
                 <Container maxWidth={'xl'} sx={{ py: 2, flex: '1 0 auto' }}>
                   {children}
                 </Container>
-                <Footer content={pageProps.footer} />
+                <Footer />
               </Stack>
             </HeaderContextProvider>
           </AuthContextProvider>
