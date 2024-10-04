@@ -13,8 +13,6 @@ describe('[helpers] buildCreateCustomerB2bUserInput function', () => {
       firstName: 'Kushagra',
       lastName: 'Agrawal',
       emailAddress: 'kushagra.agarwal@gmail.com',
-      mailingList: false,
-      termsConditionCheck: false,
     }
 
     expect(buildCreateCustomerB2bAccountParams(values)).toStrictEqual({

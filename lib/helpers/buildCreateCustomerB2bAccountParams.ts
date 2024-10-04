@@ -5,16 +5,7 @@ export const buildCreateCustomerB2bAccountParams = (
   params: CreateCustomerB2bAccountParams,
   isAccountHierarchy?: boolean
 ): MutationCreateCustomerB2bAccountArgs => {
-  const {
-    parentAccount,
-    companyOrOrganization,
-    taxId,
-    firstName,
-    lastName,
-    emailAddress,
-    mailingList,
-    termsConditionCheck,
-  } = params
+  const { parentAccount, companyOrOrganization, taxId, firstName, lastName, emailAddress } = params
 
   const createCustomerB2bAccountParam = {
     b2BAccountInput: {
@@ -22,8 +13,6 @@ export const buildCreateCustomerB2bAccountParams = (
       parentAccountId: parentAccount?.id,
       companyOrOrganization,
       taxId,
-      mailingList,
-      termsConditionCheck,
       accountType: 'B2B',
       ...(!isAccountHierarchy ? { approvalStatus: 'PendingApproval' } : {}),
       users: [
