@@ -1,4 +1,4 @@
-import { createTheme, responsiveFontSizes } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles'
 import type {} from '@mui/lab/themeAugmentation'
 declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions {
@@ -73,39 +73,99 @@ const buttonStyleOverrides = {
 // Create a base theme instance and define the basic design options
 let theme = createTheme({
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'Poppins',
+    htmlFontSize: 16,
     h1: {
-      fontSize: '1.75rem', // 28px
-      fontWeight: 'bold',
-      '@media (max-width:600px)': {
-        fontSize: '1.5rem', // 24px
+      fontSize: '2.5rem', // 40px
+      fontWeight: '500',
+      lineHeight: '3.438rem', //55px
+      '@media (max-width:910px)': {
+        fontSize: '1.875rem', // 30px
+        lineHeight: '2.625rem', // 42px
       },
     },
     h2: {
-      fontSize: '1.5rem', // 24px
-      fontWeight: 'bold',
-      '@media (max-width:600px)': {
-        fontSize: '1.25rem', // 20px
+      fontSize: '2.375rem', // 38px
+      fontWeight: '500',
+      lineHeight: '3.25rem', //52px
+      '@media (max-width:910px)': {
+        fontSize: '1.625rem', // 26px
+        lineHeight: '2.188rem', // 35px
       },
     },
     h3: {
+      fontSize: '1.875rem', // 30px
+      fontWeight: '500',
+      lineHeight: '2.813rem', //45px
+      '@media (max-width:910px)': {
+        fontSize: '1.5rem', // 24px
+        lineHeight: '2.188rem', // 35px
+      },
+    },
+    h4: {
       fontSize: '1.25rem', // 20px
-      '@media (max-width:600px)': {
+      fontWeight: '500',
+      lineHeight: '1.563rem', // 25px
+      '@media (max-width:910px)': {
         fontSize: '1rem', // 16px
+        lineHeight: '1.375rem', // 22px
+      },
+    },
+    h5: {
+      fontSize: '1.5rem', // 24px
+      fontWeight: '300',
+      lineHeight: '2.188rem', //35px
+      '@media (max-width:910px)': {
+        fontSize: '1.25rem', // 20px
+        lineHeight: '1.875rem', //30px
+      },
+    },
+    h6: {
+      fontSize: '0.875rem', // 14px
+      fontWeight: '500',
+      lineHeight: '1.25rem', // 20px
+      '@media (max-width:910px)': {
+        fontSize: '0.875rem', // 14px
+        lineHeight: '1.25rem', // 20px
       },
     },
     subtitle1: {
-      fontSize: '1.125rem', // 18px
+      // footnote
+      fontSize: '0.688rem', // 11px
+      fontWeight: '500',
+      lineHeight: '1.25rem', // 20px,
     },
-    subtitle2: {
-      fontSize: '1rem', // 16px
-    },
-    // body1: {
+    // subtitle2: {
     //   fontSize: '1rem', // 16px
     // },
-    // body2: {
-    //   fontSize: '0.875rem', // 14px
-    // },
+    body1: {
+      fontSize: '1.375rem', // 22px
+      fontWeight: '300',
+      lineHeight: '2.5rem', // 40px
+      '@media (max-width:910px)': {
+        fontSize: '1.125rem', // 18px
+        lineHeight: '1.75rem', // 28px
+      },
+    },
+    body2: {
+      fontSize: '1rem', // 16px
+      fontWeight: '300',
+      lineHeight: '1.563rem', //25px
+      '@media (max-width:910px)': {
+        fontSize: '0.875rem', // 14px
+        lineHeight: '1.375rem', // 22px
+      },
+    },
+    button: {
+      //Button1-Large
+      fontSize: '1.375rem', // 22px
+      fontWeight: '300',
+      lineHeight: '1.875rem', //30px
+      '@media (max-width:910px)': {
+        fontSize: '1rem', // 16px
+        lineHeight: '1.5rem', // 24px
+      },
+    },
   },
   palette: {
     primary: {
@@ -161,4 +221,4 @@ let theme = createTheme({
 })
 // compose theme (place theme options that depend on the base theme here)
 theme = createTheme(theme)
-export default responsiveFontSizes(theme)
+export default theme
