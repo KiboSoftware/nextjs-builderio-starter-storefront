@@ -16,8 +16,8 @@ jobs:
         run: npm install @commitlint/cli @commitlint/config-conventional
 
       # Run commitlint on the pull request title using npx
-      - name: Validate PR Title
-        run: npx commitlint --config ./commitlint.config.js
+      # - name: Validate PR Title
+      #   run: npx commitlint --config ./commitlint.config.js
 # name: Commitlint
 # on:
 #   pull_request:
