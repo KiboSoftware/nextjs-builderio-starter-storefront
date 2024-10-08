@@ -17,7 +17,7 @@ jobs:
 
       # Run commitlint on the pull request title using npx
       - name: Validate PR Title
-        run: npx commitlint --config ./commitlint.config.js --edit ${{ github.event.pull_request.title }}
+        run: npx commitlint --config ./commitlint.config.js
 # name: Commitlint
 # on:
 #   pull_request:
