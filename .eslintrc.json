@@ -11,6 +11,7 @@
   ],
   "rules": {
     "@emotion/jsx-import": "error",
+    "@typescript-eslint/no-var-requires": 0,
     "@emotion/no-vanilla": "error",
     "@emotion/import-from-emotion": "error",
     "@emotion/styled-import": "error",
