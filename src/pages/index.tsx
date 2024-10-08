@@ -1,6 +1,5 @@
 import { BuilderComponent, builder, Builder } from '@builder.io/react'
 import '@builder.io/widgets'
-import { Box } from '@mui/material'
 import getConfig from 'next/config'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -400,7 +399,6 @@ const Home: NextPageWithLayout<HomePageProps> = (props) => {
   console.log('themeSetting', themeSetting)
   return (
     <>
-      <Box>This is to check if existing lint error still persists.</Box>
       <BuilderComponent
         model={publicRuntimeConfig?.builderIO?.modelKeys?.defaultPage}
         content={page}
