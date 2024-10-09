@@ -7,17 +7,17 @@ declare module '@mui/material/styles/createPalette' {
 }
 
 export const grey = {
-  900: '#2B2B2B',
+  900: '#020027', //Fortis theme
   // Fill Form Label Text, information text
   700: '#494949',
   // Home Page background
-  600: '#7C7C7C',
+  600: '#8D8D8D', //Fortis theme
   // Thin borders, placeholder text
-  500: '#C7C7C7',
+  500: '#6A6A6A', //Fortis theme
   // Header Accent Color, page separator bar
   400: '#CDCDCD',
   // Button background and border color
-  300: '#EAEAEA',
+  300: '#EDEDED', //Fortis theme
   // Order Summary Background
   100: '#F7F7F7',
   // Secondary Button (cancel button)
@@ -25,14 +25,14 @@ export const grey = {
 }
 
 export const red = {
-  900: '#bb2500',
+  900: '#BD3742', //Fortis theme
   // wishlist color
-  700: '#e13b0e',
-  600: '#ef4214',
-  500: '#fa4818',
-  300: '#fc825e',
-  100: '#fec9b9',
-  50: '#fbe8e6',
+  700: '#BD3742', //Fortis theme
+  600: '#BD3742', //Fortis theme
+  500: '#BD3742', //Fortis theme
+  300: '#EBC3C6', //Fortis theme
+  100: '#EBC3C6', //Fortis theme
+  50: '#EBC3C6', //Fortis theme
 }
 
 const buttonStyleOverrides = {
@@ -169,22 +169,22 @@ let theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#2ea195',
-      light: '#C0E3DF',
+      main: '#30299A', //Fortis theme
+      light: '#4C47C4', //Fortis theme
     },
     secondary: {
-      main: '#c0e3df',
+      main: '#E3E2FF', //Fortis theme
       light: '#FFFFFF',
     },
     text: {
       primary: grey[900],
-      secondary: grey[600],
+      secondary: grey[500],
     },
     warning: {
-      main: '#f8ca24',
+      main: '#EBC3C6', //Fortis theme
     },
     error: {
-      main: '#e42d00',
+      main: '#BD3742', //Fortis theme
     },
     grey: { ...grey },
     red: { ...red },
