@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
+import builder from '@builder.io/react'
 import { Stack, Typography, Link, styled } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 
 import { KiboDialog } from '@/components/common'
+import { B2BAccountFormDialog } from '@/components/dialogs'
 import { RegisterAccountDialog, ResetPasswordDialog } from '@/components/layout'
 import LoginContent, { LoginData } from '@/components/layout/Login/LoginContent/LoginContent'
 import { useAuthContext } from '@/context'
 import { useModalContext } from '@/context/ModalContext'
+import { useCreateCustomerB2bAccountMutation } from '@/hooks'
+import { buildCreateCustomerB2bAccountParams } from '@/lib/helpers'
+import { CreateCustomerB2bAccountParams } from '@/lib/types'
 
 export interface LoginFooterProps {
   onRegisterNow: () => void
@@ -44,9 +49,78 @@ const LoginDialog = () => {
 
   const { login } = useAuthContext()
   const { showModal, closeModal } = useModalContext()
+  const { createCustomerB2bAccount } = useCreateCustomerB2bAccountMutation()
 
   const onRegisterClick = () => {
-    showModal({ Component: RegisterAccountDialog })
+    showModal({
+      Component: B2BAccountFormDialog,
+      props: {
+        isAddingAccountToChild: false,
+        isRequestAccount: true,
+        primaryButtonText: t('create-account'),
+        formTitle: t('b2b-account-request'),
+        onSave: (formValues: CreateCustomerB2bAccountParams) => handleAccountRequest(formValues),
+        onClose: () => closeModal(),
+      },
+    })
+  }
+
+  const [googleReCaptcha, setGoogleReCaptcha] = useState(null)
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const settings = await builder.get('theme-setting').promise()
+      setGoogleReCaptcha(settings.data?.googleReCaptcha)
+    }
+    fetchSettings()
+  }, [])
+
+  const handleAccountRequest = async (formValues: CreateCustomerB2bAccountParams) => {
+    const variables = buildCreateCustomerB2bAccountParams(formValues)
+    if ((googleReCaptcha as any)?.reCaptchAccountCreation) {
+      try {
+        console.log('formValues', formValues)
+        // Ensure grecaptcha is available and ready
+        const siteKey = (googleReCaptcha as any)?.accountCreationSiteKey
+          ? (googleReCaptcha as any)?.accountCreationSiteKey
+          : process.env.siteKeySignup
+
+        grecaptcha.enterprise.ready(async () => {
+          const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
+            action: 'signup',
+          })
+          const payLoad = {
+            googleReCaptcha: googleReCaptcha,
+            responseKey: reCaptchaResponseCode,
+          }
+
+          const response = await fetch('/api/user/validate-recaptcha', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ payLoad }),
+          })
+
+          const result = await response.json()
+          console.log('result:', result)
+          if (result?.success === true) {
+            // Proceed with account creation API call here
+            await createCustomerB2bAccount.mutateAsync(variables)
+            closeModal()
+          } else {
+            console.log('error model')
+            closeModal()
+          }
+        })
+      } catch (error) {
+        console.error('Error handling account request:', error)
+      }
+    } else {
+      console.log('recapcha disabled')
+      await createCustomerB2bAccount.mutateAsync(variables)
+      closeModal()
+    }
   }
 
   const onForgotPassword = () => {

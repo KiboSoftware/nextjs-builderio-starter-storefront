@@ -1,0 +1,133 @@
+/*Text button custom component */
+@media (min-width: 641px) {
+  .btnContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #30299a;
+    border-bottom: 1px solid #30299a;
+    background: transparent;
+    padding-bottom: 12px;
+    transition: border-bottom 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+
+  .btnText {
+    font-family: Poppins;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+    color: #30299a;
+    margin-right: 10px;
+    transition: color 0.3s ease-in-out;
+  }
+
+  .btnArrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    position: relative;
+  }
+
+  /* Chevron icon */
+  .btnArrow::before {
+    content: 'chevron_right';
+    font-family: 'Material Icons';
+    font-size: 22px;
+    color: #30299a;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* Arrow icon */
+  .btnArrow::after {
+    content: 'arrow_forward';
+    font-family: 'Material Icons';
+    font-size: 22px;
+    color: #4c47c4;
+    position: absolute;
+    opacity: 0;
+    transform: translateX(0);
+    will-change: transform, opacity;
+    transition: opacity 0.3s linear, transform 0.3s linear;
+    backface-visibility: hidden;
+  }
+
+  .btnContainer:hover {
+    color: #4c47c4;
+    border-bottom-color: #4c47c4;
+    animation: blinkUnderline 0.3s ease-in-out;
+  }
+
+  .btnContainer:hover .btnText {
+    color: #4c47c4;
+  }
+
+  .btnContainer:hover .btnArrow::before {
+    opacity: 0;
+  }
+
+  .btnContainer:hover .btnArrow::after {
+    opacity: 1;
+    transform: translateX(5px); /* Slide arrow slightly to the right */
+  }
+  .btnContainer:not(:hover) .btnArrow::before {
+    opacity: 1;
+  }
+
+  .btnContainer:not(:hover) .btnArrow::after {
+    opacity: 0;
+    transform: translateX(0);
+    transition: transform 0.3s linear, opacity 0.1s linear;
+  }
+
+  /* Animation for blinking underline */
+  @keyframes blinkUnderline {
+    0% {
+      border-bottom-color: #30299a;
+    }
+    20% {
+      border-bottom-color: #4c47c4;
+    }
+    50% {
+      border-bottom-color: #4c47c4;
+    }
+    60% {
+      border-bottom-color: #30299a;
+    }
+    100% {
+      border-bottom-color: #30299a;
+    }
+  }
+}
+
+/*For Mobile Device*/
+
+@media (max-width: 640px) {
+  .btnContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #30299a; /* Dark purple color */
+    border-bottom: 1px solid #30299a; /* Dark purple line */
+    background: transparent;
+    padding-bottom: 12px;
+  }
+  .btnText {
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #30299a;
+    margin-right: 35px;
+  }
+  .btnArrow::before {
+    content: 'chevron_right';
+    font-family: 'Material Icons';
+    font-size: 16px;
+    color: #30299a; /* Dark purple color */
+  }
+}

@@ -1,4 +1,4 @@
-import { createTheme, responsiveFontSizes } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles'
 import type {} from '@mui/lab/themeAugmentation'
 declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions {
@@ -7,17 +7,17 @@ declare module '@mui/material/styles/createPalette' {
 }
 
 export const grey = {
-  900: '#2B2B2B',
+  900: '#020027', //Fortis theme
   // Fill Form Label Text, information text
   700: '#494949',
   // Home Page background
-  600: '#7C7C7C',
+  600: '#8D8D8D', //Fortis theme
   // Thin borders, placeholder text
-  500: '#C7C7C7',
+  500: '#6A6A6A', //Fortis theme
   // Header Accent Color, page separator bar
   400: '#CDCDCD',
   // Button background and border color
-  300: '#EAEAEA',
+  300: '#EDEDED', //Fortis theme
   // Order Summary Background
   100: '#F7F7F7',
   // Secondary Button (cancel button)
@@ -25,14 +25,14 @@ export const grey = {
 }
 
 export const red = {
-  900: '#bb2500',
+  900: '#BD3742', //Fortis theme
   // wishlist color
-  700: '#e13b0e',
-  600: '#ef4214',
-  500: '#fa4818',
-  300: '#fc825e',
-  100: '#fec9b9',
-  50: '#fbe8e6',
+  700: '#BD3742', //Fortis theme
+  600: '#BD3742', //Fortis theme
+  500: '#BD3742', //Fortis theme
+  300: '#EBC3C6', //Fortis theme
+  100: '#EBC3C6', //Fortis theme
+  50: '#EBC3C6', //Fortis theme
 }
 
 const buttonStyleOverrides = {
@@ -73,58 +73,118 @@ const buttonStyleOverrides = {
 // Create a base theme instance and define the basic design options
 let theme = createTheme({
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'Poppins',
+    htmlFontSize: 16,
     h1: {
-      fontSize: '1.75rem', // 28px
-      fontWeight: 'bold',
-      '@media (max-width:600px)': {
-        fontSize: '1.5rem', // 24px
+      fontSize: '2.5rem', // 40px
+      fontWeight: '500',
+      lineHeight: '3.438rem', // 55px
+      '@media (max-width:910px)': {
+        fontSize: '1.875rem', // 30px
+        lineHeight: '2.625rem', // 42px
       },
     },
     h2: {
-      fontSize: '1.5rem', // 24px
-      fontWeight: 'bold',
-      '@media (max-width:600px)': {
-        fontSize: '1.25rem', // 20px
+      fontSize: '2.375rem', // 38px
+      fontWeight: '500',
+      lineHeight: '3.25rem', // 52px
+      '@media (max-width:910px)': {
+        fontSize: '1.625rem', // 26px
+        lineHeight: '2.188rem', // 35px
       },
     },
     h3: {
+      fontSize: '1.875rem', // 30px
+      fontWeight: '500',
+      lineHeight: '2.813rem', // 45px
+      '@media (max-width:910px)': {
+        fontSize: '1.5rem', // 24px
+        lineHeight: '2.188rem', // 35px
+      },
+    },
+    h4: {
       fontSize: '1.25rem', // 20px
-      '@media (max-width:600px)': {
+      fontWeight: '500',
+      lineHeight: '1.563rem', // 25px
+      '@media (max-width:910px)': {
         fontSize: '1rem', // 16px
+        lineHeight: '1.375rem', // 22px
+      },
+    },
+    h5: {
+      fontSize: '1.5rem', // 24px
+      fontWeight: '300',
+      lineHeight: '2.188rem', // 35px
+      '@media (max-width:910px)': {
+        fontSize: '1.25rem', // 20px
+        lineHeight: '1.875rem', // 30px
+      },
+    },
+    h6: {
+      fontSize: '0.875rem', // 14px
+      fontWeight: '500',
+      lineHeight: '1.25rem', // 20px
+      '@media (max-width:910px)': {
+        fontSize: '0.875rem', // 14px
+        lineHeight: '1.25rem', // 20px
       },
     },
     subtitle1: {
-      fontSize: '1.125rem', // 18px
+      // footnote
+      fontSize: '0.688rem', // 11px
+      fontWeight: '500',
+      lineHeight: '1.25rem', // 20px,
     },
-    subtitle2: {
-      fontSize: '1rem', // 16px
-    },
-    // body1: {
+    // subtitle2: {
     //   fontSize: '1rem', // 16px
     // },
-    // body2: {
-    //   fontSize: '0.875rem', // 14px
-    // },
+    body1: {
+      fontSize: '1.375rem', // 22px
+      fontWeight: '300',
+      lineHeight: '2.5rem', // 40px
+      '@media (max-width:910px)': {
+        fontSize: '1.125rem', // 18px
+        lineHeight: '1.75rem', // 28px
+      },
+    },
+    body2: {
+      fontSize: '1rem', // 16px
+      fontWeight: '300',
+      lineHeight: '1.563rem', // 25px
+      '@media (max-width:910px)': {
+        fontSize: '0.875rem', // 14px
+        lineHeight: '1.375rem', // 22px
+      },
+    },
+    button: {
+      //Button1-Large
+      fontSize: '1.375rem', // 22px
+      fontWeight: '300',
+      lineHeight: '1.875rem', // 30px
+      '@media (max-width:910px)': {
+        fontSize: '1rem', // 16px
+        lineHeight: '1.5rem', // 24px
+      },
+    },
   },
   palette: {
     primary: {
-      main: '#2ea195',
-      light: '#C0E3DF',
+      main: '#30299A', //Fortis theme
+      light: '#4C47C4', //Fortis theme
     },
     secondary: {
-      main: '#c0e3df',
+      main: '#E3E2FF', //Fortis theme
       light: '#FFFFFF',
     },
     text: {
       primary: grey[900],
-      secondary: grey[600],
+      secondary: grey[500],
     },
     warning: {
-      main: '#f8ca24',
+      main: '#EBC3C6', //Fortis theme
     },
     error: {
-      main: '#e42d00',
+      main: '#BD3742', //Fortis theme
     },
     grey: { ...grey },
     red: { ...red },
@@ -161,4 +221,4 @@ let theme = createTheme({
 })
 // compose theme (place theme options that depend on the base theme here)
 theme = createTheme(theme)
-export default responsiveFontSizes(theme)
+export default theme

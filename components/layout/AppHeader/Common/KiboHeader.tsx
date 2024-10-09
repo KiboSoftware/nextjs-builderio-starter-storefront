@@ -75,7 +75,8 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
             />
           </Box>
         )}
-        <Box
+        {/* Logo */}
+        {/* <Box
           component={'section'}
           sx={{
             ...kiboHeaderStyles.logoStyles,
@@ -84,20 +85,20 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
           <Link href="/">
             <KiboLogo />
           </Link>
-        </Box>
+        </Box> */}
 
         <Box display="flex" flex={1} justifyContent={'flex-end'} gap={2}>
-          <StoreFinderIcon size={isHeaderSmall ? 'small' : 'medium'} />
+          {/* <StoreFinderIcon size={isHeaderSmall ? 'small' : 'medium'} /> */}
           <AccountIcon
             size={isHeaderSmall ? 'small' : 'medium'}
             onAccountIconClick={onAccountIconClick}
           />
-          <AccountRequestIcon
+          {/* <AccountRequestIcon
             onClick={onAccountRequestClick}
             isElementVisible={false}
             iconProps={{ fontSize: isHeaderSmall ? 'small' : 'medium' }}
             buttonText={t('b2b-account-request')}
-          />
+          /> */}
           <CartIcon size={isHeaderSmall ? 'small' : 'medium'} />
         </Box>
       </Container>
@@ -228,8 +229,6 @@ const KiboHeader = (props: KiboHeaderProps) => {
       >
         <Backdrop open={isBackdropOpen} data-testid="backdrop" />
 
-        <TopHeader navLinks={navLinks} />
-
         <Box component={'section'} sx={{ ...kiboHeaderStyles.topBarStyles }}>
           {getSection()}
         </Box>
@@ -242,7 +241,9 @@ const KiboHeader = (props: KiboHeaderProps) => {
           data-testid="mega-menu-container"
         >
           {!isCheckoutPage && (
-            <MegaMenu categoryTree={categoriesTree} onBackdropToggle={setIsBackdropOpen} />
+            <Box sx={{ display: 'flex', width: '100%' }}>
+              <MegaMenu categoryTree={categoriesTree} onBackdropToggle={setIsBackdropOpen} />
+            </Box>
           )}
         </Box>
       </AppBar>
