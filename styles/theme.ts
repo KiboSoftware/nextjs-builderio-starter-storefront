@@ -78,7 +78,7 @@ let theme = createTheme({
     h1: {
       fontSize: '2.5rem', // 40px
       fontWeight: '500',
-      lineHeight: '3.438rem', //55px
+      lineHeight: '3.438rem', // 55px
       '@media (max-width:910px)': {
         fontSize: '1.875rem', // 30px
         lineHeight: '2.625rem', // 42px
@@ -87,7 +87,7 @@ let theme = createTheme({
     h2: {
       fontSize: '2.375rem', // 38px
       fontWeight: '500',
-      lineHeight: '3.25rem', //52px
+      lineHeight: '3.25rem', // 52px
       '@media (max-width:910px)': {
         fontSize: '1.625rem', // 26px
         lineHeight: '2.188rem', // 35px
@@ -96,7 +96,7 @@ let theme = createTheme({
     h3: {
       fontSize: '1.875rem', // 30px
       fontWeight: '500',
-      lineHeight: '2.813rem', //45px
+      lineHeight: '2.813rem', // 45px
       '@media (max-width:910px)': {
         fontSize: '1.5rem', // 24px
         lineHeight: '2.188rem', // 35px
@@ -114,10 +114,10 @@ let theme = createTheme({
     h5: {
       fontSize: '1.5rem', // 24px
       fontWeight: '300',
-      lineHeight: '2.188rem', //35px
+      lineHeight: '2.188rem', // 35px
       '@media (max-width:910px)': {
         fontSize: '1.25rem', // 20px
-        lineHeight: '1.875rem', //30px
+        lineHeight: '1.875rem', // 30px
       },
     },
     h6: {
@@ -150,7 +150,7 @@ let theme = createTheme({
     body2: {
       fontSize: '1rem', // 16px
       fontWeight: '300',
-      lineHeight: '1.563rem', //25px
+      lineHeight: '1.563rem', // 25px
       '@media (max-width:910px)': {
         fontSize: '0.875rem', // 14px
         lineHeight: '1.375rem', // 22px
@@ -160,7 +160,7 @@ let theme = createTheme({
       //Button1-Large
       fontSize: '1.375rem', // 22px
       fontWeight: '300',
-      lineHeight: '1.875rem', //30px
+      lineHeight: '1.875rem', // 30px
       '@media (max-width:910px)': {
         fontSize: '1rem', // 16px
         lineHeight: '1.5rem', // 24px
