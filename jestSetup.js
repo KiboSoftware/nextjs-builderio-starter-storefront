@@ -14,6 +14,7 @@ jest.mock('next-i18next', () => ({
     return {
       t: (str) => str,
       i18n: {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         changeLanguage: () => new Promise(() => {}),
       },
     }
