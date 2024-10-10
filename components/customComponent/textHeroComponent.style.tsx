@@ -12,7 +12,7 @@ export const TextHeroStyle = {
     overflow: 'hidden',
   },
   image1: {
-    width: '71.5%',
+    width: '70.8%',
     height: '100%',
     position: 'absolute',
     top: '50%',
@@ -22,7 +22,7 @@ export const TextHeroStyle = {
     display: { xs: 'none', sm: 'block', md: 'block' },
   },
   image2: {
-    width: '71.5%',
+    width: '70.8%',
     height: '100%',
     position: 'absolute',
     top: '50%',
@@ -32,8 +32,8 @@ export const TextHeroStyle = {
     display: { xs: 'none', sm: 'block', md: 'block' },
   },
   paragraphText: {
-    width: { md: '626px', sm: '400px', xs: 'auto' },
-    height: { md: 'auto', sm: 'auto', xs: '305px' },
+    width: { md: 'auto', sm: '400px', xs: 'auto' },
+    height: { md: 'auto', sm: 'auto', xs: '283px' },
     minHeight: '327px',
     borderRadius: '5px',
     backgroundSize: { md: 'contain', sm: 'contain', xs: 'contain' },
@@ -48,14 +48,18 @@ export const TextHeroStyle = {
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    padding: { md: '30px', sm: '20px', xs: '23px' },
+    padding: { md: '30px', sm: '20px' },
+    '@media (max-width: 480px)': {
+      top: '40%',
+    },
   },
   paragraphTextP: {
     fontFamily: 'Poppins',
-    width: { md: '530px', sm: '450px', xs: 'auto' },
+    width: { md: '626px', sm: '450px', xs: 'auto' },
     fontSize: { md: '28px', sm: '20px', xs: '18px' },
     fontWeight: { md: 300, sm: 500, xs: 500 },
     lineHeight: { md: '42px', sm: '32px', xs: '30px' },
     textAlign: 'center',
+    padding: { xs: '23px' },
   },
 }
