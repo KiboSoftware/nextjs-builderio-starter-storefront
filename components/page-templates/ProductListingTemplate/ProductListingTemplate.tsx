@@ -315,7 +315,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                         display={'flex'}
                         justifyContent="center"
                         item
-                        lg={3}
+                        lg={4}
                         md={4}
                         sm={4}
                         xs={6}
@@ -331,7 +331,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                       item
                       display={'flex'}
                       justifyContent={'center'}
-                      lg={isListView ? 12 : 3}
+                      lg={isListView ? 12 : 4}
                       md={isListView ? 12 : 4}
                       sm={isListView ? 12 : 4}
                       xs={isListView ? 12 : 6}

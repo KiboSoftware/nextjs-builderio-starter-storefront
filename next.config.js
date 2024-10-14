@@ -82,7 +82,7 @@ module.exports = {
         { value: 'Oldest', id: 'createDate asc' },
       ],
       // For Infinite Scroll use this.
-      pageSize: 16,
+      pageSize: 15,
       // For Pagination use this.
       // pageSize: [15, 30, 50],
     },
