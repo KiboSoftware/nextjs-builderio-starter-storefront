@@ -79,7 +79,12 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
         <Box display="flex" flex={1} justifyContent={'flex-end'} gap={2}>
           <Box
             component={'span'}
-            sx={{ color: '#30299a', fontFamily: 'poppins', fontWeight: '400' }}
+            sx={{
+              color: 'primary.main',
+              fontFamily: 'poppins',
+              fontWeight: '500',
+              fontSize: '14px',
+            }}
           >
             CONTACT
           </Box>
@@ -207,8 +212,15 @@ const KiboHeader = (props: KiboHeaderProps) => {
           data-testid="mega-menu-container"
         >
           {!isCheckoutPage && (
-            <Container disableGutters>
-              <Box sx={{ display: 'flex', width: '100%' }}>
+            <Container
+              disableGutters
+              sx={{
+                position: 'relative', // Ensure the parent remains stable
+                overflow: 'hidden', // Avoid overflow-induced layout shifts
+                width: '100%',
+              }}
+            >
+              <Box sx={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
                 <NavigationBar />
               </Box>
             </Container>

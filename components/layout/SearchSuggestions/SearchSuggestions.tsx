@@ -160,7 +160,12 @@ const SearchSuggestions = (props: SearchSuggestionsProps) => {
           </List>
         </Paper>
       </Collapse>
-      <Backdrop open={isOpen} onClick={handleClose} data-testid="backdrop"></Backdrop>
+      <Backdrop
+        open={isOpen}
+        sx={{ visibility: 'hidden' }}
+        onClick={handleClose}
+        data-testid="backdrop"
+      ></Backdrop>
     </Stack>
   )
 }
