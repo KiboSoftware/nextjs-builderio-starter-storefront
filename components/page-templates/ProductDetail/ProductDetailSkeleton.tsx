@@ -20,11 +20,11 @@ function ProductDetailSkeleton() {
           <Skeleton height={100} />
         </Box>
 
-        <Box data-testid="product-rating">
+        {/* <Box data-testid="product-rating"> //commented rating as per WEB-920, in future if needed one can reuse this block
           <Skeleton>
             <Rating />
           </Skeleton>
-        </Box>
+        </Box> */}
 
         {Array(4)
           .fill(1)
