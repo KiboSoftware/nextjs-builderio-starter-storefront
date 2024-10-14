@@ -418,7 +418,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           )}
         </Box>
 
-        <Box data-testid="product-rating">
+        {/* <Box data-testid="product-rating">  //commented rating as per WEB-920, in future if needed one can reuse this block
           <Rating
             name="read-only"
             value={productRating}
@@ -428,7 +428,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             icon={<StarRounded color="primary" />}
             emptyIcon={<StarRounded />}
           />
-        </Box>
+        </Box> */}
 
         <Box paddingX={1} paddingY={3} display={optionsVisibility.color ? 'block' : 'none'}>
           <ColorSelector

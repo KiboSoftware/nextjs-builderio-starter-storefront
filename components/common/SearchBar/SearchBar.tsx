@@ -33,11 +33,11 @@ const style = {
     height: 'auto',
     color: 'primary.main',
     fontFamily: 'poppins',
+    fontSize: '14px',
+    fontWeight: '500',
+    fontColor: 'primary.main',
     input: {
       paddingBottom: 0,
-      '&::placeholder': {
-        color: 'primary.main',
-      },
     },
   },
   divider: { height: 20, m: 0.5 },

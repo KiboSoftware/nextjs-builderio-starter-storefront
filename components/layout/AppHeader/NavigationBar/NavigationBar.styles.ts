@@ -7,10 +7,13 @@ export const navbarStyles: SxProps = {
   alignItems: 'center',
   padding: '20px',
   backgroundColor: 'white',
-  transition: 'height 0.3s ease',
+  transition: 'height 0.3s ease-in-out',
   height: '90px',
+  minHeight: '58px',
+  maxHeight: '90px',
+  willChange: 'height',
   '&.scrolled': {
-    height: '58px', // Height when scrolled
+    height: '58px',
   },
 }
 
@@ -21,10 +24,13 @@ export const logoStyles: SxProps = {
 export const navMenuStyles: SxProps = {
   display: 'flex',
   justifyContent: 'center',
+  whiteSpace: 'nowrap',
   listStyle: 'none',
   position: 'absolute',
   left: '50%',
   transform: 'translateX(-50%)',
+  padding: '0 !important',
+  overflow: 'hidden',
 }
 
 export const navItemStyles: SxProps = {

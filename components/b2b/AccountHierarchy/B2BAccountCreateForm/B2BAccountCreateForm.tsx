@@ -286,7 +286,7 @@ const B2BAccountCreateForm = (props: AccountHierarchyFormProps) => {
                 <KiboTextBox
                   type="email"
                   value={field.value}
-                  label={t('email')}
+                  label={t('email-address')}
                   onChange={(_name, value) => field.onChange(value)}
                   onBlur={field.onBlur}
                   error={!!errors?.emailAddress}
@@ -389,7 +389,7 @@ const B2BAccountCreateForm = (props: AccountHierarchyFormProps) => {
                           dangerouslySetInnerHTML={{
                             __html:
                               t('terms-condition-checkbox-part1') +
-                              '<a href="/sale-terms">Terms and Conditions of Sale</a> and the <a href="/privacy-policy">Privacy Policy</a>',
+                              '<a href="/sale-terms">Sale Terms and Conditions</a> and the <a href="/privacy-policy">Privacy Policy</a>',
                           }}
                         />
                       }
