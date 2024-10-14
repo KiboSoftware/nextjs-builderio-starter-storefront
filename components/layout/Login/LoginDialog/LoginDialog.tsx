@@ -65,15 +65,6 @@ const LoginDialog = () => {
     })
   }
 
-  function extractDomain(email: string | string[]) {
-    // Assuming email is a valid email address
-    const atIndex = email.indexOf('@')
-    if (atIndex !== -1) {
-      return email.slice(atIndex + 1)
-    }
-    return '' // Handle invalid email format or other cases
-  }
-
   const [googleReCaptcha, setGoogleReCaptcha] = useState(null)
 
   useEffect(() => {
@@ -115,25 +106,20 @@ const LoginDialog = () => {
           console.log('result:', result)
           if (result?.success === true) {
             // Proceed with account creation API call here
-            const emailDomain = extractDomain(formValues?.emailAddress)
-            console.log('emailDomain', emailDomain)
-
-            // await createCustomerB2bAccount.mutateAsync(variables)
+            await createCustomerB2bAccount.mutateAsync(variables)
             closeModal()
           } else {
             console.log('error model')
-            // await createCustomerB2bAccount.mutateAsync(variables)
             closeModal()
           }
         })
       } catch (error) {
         console.error('Error handling account request:', error)
-        await createCustomerB2bAccount.mutateAsync(variables)
       }
     } else {
       console.log('recapcha disabled')
       await createCustomerB2bAccount.mutateAsync(variables)
-      // closeModal()
+      closeModal()
     }
   }
 

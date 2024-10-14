@@ -101,7 +101,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
   } = useProductCardActions()
 
   const [showFilterBy, setFilterBy] = useState<boolean>(false)
-  const [isListView, setIsListView] = useState<boolean>(true)
+  const [isListView, setIsListView] = useState<boolean>(false)
 
   const { t } = useTranslation('common')
   // const { showModal } = useModalContext()

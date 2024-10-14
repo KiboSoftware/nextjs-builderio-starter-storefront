@@ -11,8 +11,10 @@ export default async function handler(req, res) {
     ? googleReCaptcha.accountCreationRecaptchaErrorMsg
     : process.env.accountCreationRecaptchaErrorMsg
   if (enableB2BAccountCreationRecaptcha && responseKey) {
-    const projectId = process.env.recapchaProjectId
-    const apiKey = process.env.recapchaApiKey
+    const projectId = googleReCaptcha.projectId
+      ? googleReCaptcha.projectId
+      : process.env.recapchaProjectId
+    const apiKey = googleReCaptcha.apiKey ? googleReCaptcha.apiKey : process.env.recapchaApiKey
     const minScore = googleReCaptcha.minScore ? googleReCaptcha.minScore : process.env.minScore
     const siteKey = googleReCaptcha.accountCreationSiteKey
       ? googleReCaptcha.accountCreationSiteKey
@@ -20,8 +22,6 @@ export default async function handler(req, res) {
     // Construct the API URL
     const url = `https://recaptchaenterprise.googleapis.com/v1beta1/projects/${projectId}/assessments?key=${apiKey}`
     // console.log('url', url)
-    console.log('projectId', projectId)
-    console.log('apiKey', apiKey)
     const requestData = {
       event: {
         token: responseKey,
