@@ -70,8 +70,6 @@ const AccountHierarchyForm = (props: AccountHierarchyFormProps) => {
       lastName: '',
       emailAddress: '',
       taxId: '',
-      mailingList: false,
-      termsConditionCheck: false,
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
