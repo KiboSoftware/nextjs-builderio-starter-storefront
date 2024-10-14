@@ -25,7 +25,7 @@ export const headerActionAreaStyles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#e3e2ff',
-    paddingBlock: { xs: 0, md: 1 },
+    // paddingBlock: { xs: 0, md: 1 },
   },
   container: {
     display: 'flex',
@@ -35,7 +35,7 @@ export const headerActionAreaStyles = {
   searchSuggestionsWrapper: {
     width: '543px',
     position: 'absolute',
-    left: '50.9%',
+    left: '50%',
     transform: 'translateX(-50%)',
     flex: 1,
     display: { xs: 'none', md: 'inline-flex' },
