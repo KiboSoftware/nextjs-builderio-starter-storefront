@@ -78,7 +78,7 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
           lineHeight: '25px',
         }}
         shrink
-        htmlFor="kibo-input"
+        htmlFor={label}
       >
         {label}
       </InputLabel>

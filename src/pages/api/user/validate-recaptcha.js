@@ -11,10 +11,8 @@ export default async function handler(req, res) {
     ? googleReCaptcha.accountCreationRecaptchaErrorMsg
     : process.env.accountCreationRecaptchaErrorMsg
   if (enableB2BAccountCreationRecaptcha && responseKey) {
-    const projectId = googleReCaptcha.projectId
-      ? googleReCaptcha.projectId
-      : process.env.recapchaProjectId
-    const apiKey = googleReCaptcha.apiKey ? googleReCaptcha.apiKey : process.env.recapchaApiKey
+    const projectId = process.env.recapchaProjectId
+    const apiKey =  process.env.recapchaApiKey
     const minScore = googleReCaptcha.minScore ? googleReCaptcha.minScore : process.env.minScore
     const siteKey = googleReCaptcha.accountCreationSiteKey
       ? googleReCaptcha.accountCreationSiteKey
