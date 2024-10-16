@@ -22,8 +22,6 @@ export interface CreateCustomerB2bAccountParams {
   firstName: string
   lastName: string
   emailAddress: string
-  mailingList: boolean
-  termsConditionCheck: boolean
 }
 
 export interface EditChildAccountProps {

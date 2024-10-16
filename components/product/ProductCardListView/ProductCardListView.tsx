@@ -176,7 +176,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                 <Typography variant="body1" gutterBottom color="text.primary">
                   {title}
                 </Typography>
-                <Rating
+                {/* <Rating
                   name="read-only"
                   value={rating}
                   precision={0.5}
@@ -187,7 +187,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   }
                   emptyIcon={<StarRounded data-testid="empty-rating" fontSize="small" />}
                   data-testid="product-rating"
-                />
+                /> */}
                 <Box>
                   <Box
                     data-testid="short-description"

@@ -173,7 +173,7 @@ const ProductCard = (props: ProductCardProps) => {
                   priceRange={productPriceRange}
                   variant="body1"
                 />
-                <Rating
+                {/* <Rating
                   name="read-only"
                   value={rating}
                   precision={0.5}
@@ -182,7 +182,7 @@ const ProductCard = (props: ProductCardProps) => {
                   icon={<StarRounded color="primary" data-testid="filled-rating" />}
                   emptyIcon={<StarRounded data-testid="empty-rating" />}
                   data-testid="product-rating"
-                />
+                /> */}
                 <Box
                   pt={2}
                   textAlign={'center'}

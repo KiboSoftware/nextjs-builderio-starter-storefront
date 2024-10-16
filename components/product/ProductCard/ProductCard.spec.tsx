@@ -72,23 +72,23 @@ describe('[components] Product Card Component', () => {
       expect(image).toHaveAttribute('alt', 'product-image-alt')
     })
 
-    it('should render rating component', () => {
-      setup()
+    // it('should render rating component', () => {
+    //   setup()
 
-      const rating = screen.getByTestId('product-rating')
+    //   const rating = screen.getByTestId('product-rating')
 
-      expect(rating).toBeVisible()
-    })
+    //   expect(rating).toBeVisible()
+    // })
 
-    describe('when not providing rating prop', () => {
-      it('should show empty rating', () => {
-        setup()
+    // describe('when not providing rating prop', () => {
+    //   it('should show empty rating', () => {
+    //     setup()
 
-        const emptyRating = screen.getAllByTestId('empty-rating')
+    //     const emptyRating = screen.getAllByTestId('empty-rating')
 
-        expect(emptyRating).toHaveLength(10)
-      })
-    })
+    //     expect(emptyRating).toHaveLength(10)
+    //   })
+    // })
   })
 
   describe('Sale Price Product Card', () => {
@@ -101,15 +101,15 @@ describe('[components] Product Card Component', () => {
     })
   })
 
-  describe('Rating Product Card', () => {
-    it('should render rating component with provided rating value', () => {
-      render(<WithRating {...WithRating.args} />)
+  // describe('Rating Product Card', () => {
+  //   it('should render rating component with provided rating value', () => {
+  //     render(<WithRating {...WithRating.args} />)
 
-      const filledRating = screen.getAllByTestId('filled-rating')
+  //     const filledRating = screen.getAllByTestId('filled-rating')
 
-      expect(filledRating).toHaveLength((WithRating.args?.rating as number) * 2)
-    })
-  })
+  //     expect(filledRating).toHaveLength((WithRating.args?.rating as number) * 2)
+  //   })
+  // })
 
   describe('No Image Product Card', () => {
     it('should render Common Image placeholder', () => {

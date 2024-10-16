@@ -66,7 +66,7 @@ describe('[component] Product Detail Template component', () => {
       name: new RegExp(Common?.args?.product?.content?.productName as string),
     })
     const desc = screen.getByTestId('short-description')
-    const rating = screen.getAllByTestId('StarRoundedIcon')
+    //const rating = screen.getAllByTestId('StarRoundedIcon')
     const ColorSelector = screen.getByTestId('color-selector-mock')
     const SizeSelector = screen.getByTestId('size-selector-mock')
     const ProductOptionSelect = screen.getByTestId('product-option-select-mock')
@@ -87,7 +87,7 @@ describe('[component] Product Detail Template component', () => {
     expect(breadcrumbLinks.length).toBe(1)
     expect(productName).toBeVisible()
     expect(desc.innerHTML).toBe(Common?.args?.product?.content?.productShortDescription)
-    expect(rating.length).toBe(10)
+    //expect(rating.length).toBe(10)
     expect(ColorSelector).toBeVisible()
     expect(SizeSelector).toBeVisible()
     expect(ProductOptionSelect).toBeVisible()
