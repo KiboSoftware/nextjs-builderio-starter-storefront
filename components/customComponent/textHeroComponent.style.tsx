@@ -12,7 +12,7 @@ export const TextHeroStyle = {
     overflow: 'hidden',
   },
   image1: {
-    width: '70.8%',
+    width: '70.5%',
     height: '100%',
     position: 'absolute',
     top: '50%',
@@ -22,7 +22,7 @@ export const TextHeroStyle = {
     display: { xs: 'none', sm: 'block', md: 'block' },
   },
   image2: {
-    width: '70.8%',
+    width: '70.5%',
     height: '100%',
     position: 'absolute',
     top: '50%',
