@@ -124,12 +124,14 @@ export const LeftTextHeroStyle = {
       right: 0,
       zIndex: 2,
       marginTop: '20px',
-
+      '@media (min-width: 384px) and (max-width: 427px)': {
+        top: '69%',
+      },
       '@media (min-width: 428px) and (max-width: 500px)': {
         top: '65%',
       },
       '@media (min-width: 501px) and (max-width: 577px)': {
-        top: '64%',
+        top: '63%',
       },
       '@media (min-width: 578px) and (max-width: 599px)': {
         top: '59%',
