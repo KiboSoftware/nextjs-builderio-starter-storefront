@@ -10,6 +10,8 @@ export { default as CategoryNestedNavigation } from './CategoryNestedNavigation/
 export { default as LoginDialog } from './Login/LoginDialog/LoginDialog'
 export { default as MegaMenu } from './MegaMenu/MegaMenu'
 export { default as MegaMenuItem } from './MegaMenuItem/MegaMenuItem'
+export { default as FortisMegaMenu } from './AppHeader/FortisMegaMenu/FortisMegaMenu'
+export { default as MenuPopover } from './AppHeader/FortisMegaMenu/MenuPopover'
 export { default as SearchSuggestions } from './SearchSuggestions/SearchSuggestions'
 export { default as Footer } from './Footer/Footer'
 export { default as DefaultLayout } from './DefaultLayout/DefaultLayout'

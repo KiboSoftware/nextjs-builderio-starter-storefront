@@ -216,7 +216,7 @@ const KiboHeader = (props: KiboHeaderProps) => {
               disableGutters
               sx={{
                 position: 'relative', // Ensure the parent remains stable
-                overflow: 'hidden', // Avoid overflow-induced layout shifts
+                // overflow: 'hidden', // Avoid overflow-induced layout shifts
                 width: '100%',
               }}
             >
