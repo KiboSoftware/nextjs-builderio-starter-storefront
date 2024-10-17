@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box } from '@mui/material'
 import Link from 'next/link'
 
-import { logoStyles, navbarStyles, navItemStyles, navMenuStyles } from './NavigationBar.styles'
+import { logoStyles, navbarStyles, navMenuStyles } from './NavigationBar.styles'
+import FortisMegaMenu from '../FortisMegaMenu/FortisMegaMenu'
 import logo from '@/assets/fortisLogo.png'
 import { KiboLogo } from '@/components/common'
 
@@ -43,12 +43,7 @@ const NavigationBar = () => {
         </Link>
       </Box>
       <Box component="ul" sx={navMenuStyles}>
-        {['Products', 'Services', 'Learning Center', 'About Fortis'].map((text) => (
-          <Box component="li" sx={navItemStyles} key={text}>
-            <Link href={`/${text.toLowerCase().replace(' ', '-')}`}>{text}</Link>
-            <KeyboardArrowDownIcon sx={{ color: '#30299a', marginLeft: '10px' }} />
-          </Box>
-        ))}
+        <FortisMegaMenu scrolled={scrolled} />
       </Box>
     </Box>
   )

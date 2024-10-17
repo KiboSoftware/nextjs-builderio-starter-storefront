@@ -30,7 +30,7 @@ export const navMenuStyles: SxProps = {
   left: '50%',
   transform: 'translateX(-50%)',
   padding: '0 !important',
-  overflow: 'hidden',
+  // overflow: 'hidden',
 }
 
 export const navItemStyles: SxProps = {
