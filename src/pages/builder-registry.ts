@@ -120,10 +120,18 @@ const BuilderComponents = () => {
         type: 'string',
         friendlyName: 'Button Style',
         enum: [
-          { label: 'Primary', value: 'primary' }, // Dropdown option for "Primary"
-          { label: 'Secondary', value: 'secondary' }, // Dropdown option for "Secondary"
+          { label: 'Primary', value: 'primary' },
+          { label: 'Secondary', value: 'secondary' },
         ],
         defaultValue: 'primary',
+      },
+      {
+        name: 'url',
+        type: 'string',
+        friendlyName: 'Metadata URL',
+        helperText:
+          'Enter the URL to fetch metadata from. This will only be used if "Metadata" mode is selected.',
+        showIf: (options) => options.get('selectMode') === 'metadata', // Show only when metadata mode is selected
       },
       // Primary Fields
       {

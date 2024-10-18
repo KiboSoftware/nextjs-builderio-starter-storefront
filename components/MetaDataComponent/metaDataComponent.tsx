@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import { ArrowForwardIos } from '@mui/icons-material' // Same icon as FeaturedPageButton
+import { ArrowForwardIos } from '@mui/icons-material'
 import { Box, Typography, IconButton } from '@mui/material'
 import Image from 'next/image'
 
-import { buttonStyle } from '../customComponent/featuredPageButtonComponent.style' // Import the style
+import { buttonStyle } from './metaDataComponent.style'
 
 interface Metadata {
   title: string | null
@@ -14,81 +14,131 @@ interface Metadata {
 
 interface MetadataComponentProps {
   url: string
-  styleType: 'primary' | 'secondary' // Added to distinguish between styles
+  styleType: 'primary' | 'secondary'
+  manualImage?: string
+  manualTitle?: string
+  manualDescription?: string
 }
 
-const MetadataComponent: React.FC<MetadataComponentProps> = ({ url, styleType }) => {
+const MetadataComponent: React.FC<MetadataComponentProps> = ({
+  url,
+  styleType,
+  manualImage,
+  manualTitle,
+  manualDescription,
+}) => {
   const [metadata, setMetadata] = useState<Metadata | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     async function loadMetadata() {
-      const response = await fetch(`/api/fetchMetadata?url=${encodeURIComponent(url)}`)
-      const data = await response.json()
-      setMetadata(data)
+      if (!url) return
+      try {
+        const response = await fetch(`/api/fetchMetadata?url=${encodeURIComponent(url)}`)
+        const data = await response.json()
+        setMetadata(data)
+      } catch (error) {
+        console.error('Failed to fetch metadata:', error)
+      }
     }
     loadMetadata()
   }, [url])
 
   console.log('This is the metaData -----> ', metadata)
 
-  if (!metadata) {
+  const resolvedImage = metadata?.image || manualImage
+  const resolvedTitle = metadata?.title || manualTitle
+  const resolvedDescription = metadata?.description || manualDescription
+
+  if (!resolvedImage && !resolvedTitle && !resolvedDescription) {
     return <div>Loading...</div>
   }
 
   return (
-    <Box sx={buttonStyle.featuredButtonContainer}>
+    <Box
+      sx={{
+        ...buttonStyle.featuredButtonContainer,
+        flexDirection: {
+          xs: 'column',
+          sm: 'column',
+          md: 'column',
+        },
+        padding: { xs: '0', sm: '0', md: '0 20px' },
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Box
-        sx={
-          styleType === 'primary'
-            ? buttonStyle.primaryImageContainer
-            : buttonStyle.secondaryImageContainer
-        }
+        sx={{
+          ...buttonStyle.imageContainer,
+          width: '100%',
+          height: { xs: 'auto', sm: 'auto', md: '255px' },
+          marginBottom: { xs: '0', sm: '0', md: '0' },
+        }}
       >
-        {metadata.image && <Image src={metadata.image} alt={metadata.title || 'Image'} />}
+        {resolvedImage && (
+          <Image
+            src={resolvedImage}
+            alt={resolvedImage || 'Image'}
+            width={388}
+            height={255}
+            style={{ objectFit: 'cover' }}
+          />
+        )}
       </Box>
 
       <Box
         sx={[
           buttonStyle.featuredButtonContent,
           styleType === 'primary' && buttonStyle.primaryHoverEffect,
+          {
+            marginTop: { xs: 0, sm: 0, md: 0 },
+            paddingTop: { xs: '10px', sm: '10px', md: '0' },
+          },
         ]}
       >
         <Typography
           variant="h4"
-          sx={
+          sx={[
             styleType === 'primary'
               ? buttonStyle.primaryHeadingText
-              : buttonStyle.secondaryHeadingText
-          }
+              : buttonStyle.secondaryHeadingText,
+            isHovered && { color: '#4C47C4' },
+            { paddingTop: { xs: '20px', md: '90px' } },
+          ]}
         >
-          {metadata.title}
+          {resolvedTitle}
         </Typography>
 
         <Typography
           variant="body2"
-          sx={
+          sx={[
             styleType === 'primary'
               ? buttonStyle.primaryParagraphText
-              : buttonStyle.secondaryParagraphText
-          }
+              : buttonStyle.secondaryParagraphText,
+            isHovered && { color: '#4C47C4' },
+            { paddingTop: { xs: '10px', md: '24px' } },
+          ]}
         >
-          {metadata.description}
+          {resolvedDescription}
         </Typography>
 
         <Box sx={buttonStyle.iconContainer}>
           <IconButton
-            sx={
+            sx={[
               styleType === 'primary'
                 ? buttonStyle.arrowPrimaryButton
-                : buttonStyle.arrowSecondaryButton
-            }
+                : buttonStyle.arrowSecondaryButton,
+              isHovered && { backgroundColor: '#4C47C4' },
+            ]}
           >
             <ArrowForwardIos
-              sx={
+              sx={[
                 styleType === 'primary'
                   ? buttonStyle.primaryArrowIcon
-                  : buttonStyle.secondaryArrowIcon
-              }
+                  : buttonStyle.secondaryArrowIcon,
+                isHovered && { color: '#fff' },
+              ]}
             />
           </IconButton>
         </Box>

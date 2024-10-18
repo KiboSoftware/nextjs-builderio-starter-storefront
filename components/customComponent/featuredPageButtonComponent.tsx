@@ -10,6 +10,7 @@ import MetadataComponent from '../MetaDataComponent/metaDataComponent'
 interface FeaturedPageButtonProps {
   selectMode: 'metadata' | 'manual'
   featuredButtonStyle: 'primary' | 'secondary'
+  url?: string
   primaryImage?: string
   primaryHeadingText?: string
   primaryParagraphText?: string
@@ -26,6 +27,7 @@ const truncateText = (text: string | undefined, maxLength: number): string => {
 const FeaturedPageButton: React.FC<FeaturedPageButtonProps> = ({
   selectMode = 'manual',
   featuredButtonStyle = 'primary',
+  url,
   primaryImage,
   primaryHeadingText,
   primaryParagraphText,
@@ -45,7 +47,20 @@ const FeaturedPageButton: React.FC<FeaturedPageButtonProps> = ({
 
   // Only render content if Select Mode is set to "manual"
   if (selectMode === 'metadata') {
-    return <MetadataComponent url="https://example.com" styleType={selectedStyle} />
+    if (!url) {
+      return <Typography variant="body1">No URL provided to fetch metadata.</Typography>
+    }
+    return (
+      <MetadataComponent
+        url={url}
+        styleType={selectedStyle}
+        manualImage={selectedStyle === 'primary' ? primaryImage : secondaryImage}
+        manualTitle={selectedStyle === 'primary' ? primaryHeadingText : secondaryHeadingText}
+        manualDescription={
+          selectedStyle === 'primary' ? primaryParagraphText : secondaryParagraphText
+        }
+      />
+    )
   }
 
   return (
