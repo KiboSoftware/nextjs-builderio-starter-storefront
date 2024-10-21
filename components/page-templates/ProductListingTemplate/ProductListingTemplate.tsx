@@ -114,10 +114,18 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
 
   const handleClearAllFilters = () => {
     updateRoute('')
+    window.scrollTo({
+      top: 200,
+      behavior: 'smooth',
+    })
   }
 
   const handleSelectedTileRemoval = (selectedTile: string) => {
     updateRoute(selectedTile)
+    window.scrollTo({
+      top: 200,
+      behavior: 'smooth',
+    })
   }
 
   const productCardProps = (product: Product): ProductCardListViewProps => {
@@ -198,7 +206,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                 />
               )}
               <Box pt={4} textAlign={'center'}>
-                <Button variant="contained" color="secondary" onClick={handleClearAllFilters}>
+                <Button variant="contained" color="primary" onClick={handleClearAllFilters}>
                   {t('clear-settings')}
                 </Button>
               </Box>
