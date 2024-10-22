@@ -88,7 +88,8 @@ const ContentTiles = (props: TileProps) => {
             src={imgSource}
             alt={'content tiles'}
             layout="fill"
-            objectFit="cover"
+            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
             quality={75}
           />
         </ImageWrapper>

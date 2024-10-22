@@ -11,7 +11,7 @@ import { ProductCardStyles } from './ProductCardListView.styles'
 import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import type { ProductPriceRange } from '@/lib/gql/types'
 
@@ -167,9 +167,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   src={imageUrl ?? placeholderImageUrl}
                   alt={imageUrl ? imageAltText : 'no-image-alt'}
                   fill
-                  objectFit="contain"
+                  style={{ objectFit: 'contain' }}
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   data-testid="product-image"
-                  errorimage={placeholderImageUrl}
                 />
               </CardMedia>
               <Box flexDirection="column" m={1} width="75%" className="product-info">

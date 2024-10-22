@@ -13,7 +13,7 @@ import { ProductOptionList } from '@/components/product'
 import { useModalContext } from '@/context'
 import { cartGetters, productGetters } from '@/lib/getters'
 import { uiHelpers } from '@/lib/helpers'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import { CrOrderItem, CrProductOption, CrWishlistItem } from '@/lib/gql/types'
 
