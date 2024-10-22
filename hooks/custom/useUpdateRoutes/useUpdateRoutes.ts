@@ -30,6 +30,7 @@ export const useUpdateRoutes = () => {
       .reduce(reduceFilters(query as Record<string, string>), {})
   }
   const changeFilters = (filters: string) => {
+    const pageSize = 15
     router.push(
       {
         pathname: router?.pathname,
@@ -37,6 +38,7 @@ export const useUpdateRoutes = () => {
           ...router.query,
           ...getFiltersDataFromUrl(false),
           filters,
+          pageSize,
         },
       },
       undefined,
