@@ -175,7 +175,15 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     />
                   </Box>
                   <Box sx={featuredText}>
-                    <Typography variant="body2" sx={{ fontWeight: '600', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: '600',
+                        color: 'primary.main',
+                        height: 'auto',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {content.title}
                     </Typography>
                     <Link href={content.linkUrl} passHref>
@@ -186,6 +194,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textDecoration: 'underline',
                           textDecorationColor: '#30299A',
                           textUnderlineOffset: '6px',
+                          whiteSpace: 'normal',
                         }}
                       >
                         {content.linkText}
@@ -223,7 +232,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
             <Grid item xs={4} sx={menuSection}>
               {featuredContent.map((content, index) => (
                 <Box key={index} className="featured-item" sx={featuredContentColumn}>
-                  <Box sx={{ display: 'flex', borderRadius: '5px', overflow: 'hidden' }}>
+                  <Box
+                    sx={{ display: 'flex', borderRadius: '5px', overflow: 'hidden', width: '50%' }}
+                  >
                     <Image
                       src={content.image}
                       width={169}
@@ -233,7 +244,15 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     />
                   </Box>
                   <Box sx={featuredText}>
-                    <Typography variant="body2" sx={{ fontWeight: '600', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: '600',
+                        color: 'primary.main',
+                        height: 'auto',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {content.title}
                     </Typography>
                     <Link href={content.linkUrl} passHref>
@@ -244,6 +263,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textDecoration: 'underline',
                           textDecorationColor: '#30299A',
                           textUnderlineOffset: '6px',
+                          whiteSpace: 'normal',
                         }}
                       >
                         {content.linkText}
