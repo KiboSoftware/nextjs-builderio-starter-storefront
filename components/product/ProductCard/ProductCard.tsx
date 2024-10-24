@@ -12,7 +12,7 @@ import { ProductCardStyles } from './ProductCard.styles'
 import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import type { CrProductOption, Product, ProductPriceRange } from '@/lib/gql/types'
 export interface ProductCardProps {
@@ -160,7 +160,6 @@ const ProductCard = (props: ProductCardProps) => {
                   sizes="(max-width: 240px) 240px, 240px"
                   style={{ objectFit: 'contain' }}
                   data-testid="product-image"
-                  errorimage={placeholderImageUrl}
                 />
               </CardMedia>
               <Box flexDirection="column" m={1}>

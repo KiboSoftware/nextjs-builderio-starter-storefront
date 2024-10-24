@@ -14,6 +14,7 @@ interface HeaderActionProps {
   showTitleInMobile?: boolean
   iconFontSize?: 'small' | 'medium' | 'large'
   isElementVisible?: boolean
+  source?: string
 }
 const StyledBadge = styled(Badge)(() => ({
   '& .MuiBadge-badge': {
@@ -38,8 +39,31 @@ const HeaderAction = (props: HeaderActionProps) => {
     mobileIconColor = 'white',
     showTitleInMobile = false,
     iconFontSize = 'large',
+    source,
   } = props
   const Icon = props.icon
+
+  // Conditional rendering for mobileHeader source
+  if (source === 'mobileHeader') {
+    return (
+      <Box display="flex" alignItems="center" sx={{ cursor: 'pointer' }} onClick={onClick}>
+        <Typography
+          variant="body2"
+          color="primary"
+          component="span"
+          sx={{
+            color: 'primary.main',
+            textDecoration: 'underline',
+            textDecorationColor: '#30299A',
+            textUnderlineOffset: '6px',
+          }}
+        >
+          Account
+        </Typography>
+      </Box>
+    )
+  }
+
   return (
     <Box
       display="flex"

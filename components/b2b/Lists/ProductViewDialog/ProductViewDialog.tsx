@@ -18,7 +18,7 @@ import { KeyValueDisplay, KiboDialog, KiboImage } from '@/components/common'
 import { ProductOptionList } from '@/components/product'
 import { productGetters } from '@/lib/getters'
 import { uiHelpers } from '@/lib/helpers'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import { CrProductOption, CrWishlistItem } from '@/lib/gql/types'
 

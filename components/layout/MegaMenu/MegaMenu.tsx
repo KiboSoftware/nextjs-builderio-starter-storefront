@@ -19,7 +19,7 @@ import { useTranslation } from 'next-i18next'
 import { KiboImage } from '@/components/common'
 import { MegaMenuItem } from '@/components/layout'
 import { uiHelpers } from '@/lib/helpers'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import type { Maybe, PrCategory } from '@/lib/gql/types'
 

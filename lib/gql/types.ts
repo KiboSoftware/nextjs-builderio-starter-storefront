@@ -9437,6 +9437,18 @@ export type PrCategory = {
   updateDate: Scalars['DateTime']
 }
 
+export type MenuItem = {
+  __typename?: 'MenuItem'
+  _get?: Maybe<Scalars['AnyScalar']>
+  viewAllText: string
+  categoryLink: string
+  categoryCode: string
+  categoryName: string
+  childCategory: any[]
+  featuredContent: any[]
+  typeOfMenu: string
+}
+
 export type PrCategory_GetArgs = {
   allowUndefined?: InputMaybe<Scalars['Boolean']>
   defaultValue?: InputMaybe<Scalars['AnyScalar']>
