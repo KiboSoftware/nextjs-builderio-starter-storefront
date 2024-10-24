@@ -4,6 +4,7 @@ import GetThemeSettings from './getThemeSettings'
 
 const IpWhoIs = async () => {
   try {
+    const ipWhoIsApiKey = process.env.IP_WHO_IS_API_KEY
     const themeSettingsValues = await GetThemeSettings()
 
     if (!themeSettingsValues || !themeSettingsValues?.data) {
@@ -28,7 +29,7 @@ const IpWhoIs = async () => {
         const response = await fetch('https://api.ipify.org?format=json')
         const data = await response.json()
 
-        const res = await fetch(`https://ipwhois.app/json/${data.ip}?key=TvQbfSbE46pxtkHP`)
+        const res = await fetch(`https://ipwhois.app/json/${data.ip}?key=${ipWhoIsApiKey}`)
         const ipData = await res.json()
 
         cookienext.setCookie('ipBasedCountryCode', ipData.country_code, {
