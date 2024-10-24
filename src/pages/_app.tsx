@@ -13,6 +13,7 @@ import 'next-i18next.config'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 
+import IpWhoIs from './api/ipWhoIs'
 import BuilderComponents from './builder-registry'
 import registerDesignToken from './registerDesignToken'
 import { DefaultLayout } from '@/components/layout'
@@ -30,6 +31,8 @@ const apiKey = publicRuntimeConfig?.builderIO?.apiKey
 builder.init(apiKey) // Replace with your actual Builder.io API key
 
 BuilderComponents()
+
+IpWhoIs()
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
