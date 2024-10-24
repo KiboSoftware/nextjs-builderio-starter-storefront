@@ -54,8 +54,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
     onMouseEnter()
   }
 
-  console.log('parentLink ---> ', parentLink)
-  console.log('viewAllText ---> ', viewAllText)
+  const handleLinkClick = () => {
+    onClose() // Close the popover when a link is clicked
+  }
 
   return (
     <Paper
@@ -78,7 +79,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               {viewAllText && (
                 <Box sx={submenuItem}>
                   <Link href={parentLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {viewAllText}
                     </Typography>
                   </Link>
@@ -95,6 +100,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <Typography
                         variant="body2"
                         sx={{ paddingLeft: '16px', color: 'primary.main' }}
+                        onClick={handleLinkClick}
                       >
                         {category.categoryName}
                       </Typography>
@@ -148,7 +154,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               {activeCategory.childCategory?.map((submenu: any, index: any) => (
                 <Box key={index} sx={submenuItem}>
                   <Link href={submenu.categoryLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {submenu.categoryName}
                     </Typography>
                   </Link>
@@ -156,7 +166,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               ))}
               <Box sx={{ ...submenuItem, marginTop: '50px' }}>
                 <Link href={activeCategory.categoryLink} passHref>
-                  <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                    onClick={handleLinkClick}
+                  >
                     View All {activeCategory.categoryName}
                   </Typography>
                 </Link>
@@ -196,6 +210,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textUnderlineOffset: '6px',
                           whiteSpace: 'normal',
                         }}
+                        onClick={handleLinkClick}
                       >
                         {content.linkText}
                       </Typography>
@@ -222,7 +237,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               {childCategory.map((category, index) => (
                 <Grid item xs={6} key={index} sx={submenuItem}>
                   <Link href={category.categoryLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {category.categoryName}
                     </Typography>
                   </Link>
@@ -265,6 +284,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textUnderlineOffset: '6px',
                           whiteSpace: 'normal',
                         }}
+                        onClick={handleLinkClick}
                       >
                         {content.linkText}
                       </Typography>
