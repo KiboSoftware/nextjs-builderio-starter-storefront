@@ -396,7 +396,6 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 
 const Home: NextPageWithLayout<HomePageProps> = (props) => {
   const { page, themeSetting } = props
-  console.log('themeSetting', themeSetting)
   return (
     <>
       <BuilderComponent

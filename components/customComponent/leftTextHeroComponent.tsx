@@ -77,7 +77,7 @@ const LeftTextHero: React.FC<LeftTextHeroProps> = ({
             </>
           )}
         </Box>
-        <Box sx={{ ...LeftTextHeroStyle.leftTxtImage }} position="relative">
+        <Box sx={{ ...LeftTextHeroStyle.leftTxtImage }}>
           <Image src={leftTextImage} alt="Left Text Image" fill />
         </Box>
       </Box>
