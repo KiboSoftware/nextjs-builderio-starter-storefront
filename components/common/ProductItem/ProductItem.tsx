@@ -89,8 +89,7 @@ const ProductItem = (props: ProductItemProps) => {
             <KiboImage
               src={productGetters.handleProtocolRelativeUrl(image) || DefaultImage}
               alt={name}
-              width={80}
-              height={80}
+              style={{ objectFit: 'contain', width: '80px', height: '80px' }}
             />
           </Link>
         </Box>
