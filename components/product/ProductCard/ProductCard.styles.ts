@@ -32,6 +32,7 @@ export const ProductCardStyles = {
       opacity: 1,
     },
   },
+
   iconButton: {
     backgroundColor: 'primary.light',
     width: 50,
