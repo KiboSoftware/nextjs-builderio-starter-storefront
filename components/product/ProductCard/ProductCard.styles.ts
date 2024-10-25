@@ -11,7 +11,7 @@ export const ProductCardStyles = {
   cardRoot: {
     position: 'relative',
     padding: '0.625rem',
-    backgroundColor: '#FFF',
+    backgroundColor: 'secondary.light',
     textDecoration: 'none',
     width: 260,
     maxWidth: 260,
@@ -33,7 +33,7 @@ export const ProductCardStyles = {
     },
   },
   iconButton: {
-    backgroundColor: '#4C47C4',
+    backgroundColor: 'primary.light',
     width: 50,
     height: 50,
     borderRadius: '25px 0px',
@@ -47,7 +47,7 @@ export const ProductCardStyles = {
     right: '0px',
     '&:hover': {
       opacity: 1,
-      backgroundColor: '#4C47C4',
+      backgroundColor: 'primary.light',
     },
   },
   newTag: {
@@ -78,7 +78,7 @@ export const ProductCardStyles = {
     '&:hover': {
       backgroundColor: 'primary.main',
       '& > *': {
-        color: '#fff',
+        color: 'secondary.light',
       },
     },
   },
