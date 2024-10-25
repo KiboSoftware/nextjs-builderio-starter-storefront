@@ -59,8 +59,7 @@ const ProductView = (props: ProductViewProps) => {
                     DefaultImage
                   }
                   alt={product?.name as string}
-                  width={80}
-                  height={80}
+                  style={{ width: '80px', height: '80px' }}
                 />
               </Link>
             </Box>

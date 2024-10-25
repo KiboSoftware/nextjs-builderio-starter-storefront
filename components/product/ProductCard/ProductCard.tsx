@@ -153,7 +153,7 @@ const ProductCard = (props: ProductCardProps) => {
                 }}
               >
                 <KiboImage
-                  src={imageUrl || placeholderImageUrl}
+                  src={imageUrl ? imageUrl : placeholderImageUrl}
                   alt={imageAltText}
                   fill
                   quality={100}
