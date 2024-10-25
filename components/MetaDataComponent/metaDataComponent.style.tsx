@@ -12,6 +12,9 @@ export const buttonStyle = {
   iconContainer: {
     display: 'flex',
     justifyContent: 'end',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
   },
   imageContainer: {
     width: '100%',
@@ -35,6 +38,7 @@ export const buttonStyle = {
   featuredButtonContent: {
     width: '100%', //
     height: '374px',
+    borderRadius: '26px 0px',
     position: 'relative',
     top: { md: '0px', sm: '-15px', xs: '-15px' },
     '@media (min-width: 900px) and (max-width: 999px)': {

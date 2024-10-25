@@ -12,12 +12,16 @@ export const buttonStyle = {
   iconContainer: {
     display: 'flex',
     justifyContent: 'end',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
   },
   featuredButtonContent: {
     width: '100%',
     height: '374px',
     position: 'relative',
     top: '180px',
+    borderRadius: '26px 0px',
     zIndex: 1,
     backgroundColor: 'white',
     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
@@ -103,9 +107,6 @@ export const buttonStyle = {
     zIndex: 2,
     transition: 'box-shadow 0.3s ease',
     boxShadow: 'none',
-    '&:hover': {
-      boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.2)',
-    },
   },
   secondaryHeadingText: {
     width: '347px',
