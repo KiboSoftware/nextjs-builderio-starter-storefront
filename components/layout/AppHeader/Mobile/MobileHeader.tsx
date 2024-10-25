@@ -1,20 +1,25 @@
 import React from 'react'
 
 import SearchIcon from '@mui/icons-material/Search'
-import { Box, Grid } from '@mui/material'
+import { Grid } from '@mui/material'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
 import fortisLogo from '@/assets/fortisLogo.png'
 import { HeaderAction, KiboLogo } from '@/components/common'
-import { HamburgerIcon, StoreFinderIcon, CartIcon } from '@/components/layout'
+import { HamburgerIcon, CartIcon } from '@/components/layout'
 import { useHeaderContext } from '@/context'
+
+interface MobileHeaderProps {
+  children?: React.ReactNode
+  hideIcons?: boolean
+}
 
 const MobileHeaderStyles = {
   topBar: {
     height: '8px',
     width: '100%',
-    backgroundColor: '#E3E2FF',
+    backgroundColor: 'secondary.main',
   },
   container: {
     width: '100%',
@@ -33,7 +38,7 @@ const MobileHeaderStyles = {
   },
 }
 
-const MobileHeader = ({ children }: { children?: React.ReactNode }) => {
+const MobileHeader = ({ children, hideIcons = false }: MobileHeaderProps) => {
   const { toggleMobileSearchPortal } = useHeaderContext()
   const { t } = useTranslation('common')
 
@@ -47,7 +52,7 @@ const MobileHeader = ({ children }: { children?: React.ReactNode }) => {
           container
           spacing={2}
           data-testid="mobile-header"
-          sx={MobileHeaderStyles.container}
+          sx={{ ...MobileHeaderStyles.container, display: hideIcons ? 'none' : 'inherit' }}
         >
           <Grid item xs={1.5} sx={MobileHeaderStyles.item}>
             <HeaderAction
@@ -80,32 +85,6 @@ const MobileHeader = ({ children }: { children?: React.ReactNode }) => {
           </Grid>
         </Grid>
       </Grid>
-
-      {/* <Box sx={MobileHeaderStyles.container} data-testid="mobile-header">
-        <HeaderAction
-          title={t('search')}
-          icon={SearchIcon}
-          iconFontSize={'medium'}
-          mobileIconColor="black"
-          onClick={() => toggleMobileSearchPortal()}
-          data-testid="mobile-header-search-icon"
-        />
-
-        <CartIcon size="medium" mobileIconColor="black" data-testid="mobile-header-cart-icon" />
-
-        <Box position="relative">
-          <Link href="/" passHref>
-            <KiboLogo small />
-          </Link>
-        </Box>
-
-        <HamburgerIcon
-          size="medium"
-          mobileIconColor="black"
-          isElementVisible={true}
-          data-testid="mobile-header-hamburger-icon"
-        />
-      </Box> */}
 
       {children}
     </>

@@ -1,16 +1,7 @@
 import React from 'react'
 
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import {
-  Box,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  SwipeableDrawer,
-  Link as MuiLink,
-  Typography,
-} from '@mui/material'
+import { Box, SwipeableDrawer } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
@@ -23,7 +14,7 @@ import type { NavigationLink } from '@/lib/types'
 import type { Maybe, PrCategory } from '@/lib/gql/types'
 
 interface HamburgerMenuProps {
-  categoryTree: Maybe<PrCategory>[]
+  categoryTree?: Maybe<PrCategory>[]
   isDrawerOpen?: boolean
   navLinks?: NavigationLink[]
   marginTop?: number | string
@@ -34,7 +25,7 @@ interface HamburgerMenuProps {
 
 const styles = {
   container: {
-    width: '80vw',
+    width: '100vw',
     position: 'relative',
     height: '-webkit-fill-available',
     overflowY: 'hidden',
@@ -47,7 +38,7 @@ const styles = {
     width: '100%',
   },
   spacer: {
-    backgroundColor: 'grey.300',
+    backgroundColor: 'common.white',
     height: 19,
   },
   navLinksList: {
@@ -60,11 +51,9 @@ const styles = {
 
 const HamburgerMenu = (props: HamburgerMenuProps) => {
   const {
-    categoryTree,
     isDrawerOpen,
-    marginTop = 7,
+    marginTop = 0,
     setIsDrawerOpen,
-    navLinks,
     onAccountIconClick,
     requestAccountIconComponent,
   } = props
@@ -91,16 +80,21 @@ const HamburgerMenu = (props: HamburgerMenuProps) => {
   return (
     <>
       <SwipeableDrawer
-        anchor={'left'}
+        anchor={'right'}
         open={isDrawerOpen || false}
         onClose={() => toggleDrawer(false)}
         onOpen={() => toggleDrawer(true)}
         data-testid="hamburger-menu"
+        PaperProps={{
+          sx: {
+            height: '100vh', // Full viewport height
+            overflow: 'hidden',
+          },
+        }}
       >
         <Box sx={{ ...styles.container, marginTop: marginTop }} role="presentation">
           <Box sx={{ ...styles.menuList }}>
             <CategoryNestedNavigation
-              categoryTree={categoryTree}
               onCloseMenu={toggleDrawer}
               onCategoryClick={handleCategoryClick}
             >
@@ -114,12 +108,13 @@ const HamburgerMenu = (props: HamburgerMenuProps) => {
                   showTitleInMobile={true}
                   onClick={onAccountIconClick}
                   isElementVisible={true}
+                  source="mobileHeader"
                 />
               </Box>
             </CategoryNestedNavigation>
           </Box>
           <Box sx={{ ...styles.spacer }}></Box>
-          <List sx={{ ...styles.navLinksList }}>
+          {/* <List sx={{ ...styles.navLinksList }}>
             {navLinks?.map((nav) => (
               <Box key={nav.text}>
                 <MuiLink underline="none">
@@ -137,7 +132,7 @@ const HamburgerMenu = (props: HamburgerMenuProps) => {
                 <Divider />
               </Box>
             ))}
-          </List>
+          </List> */}
           {requestAccountIconComponent}
         </Box>
       </SwipeableDrawer>
