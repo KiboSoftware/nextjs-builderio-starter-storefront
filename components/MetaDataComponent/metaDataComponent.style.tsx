@@ -45,7 +45,7 @@ export const buttonStyle = {
       top: '-45px',
     },
     zIndex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'secondary.light',
     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease',
     '&:hover': {
@@ -57,7 +57,7 @@ export const buttonStyle = {
   primaryHeadingText: {
     width: '100%',
     height: 'auto',
-    color: '#30299A',
+    color: 'primary.main',
     fontSize: '20px',
     fontWeight: '500',
     lineHeight: '25px',
@@ -69,13 +69,13 @@ export const buttonStyle = {
     paddingLeft: '20px',
     transition: 'color 0.3s ease',
     '&:hover': {
-      color: '#4C47C4',
+      color: 'primary.light',
     },
   },
   primaryParagraphText: {
     width: '347px',
     height: 'auto',
-    color: '#30299A',
+    color: 'primary.main',
     fontSize: '16px',
     fontWeight: '300',
     lineHeight: '25px',
@@ -88,30 +88,30 @@ export const buttonStyle = {
     paddingLeft: '20px',
     transition: 'color 0.3s ease',
     '&:hover': {
-      color: '#4C47C4',
+      color: 'primary.light',
     },
   },
   arrowPrimaryButton: {
     width: '61px',
     height: '74px',
-    color: '#30299A',
+    color: 'primary.main',
     borderRadius: '26px 0px',
-    border: '1px solid #30299A',
-    backgroundColor: '#30299A',
+    border: '1px solid primary.main',
+    backgroundColor: 'primary.main',
     transition: 'background-color 0.3s ease',
     '&:hover': {
-      backgroundColor: '#4C47C4',
+      backgroundColor: 'primary.light',
     },
   },
   primaryArrowIcon: {
-    color: '#fff',
+    color: 'secondary.light',
   },
 
   /* Secondary Style */
   secondaryHeadingText: {
     width: '347px',
     height: 'auto',
-    color: '#30299A',
+    color: 'primary.main',
     fontSize: '20px',
     fontWeight: '500',
     lineHeight: '25px',
@@ -124,13 +124,13 @@ export const buttonStyle = {
     paddingLeft: '20px',
     transition: 'color 0.3s ease',
     '&:hover': {
-      color: '#4C47C4',
+      color: 'primary.light',
     },
   },
   secondaryParagraphText: {
     width: '347px',
     height: 'auto',
-    color: '#30299A',
+    color: 'primary.main',
     fontSize: '16px',
     fontWeight: '300',
     lineHeight: '25px',
@@ -143,22 +143,22 @@ export const buttonStyle = {
     paddingLeft: '20px',
     transition: 'color 0.3s ease',
     '&:hover': {
-      color: '#4C47C4',
+      color: 'primary.light',
     },
   },
   arrowSecondaryButton: {
     width: '61px',
     height: '74px',
-    color: '#E3E2FF',
+    color: 'secondary.main',
     borderRadius: '26px 0px',
-    backgroundColor: '#E3E2FF',
+    backgroundColor: 'secondary.main',
     transition: 'background-color 0.3s ease',
     '&:hover': {
-      backgroundColor: '#4C47C4',
+      backgroundColor: 'primary.light',
     },
   },
   secondaryArrowIcon: {
-    color: '#30299A',
+    color: 'primary.main',
   },
 
   /* Primary-specific hover with upward movement */
