@@ -189,7 +189,7 @@ const ImageGallery = (props: ImageGalleryProps) => {
                         placeholderImageUrl
                       }
                       alt={(image?.altText as string) || t('product-image-alt')}
-                      layout="fill"
+                      fill
                       sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       style={{ objectFit: 'contain' }}
                     />
@@ -291,7 +291,7 @@ const ImageGallery = (props: ImageGalleryProps) => {
                           ? (images[selectedImage.selectedIndex]?.altText as string)
                           : 'placeholder-image'
                       }
-                      layout="fill"
+                      fill
                       sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       style={{ objectFit: 'contain' }}
                       data-testid={`selected-image`}
