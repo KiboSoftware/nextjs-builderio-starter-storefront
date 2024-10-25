@@ -48,7 +48,7 @@ export const LeftTextHeroStyle = {
     },
   },
   leftTxtHeading: {
-    color: '#30299A',
+    color: 'primary.main',
     width: { md: '589px', sm: '400px', xs: '100%' },
     height: { md: 'auto', xs: 'auto' },
     fontFamily: 'Poppins',
@@ -76,10 +76,10 @@ export const LeftTextHeroStyle = {
     },
   },
   leftTxtPrimaryButton: {
-    backgroundColor: '#30299A',
-    color: ' #fff',
+    backgroundColor: 'primary.main',
+    color: 'secondary.light',
     borderRadius: '0px 26px',
-    border: '1px solid #FFF',
+    border: '1px solid secondary.light',
     display: 'inline-flex',
     padding: '12px 18px',
     justifyContent: 'center',
@@ -87,14 +87,14 @@ export const LeftTextHeroStyle = {
     width: 'auto',
     height: { md: '49px' },
     '&:hover': {
-      backgroundColor: '#4C47C4',
+      backgroundColor: 'primary.light',
     },
   },
   leftTxtSecondaryButton: {
-    backgroundColor: '#fff',
-    color: '#30299A',
+    backgroundColor: 'secondary.light',
+    color: 'primary.main',
     borderRadius: '0px 26px',
-    border: '1px solid #30299A',
+    border: '1px solid primary.main',
     display: 'inline-flex',
     padding: '12px 18px',
     justifyContent: 'center',
@@ -103,9 +103,9 @@ export const LeftTextHeroStyle = {
     width: 'auto',
     height: { md: '49px' },
     '&:hover': {
-      backgroundColor: '#E3E2FF',
-      border: '1px solid #E3E2FF',
-      color: '#4C47C4',
+      backgroundColor: 'secondary.main',
+      border: '1px solid secondary.main',
+      color: 'primary.light',
     },
   },
   leftTxtImage: {
@@ -127,14 +127,14 @@ export const LeftTextHeroStyle = {
       '@media (min-width: 384px) and (max-width: 427px)': {
         top: '69%',
       },
-      '@media (min-width: 428px) and (max-width: 500px)': {
-        top: '65%',
+      '@media (min-width: 428px) and (max-width: 459px)': {
+        top: '67%',
       },
-      '@media (min-width: 501px) and (max-width: 577px)': {
+      '@media (min-width: 460px) and (max-width: 532px)': {
         top: '63%',
       },
-      '@media (min-width: 578px) and (max-width: 599px)': {
-        top: '59%',
+      '@media (min-width: 533px) and (max-width: 599px)': {
+        top: '61%',
       },
     },
     '@media (min-width: 601px) and (max-width: 990px)': {

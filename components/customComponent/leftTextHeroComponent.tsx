@@ -31,11 +31,6 @@ const LeftTextHero: React.FC<LeftTextHeroProps> = ({
   const smScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'))
   const xsScreen = useMediaQuery(theme.breakpoints.between('xs', 'sm'))
 
-  const truncatedParagraph =
-    leftTextParagraph && leftTextParagraph.length > 175
-      ? `${leftTextParagraph.substring(0, 175)}...`
-      : leftTextParagraph
-
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Box sx={{ ...LeftTextHeroStyle.leftTxtHeroContainer }}>
@@ -54,7 +49,7 @@ const LeftTextHero: React.FC<LeftTextHeroProps> = ({
               </Box>
               <Box>
                 <Typography component="div" sx={{ ...LeftTextHeroStyle.leftTxtParagraph }}>
-                  {truncatedParagraph}
+                  {leftTextParagraph}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
