@@ -1,26 +1,16 @@
-import * as cookienext from 'cookies-next'
+import * as cookieNext from 'cookies-next'
 
-import GetThemeSettings from './getThemeSettings'
-
-const IpWhoIs = async () => {
+const IpWhoIs = async (countryCode: string) => {
   try {
     const ipWhoIsApiKey = process.env.IP_WHO_IS_API_KEY
-    const themeSettingsValues = await GetThemeSettings()
 
-    if (!themeSettingsValues || !themeSettingsValues?.data) {
-      console.error('Failed to load theme settings')
-      return
-    }
-
-    const countryCode = themeSettingsValues.data.ipBasedCountryCode
-
-    if (!cookienext.getCookie('ipBasedCountryCode')) {
+    if (!cookieNext.getCookie('ipBasedCountryCode')) {
       const expiryDate = new Date()
       expiryDate.setMonth(expiryDate.getMonth() + 1)
 
       // Make sure countryCode is not undefined or null
       if (countryCode && (countryCode === 'US' || countryCode === 'CA')) {
-        cookienext.setCookie('ipBasedCountryCode', countryCode, {
+        cookieNext.setCookie('ipBasedCountryCode', countryCode, {
           expires: expiryDate,
           secure: true,
         })
@@ -32,7 +22,7 @@ const IpWhoIs = async () => {
         const res = await fetch(`https://ipwhois.app/json/${data.ip}?key=${ipWhoIsApiKey}`)
         const ipData = await res.json()
 
-        cookienext.setCookie('ipBasedCountryCode', ipData.country_code, {
+        cookieNext.setCookie('ipBasedCountryCode', ipData.country_code, {
           expires: expiryDate,
           secure: true,
         })

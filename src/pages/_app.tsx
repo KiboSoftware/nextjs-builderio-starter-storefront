@@ -13,6 +13,7 @@ import 'next-i18next.config'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 
+import GetThemeSettings from './api/getThemeSettings'
 import IpWhoIs from './api/ipWhoIs'
 import BuilderComponents from './builder-registry'
 import registerDesignToken from './registerDesignToken'
@@ -31,8 +32,6 @@ const apiKey = publicRuntimeConfig?.builderIO?.apiKey
 builder.init(apiKey) // Replace with your actual Builder.io API key
 
 BuilderComponents()
-
-IpWhoIs()
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -59,8 +58,12 @@ const App = (props: KiboAppProps) => {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const settings = await builder.get('theme-setting').promise()
+      const settings = await GetThemeSettings()
       setGoogleReCaptcha(settings.data?.googleReCaptcha)
+
+      if (settings?.data?.ipBasedCountryCode) {
+        IpWhoIs(settings?.data?.ipBasedCountryCode)
+      }
     }
     fetchSettings()
   }, [])
