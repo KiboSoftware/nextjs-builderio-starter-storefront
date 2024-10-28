@@ -377,12 +377,17 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       })
     }
   }, [])
+  // Update breadcrumbs links
+  const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
+    ...breadcrumb,
+    link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
+  }))
 
   return (
     <Grid container>
       {!isQuickViewModal && (
         <Grid item xs={12} alignItems="center" sx={{ paddingBlock: 4 }}>
-          <KiboBreadcrumbs breadcrumbs={breadcrumbs} />
+          <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
         </Grid>
       )}
       <Grid item xs={12} md={6} sx={{ pb: { xs: 3, md: 0 } }}>
