@@ -1,30 +1,35 @@
-import * as cookienext from 'cookies-next'
+import * as cookieNext from 'cookies-next'
 
-import GetThemeSettings from './getThemeSettings'
+const IpWhoIs = async (countryCode: string) => {
+  try {
+    const ipWhoIsApiKey = process.env.IP_WHO_IS_API_KEY
 
-const IpWhoIs = async () => {
-  const themeSettingsValues = await GetThemeSettings()
-  const countryCode = themeSettingsValues?.data?.ipBasedCountryCode
-  if (!cookienext.getCookie('ipBasedCountryCode')) {
-    const expiryDate = new Date()
-    expiryDate.setMonth(expiryDate.getMonth() + 1)
-    if (countryCode === 'US' || countryCode === 'CA') {
-      cookienext.setCookie('ipBasedCountryCode', countryCode, {
-        expires: expiryDate,
-        secure: true,
-      })
-    } else {
-      const response = await fetch('https://api.ipify.org?format=json')
-      const data = await response.json()
+    if (!cookieNext.getCookie('ipBasedCountryCode')) {
+      const expiryDate = new Date()
+      expiryDate.setMonth(expiryDate.getMonth() + 1)
 
-      const res = await fetch(`https://ipwhois.app/json/${data.ip}?key=TvQbfSbE46pxtkHP`)
-      const ipData = await res.json()
+      // Make sure countryCode is not undefined or null
+      if (countryCode && (countryCode === 'US' || countryCode === 'CA')) {
+        cookieNext.setCookie('ipBasedCountryCode', countryCode, {
+          expires: expiryDate,
+          secure: true,
+        })
+      } else {
+        // Fallback to IP-based country detection
+        const response = await fetch('https://api.ipify.org?format=json')
+        const data = await response.json()
 
-      cookienext.setCookie('ipBasedCountryCode', ipData.country_code, {
-        expires: expiryDate,
-        secure: true,
-      })
+        const res = await fetch(`https://ipwhois.app/json/${data.ip}?key=${ipWhoIsApiKey}`)
+        const ipData = await res.json()
+
+        cookieNext.setCookie('ipBasedCountryCode', ipData.country_code, {
+          expires: expiryDate,
+          secure: true,
+        })
+      }
     }
+  } catch (error) {
+    console.error('Error fetching IP-based country code:', error)
   }
 }
 

@@ -12,6 +12,7 @@ import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
 import DefaultImage from '@/public/noImage.png'
+import DefaultImage1 from '@/public/product_placeholder.svg'
 
 import type { ProductPriceRange } from '@/lib/gql/types'
 
@@ -28,6 +29,8 @@ export interface ProductCardListViewProps {
   variationProductCode?: string
   rating?: number
   productDescription?: string
+  seoFriendlyUrl?: string
+  categoryCode?: string
   imageHeight?: number
   imageLayout?: string
   isInWishlist?: boolean
@@ -37,6 +40,9 @@ export interface ProductCardListViewProps {
   isShowWishlistIcon?: boolean
   showQuickViewButton?: boolean
   badge?: string
+  brand?: string
+  variantProductName?: string
+  newProduct?: string
   isATCLoading?: boolean
   fulfillmentTypesSupported?: string[]
   onAddOrRemoveWishlistItem?: () => Promise<void>
@@ -164,9 +170,8 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                 }}
               >
                 <KiboImage
-                  src={imageUrl ?? placeholderImageUrl}
+                  src={imageUrl ? imageUrl : placeholderImageUrl}
                   alt={imageUrl ? imageAltText : 'no-image-alt'}
-                  fill
                   style={{ objectFit: 'contain' }}
                   sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   data-testid="product-image"

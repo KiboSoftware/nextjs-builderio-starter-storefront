@@ -1,3 +1,5 @@
+import zIndex from '@mui/material/styles/zIndex'
+
 export const ProductCardStyles = {
   main: {
     '& a': {
@@ -9,21 +11,53 @@ export const ProductCardStyles = {
   cardRoot: {
     position: 'relative',
     padding: '0.625rem',
-    backgroundColor: 'transparent',
+    backgroundColor: 'secondary.light',
     textDecoration: 'none',
     width: 260,
     maxWidth: 260,
     boxShadow: 'none',
     cursor: 'pointer',
-    '&:hover .quick-actions': {
-      opacity: 1,
-    },
+    borderRadius: '0px 0px 25px 0px',
+    border: '1px solid #E3E2FF',
+    // '&:hover .quick-actions': {
+    //   opacity: 1,
+    // },
     '&:hover': {
       boxShadow: '0 2px 16px 4px rgb(11 32 61 / 7%)',
-      '.quick-view': {
-        opacity: 1,
-      },
+      // '.quick-view': {
+      //   opacity: 1,
+      // },
     },
+    '&:hover .MuiIconButton-root': {
+      opacity: 1,
+    },
+  },
+
+  iconButton: {
+    backgroundColor: 'primary.light',
+    width: 50,
+    height: 50,
+    borderRadius: '25px 0px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in-out',
+    position: 'absolute',
+    bottom: '0px',
+    right: '0px',
+    '&:hover': {
+      opacity: 1,
+      backgroundColor: 'primary.light',
+    },
+  },
+  newTag: {
+    width: 80,
+    height: 41,
+    top: '0px',
+    position: 'absolute',
+    left: '0px',
+    zIndex: 2,
   },
   quickView: {
     opacity: 0,
@@ -45,7 +79,7 @@ export const ProductCardStyles = {
     '&:hover': {
       backgroundColor: 'primary.main',
       '& > *': {
-        color: '#fff',
+        color: 'secondary.light',
       },
     },
   },

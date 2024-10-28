@@ -58,6 +58,9 @@ module.exports = {
     paymentMethodPageSize: 5,
     b2bProductSearchPageSize: 16,
     badgeAttributeFQN: 'Tenant~badge',
+    variantProductAttributeName: 'tenant~variant-product-name',
+    brandAttrName: 'tenant~brand',
+    newProductAttrName: 'tenant~new-product',
     occasionAttributeFQN: 'Tenant~occasion',
     colorAttributeFQN: 'Tenant~Color',
     sizeAttributeFQN: 'Tenant~Size',
@@ -224,5 +227,22 @@ module.exports = {
   experimental: {
     workerThreads: false,
     cpus: 1,
+  },
+  async rewrites() {
+    //custom routes
+    return [
+      {
+        source: '/products/:categoryCode', // Match category URLs of categories
+        destination: '/category/:categoryCode', // Destination of category handler
+      },
+      {
+        source: '/products/:categoryCode/:productSlug/:productCode', // Match product URLs under categories
+        destination: '/product/:productCode', // Destination for the product page
+      },
+      {
+        source: '/p/:productCode', // Match product URLs under categories
+        destination: '/product/:productCode', // Destination for the product page
+      },
+    ]
   },
 }
