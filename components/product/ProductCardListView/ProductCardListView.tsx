@@ -29,6 +29,8 @@ export interface ProductCardListViewProps {
   variationProductCode?: string
   rating?: number
   productDescription?: string
+  seoFriendlyUrl?: string
+  categoryCode?: string
   imageHeight?: number
   imageLayout?: string
   isInWishlist?: boolean
@@ -38,6 +40,9 @@ export interface ProductCardListViewProps {
   isShowWishlistIcon?: boolean
   showQuickViewButton?: boolean
   badge?: string
+  brand?: string
+  variantProductName?: string
+  newProduct?: string
   isATCLoading?: boolean
   fulfillmentTypesSupported?: string[]
   onAddOrRemoveWishlistItem?: () => Promise<void>
