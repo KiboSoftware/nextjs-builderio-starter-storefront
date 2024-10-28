@@ -29,6 +29,8 @@ export interface ProductCardListViewProps {
   variationProductCode?: string
   rating?: number
   productDescription?: string
+  seoFriendlyUrl?: string
+  categoryCode?: string
   imageHeight?: number
   imageLayout?: string
   isInWishlist?: boolean

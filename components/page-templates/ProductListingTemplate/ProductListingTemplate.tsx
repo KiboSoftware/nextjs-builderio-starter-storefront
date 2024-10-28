@@ -132,16 +132,23 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
     const variationProductCode = productGetters.getVariationProductCode(product)
+    const categoryCode = product?.categories ? product?.categories[0]?.categoryCode : undefined
+    const seoFriendlyUrl = productGetters.getSeoFriendlyUrl(product)
+    const listItemUrl =
+      categoryCode !== undefined && seoFriendlyUrl
+        ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
+        : `/product/${productCode}`
     return {
       productCode,
       variationProductCode,
+      seoFriendlyUrl,
       productDescription: productGetters.getShortDescription(product),
       showQuickViewButton: showQuickViewButton,
       badge: productGetters.getBadgeAttribute(properties),
       imageUrl:
         productGetters.getCoverImage(product) &&
         productGetters.handleProtocolRelativeUrl(productGetters.getCoverImage(product)),
-      link: getProductLink(productCode, product?.content?.seoFriendlyUrl as string),
+      link: listItemUrl as string,
       price: t<string>('currency', {
         val: productGetters.getPrice(product).regular,
       }),
@@ -169,11 +176,16 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       onClickAddToCart: (payload: any) => handleAddToCart(payload),
     }
   }
+  // Update breadcrumbs links
+  const updatedBreadcrumbsList = breadCrumbsList.map((breadcrumb) => ({
+    ...breadcrumb,
+    link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
+  }))
 
   return (
     <>
       <Box sx={{ ...PLPStyles.breadcrumbsClass }}>
-        <KiboBreadcrumbs breadcrumbs={breadCrumbsList} />
+        <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
       </Box>
 
       {productListingHeader && !showFilterBy ? (
