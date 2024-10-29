@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         'content-type': 'application/json',
         authorization: `Bearer ${authToken}`,
       },
-      body: JSON.stringify([process.env.SailsRep_Id]),
+      body: JSON.stringify([process.env.SalesRep_Id]),
     })
     res.status(200).json({
       success: true,
