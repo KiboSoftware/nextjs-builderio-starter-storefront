@@ -71,6 +71,7 @@ export const featuredText = {
   justifyContent: 'space-between',
   minHeight: '130px',
   marginLeft: '15px',
+  width: '50%',
 }
 
 export const submenuItem = {
