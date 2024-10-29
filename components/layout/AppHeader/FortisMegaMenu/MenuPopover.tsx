@@ -75,7 +75,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               xs={12}
               sx={{ height: '60px', display: 'flex', justifyContent: 'space-between' }}
             >
-              <Typography variant="h3">{parentName}</Typography>
+              <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                {parentName}
+              </Typography>
               {viewAllText && (
                 <Box sx={submenuItem}>
                   <Link href={parentLink} passHref>
@@ -225,7 +227,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
         <Box sx={megaMenuContainer}>
           <Grid container spacing={1}>
             <Grid item xs={12} sx={{ height: '60px' }}>
-              <Typography variant="h3">{parentName}</Typography>
+              <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                {parentName}
+              </Typography>
             </Grid>
             <Divider sx={dividerStyle} />
             <Grid
