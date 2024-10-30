@@ -121,7 +121,7 @@ const ProductCard = (props: ProductCardProps) => {
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
-  // console.log('Product cart tsx props: ',props);
+
   const isResourceType = productType === 'Resources' ? true : false
   const resourceTypeArr = [
     {
