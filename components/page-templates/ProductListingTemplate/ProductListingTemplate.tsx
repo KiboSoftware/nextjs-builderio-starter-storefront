@@ -79,7 +79,6 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
     onInfiniteScroll,
     showQuickViewButton = true,
   } = props
-  // console.log('product:- ',products);
   const { publicRuntimeConfig } = getConfig()
   const productsPerPageArray = publicRuntimeConfig.productListing.pageSize
   const productPerPage = pageSize || productsPerPageArray[0]
