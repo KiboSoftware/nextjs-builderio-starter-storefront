@@ -57,6 +57,9 @@ export interface ProductCardProps {
   salePrice?: string
   priceRange?: ProductPriceRange
   productCode?: string
+  resourceTypeName?: string
+  categoryCode?: string
+  productType?: string
   variantProductName?: string
   variationProductCode?: string
   rating?: number
@@ -97,6 +100,9 @@ const ProductCard = (props: ProductCardProps) => {
     title,
     brand = '',
     newProduct,
+    resourceTypeName,
+    categoryCode,
+    productType,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,
@@ -115,7 +121,42 @@ const ProductCard = (props: ProductCardProps) => {
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
-
+  // console.log('Product cart tsx props: ',props);
+  const isResourceType = productType === 'Resources' ? true : false
+  const resourceTypeArr = [
+    {
+      resourceType: 'Articles',
+      value: 'article',
+    },
+    {
+      resourceType: 'Protocol',
+      value: 'integration_instructions',
+    },
+    {
+      resourceType: 'Webinar',
+      value: 'smart_display',
+    },
+    {
+      resourceType: 'Whitepaper',
+      value: 'description',
+    },
+    {
+      resourceType: 'Ebook',
+      value: 'book_2',
+    },
+    {
+      resourceType: 'Poster',
+      value: 'image',
+    },
+    {
+      resourceType: 'Infographic',
+      value: 'area_chart',
+    },
+    {
+      resourceType: 'ApplicationNote',
+      value: 'note_stack',
+    },
+  ]
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
   const { t } = useTranslation('common')
   const handleAddOrRemoveWishlistItem = (event: MouseEvent<HTMLElement>) => {
@@ -150,6 +191,25 @@ const ProductCard = (props: ProductCardProps) => {
         <Link href={link} passHref data-testid="product-card-link">
           <Box>
             <Card sx={{ ...ProductCardStyles.cardRoot, minHeight: 321 }} data-testid="product-card">
+              {isResourceType &&
+                resourceTypeName &&
+                resourceTypeArr.map((data) => {
+                  return data.resourceType === resourceTypeName ? (
+                    <Box
+                      sx={{
+                        ...ProductCardStyles.resourceIcon,
+                        '&::before': {
+                          content: `'${data.value}'`,
+                          fontFamily: 'Material Icons',
+                          fontSize: '24px',
+                        },
+                      }}
+                    ></Box>
+                  ) : (
+                    ''
+                  )
+                })}
+
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} pb={1}>
                 {newProduct && (
                   <Box
@@ -210,7 +270,7 @@ const ProductCard = (props: ProductCardProps) => {
               </CardMedia>
               <Box flexDirection="column" m={1}>
                 <Typography variant="body1" gutterBottom color="text.primary">
-                  {brand}
+                  {isResourceType ? categoryCode : brand}
                 </Typography>
                 <Typography variant="body1" gutterBottom color="text.primary">
                   {variationProductCode ? variantProductName : title}
