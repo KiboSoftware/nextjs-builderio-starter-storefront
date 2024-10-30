@@ -31,7 +31,9 @@ export const FortisMegaMenu: React.FC<MegaMenuProps> = ({ scrolled }) => {
     async function fetchMenuContent() {
       try {
         const content = await builder.get('menu').toPromise()
-        setMenuContent(content.data?.category)
+        {
+          content && setMenuContent(content.data?.category)
+        }
       } catch (error) {
         console.error('Failed to fetch menu content:', error)
       }

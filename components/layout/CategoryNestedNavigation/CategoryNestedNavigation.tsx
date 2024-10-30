@@ -99,6 +99,7 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
   }
 
   const handleClose = (shouldClose: boolean) => {
+    reset()
     setParentCategory(null)
     onCloseMenu(shouldClose)
   }
