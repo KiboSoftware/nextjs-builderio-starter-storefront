@@ -88,4 +88,17 @@ export const ProductCardStyles = {
     color: 'common.white',
     px: 2,
   },
+  resourceIcon: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 2,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'primary.main',
+    color: 'common.white',
+    width: '46px',
+    height: '46px',
+  },
 }

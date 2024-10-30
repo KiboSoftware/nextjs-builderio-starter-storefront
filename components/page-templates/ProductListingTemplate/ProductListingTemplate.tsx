@@ -131,8 +131,10 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
   const productCardProps = (product: Product): ProductCardListViewProps => {
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
+    const resourceTypeName = productGetters.getResourceTypeName(properties)
+    const productType = product?.productType as string | undefined
     const variationProductCode = productGetters.getVariationProductCode(product)
-    const categoryCode = product?.categories ? product?.categories[0]?.categoryCode : undefined
+    const categoryCode = product?.categories?.[0]?.categoryCode as string | undefined
     const seoFriendlyUrl = productGetters.getSeoFriendlyUrl(product)
     const listItemUrl =
       categoryCode !== undefined && seoFriendlyUrl
@@ -140,6 +142,10 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
         : `/product/${productCode}`
     return {
       productCode,
+      properties,
+      resourceTypeName,
+      categoryCode,
+      productType,
       variationProductCode,
       seoFriendlyUrl,
       productDescription: productGetters.getShortDescription(product),

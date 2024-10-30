@@ -80,6 +80,8 @@ fragment productInfo on Product {
         productCode
         variationProductCode
         productUsage
+        productType
+        productTypeId
         isPackagedStandAlone
         fulfillmentTypesSupported
         upc

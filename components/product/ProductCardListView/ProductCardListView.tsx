@@ -11,6 +11,7 @@ import { ProductCardStyles } from './ProductCardListView.styles'
 import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
+import { ProductProperties } from '@/lib/types'
 import DefaultImage from '@/public/noImage.png'
 import DefaultImage1 from '@/public/product_placeholder.svg'
 
@@ -26,6 +27,9 @@ export interface ProductCardListViewProps {
   salePrice?: string
   priceRange?: ProductPriceRange
   productCode?: string
+  properties?: ProductProperties[]
+  resourceTypeName?: string
+  productType?: string
   variationProductCode?: string
   rating?: number
   productDescription?: string
@@ -67,6 +71,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     salePrice,
     priceRange,
     title,
+    properties,
+    resourceTypeName,
+    categoryCode,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,
