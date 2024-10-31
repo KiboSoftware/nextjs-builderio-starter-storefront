@@ -16,11 +16,17 @@ export async function fetchMetadata(
 
   const title =
     doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+    doc.querySelector('meta[name="title"]')?.getAttribute('content') ||
     doc.querySelector('title')?.textContent ||
     null
-  const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null
+  const image =
+    doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+    doc.querySelector('meta[name="image"]')?.getAttribute('content') ||
+    null
   const description =
-    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null
+    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+    doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
+    null
 
   return { title, image, description }
 }

@@ -176,6 +176,15 @@ export const getBrandName = (properties: ProductProperties[]): string => {
   }
   return 'attribute not found'
 }
+export const getResourceTypeName = (properties: ProductProperties[]): string => {
+  const resourceType = publicRuntimeConfig?.resourceTypeName?.toLowerCase()
+  if (Array.isArray(properties)) {
+    return properties.find((prop) => prop.attributeFQN?.toLowerCase() === resourceType)
+      ?.value as string
+  }
+  return 'Resource type not found'
+}
+
 export const getVariantProductAttributeName = (properties: ProductProperties[]): string => {
   const variantProductAttributeName =
     publicRuntimeConfig?.variantProductAttributeName?.toLowerCase()
@@ -411,6 +420,7 @@ export const productGetters = {
   getShortDescription,
   getBadgeAttribute,
   getProperties,
+  getResourceTypeName,
   getProductCharacteristics,
   getCoverImageAlt,
   getSeoFriendlyUrl,

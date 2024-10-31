@@ -31,7 +31,9 @@ export const FortisMegaMenu: React.FC<MegaMenuProps> = ({ scrolled }) => {
     async function fetchMenuContent() {
       try {
         const content = await builder.get('menu').toPromise()
-        setMenuContent(content.data?.category)
+        {
+          content && setMenuContent(content.data?.category)
+        }
       } catch (error) {
         console.error('Failed to fetch menu content:', error)
       }
@@ -68,7 +70,10 @@ export const FortisMegaMenu: React.FC<MegaMenuProps> = ({ scrolled }) => {
             onMouseOver={() => handleMouseEnter(menu)}
             onMouseLeave={handleMouseLeave}
           >
-            <Typography variant="h5" sx={{ fontSize: '16px', fontWeight: '500' }}>
+            <Typography
+              variant="h5"
+              sx={{ fontSize: '16px', fontWeight: '500', color: 'primary.main' }}
+            >
               {menu.categoryName}
             </Typography>
             {hoveredMenu === menu ? (

@@ -58,9 +58,14 @@ export interface ProductCardListViewProps {
   salePrice?: string
   priceRange?: ProductPriceRange
   productCode?: string
+  properties?: ProductProperties[]
+  resourceTypeName?: string
+  productType?: string
   variationProductCode?: string
   rating?: number
   productDescription?: string
+  seoFriendlyUrl?: string
+  categoryCode?: string
   imageHeight?: number
   imageLayout?: string
   isInWishlist?: boolean
@@ -101,6 +106,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     brand = '',
     newProduct,
     reactivity,
+    properties,
+    resourceTypeName,
+    categoryCode,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,

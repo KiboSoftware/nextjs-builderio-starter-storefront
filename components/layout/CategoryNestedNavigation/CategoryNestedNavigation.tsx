@@ -65,11 +65,6 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
 
   const router = useRouter()
 
-  const gotoCart = () => {
-    router.push('/cart')
-    onCloseMenu(true)
-  }
-
   const initialSubHeader: {
     backLink: string | null
     categoryCode: string
@@ -95,6 +90,19 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
   const [menuContent, setMenuContent] = useState<MenuItem[]>([])
   const [subHeader, setSubHeader] = useState<typeof initialSubHeader>(initialSubHeader)
   const [activeCategory, setActiveCategory] = useState<MenuItem[] | null>(menuContent)
+  const [parentCategory, setParentCategory] = useState<MenuItem | null | undefined>(null)
+
+  const gotoCart = () => {
+    router.push('/cart')
+    setParentCategory(null)
+    onCloseMenu(true)
+  }
+
+  const handleClose = (shouldClose: boolean) => {
+    reset()
+    setParentCategory(null)
+    onCloseMenu(shouldClose)
+  }
 
   const reset = () => {
     setActiveCategory(menuContent)
@@ -114,6 +122,8 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
         label: selectedCategory?.categoryName as string,
         categoryCode: selectedCategory?.categoryCode as string,
       })
+
+      setParentCategory(selectedCategory)
     } else {
       null
     }
@@ -125,8 +135,10 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
       subHeader.categoryCode
     )
 
+    setParentCategory(previousCategory)
+
     if (previousCategory === null) reset()
-    if (previousCategory === undefined) onCloseMenu(false)
+    if (previousCategory === undefined) handleClose(false)
     if (previousCategory) {
       setActiveCategory(previousCategory?.childCategory as MenuItem[])
 
@@ -144,7 +156,9 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
   }
 
   useEffect(() => {
-    if (menuContent) setActiveCategory(menuContent)
+    if (menuContent.length > 0) {
+      setActiveCategory(menuContent)
+    }
   }, [menuContent])
 
   return (
@@ -188,7 +202,7 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
                 </ListSubheader>
               </>
             )}
-            <IconButton size="small" aria-label="close-button" onClick={() => onCloseMenu(false)}>
+            <IconButton size="small" aria-label="close-button" onClick={() => handleClose(false)}>
               <Close sx={{ color: 'primary.main' }} />
             </IconButton>
           </Box>
@@ -206,43 +220,74 @@ const CategoryNestedNavigation = (props: CategoryNestedNavigationProps) => {
           </ListItem>
         )}
         {/* <Divider /> */}
-        {activeCategory?.map((category: Maybe<MenuItem>) => {
+        {activeCategory?.map((category: Maybe<MenuItem>, index: number) => {
           return (
-            <Slide
-              key={category?.categoryCode}
-              direction="right"
-              in={Boolean(activeCategory.length)}
-              appear={true}
-            >
-              <Box>
-                <ListItemButton sx={{ paddingInline: 2 }}>
-                  <Link href={category?.categoryLink || '#'} passHref legacyBehavior>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant={category?.typeOfMenu ? 'h4' : 'body2'}
-                          sx={category?.childCategory?.length ? null : styles.directLinks}
-                          color="primary"
-                        >
-                          {category?.categoryName}
-                        </Typography>
-                      }
-                      onClick={() => onCloseMenu(true)}
-                    />
-                  </Link>
+            <>
+              <Slide
+                key={category?.categoryCode || index}
+                direction="right"
+                in={Boolean(activeCategory.length)}
+                appear={true}
+              >
+                <Box>
                   {category?.childCategory?.length ? (
-                    <Box component="span">
-                      <NavigateNextIcon
-                        onClick={() => handleCategoryClick(category)}
-                        sx={{ color: 'primary.main' }}
+                    <ListItemButton
+                      sx={{ paddingInline: 2 }}
+                      onClick={() => handleCategoryClick(category)}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant={category?.typeOfMenu ? 'h4' : 'body2'}
+                            color="primary"
+                          >
+                            {category?.categoryName}
+                          </Typography>
+                        }
                       />
-                    </Box>
-                  ) : null}
-                </ListItemButton>
-              </Box>
-            </Slide>
+                      <Box component="span">
+                        <NavigateNextIcon sx={{ color: 'primary.main' }} />
+                      </Box>
+                    </ListItemButton>
+                  ) : (
+                    <ListItemButton sx={{ paddingInline: 2 }}>
+                      <Link href={category?.categoryLink || '#'} passHref legacyBehavior>
+                        <ListItemText
+                          primary={
+                            <Typography
+                              variant={category?.typeOfMenu ? 'h4' : 'body2'}
+                              sx={styles.directLinks}
+                              color="primary"
+                            >
+                              {category?.categoryName}
+                            </Typography>
+                          }
+                          onClick={() => handleClose(true)}
+                        />
+                      </Link>
+                    </ListItemButton>
+                  )}
+                </Box>
+              </Slide>
+            </>
           )
         })}
+        {parentCategory && parentCategory !== undefined && (
+          <ListItemButton sx={{ paddingInline: 2 }}>
+            <Link href={parentCategory?.categoryLink || '#'} passHref legacyBehavior>
+              <ListItemText
+                primary={
+                  <Typography variant={'body2'} sx={styles.directLinks} color="primary">
+                    {parentCategory?.viewAllText
+                      ? parentCategory.viewAllText
+                      : `View All ${parentCategory?.categoryName}`}
+                  </Typography>
+                }
+                onClick={() => handleClose(true)}
+              />
+            </Link>
+          </ListItemButton>
+        )}
         {children && subHeader.label === initialSubHeader.label && (
           <>
             <Divider variant="middle" sx={{ paddingTop: '12px', marginBottom: '16px' }} />

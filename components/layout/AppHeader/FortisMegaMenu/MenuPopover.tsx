@@ -54,8 +54,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
     onMouseEnter()
   }
 
-  console.log('parentLink ---> ', parentLink)
-  console.log('viewAllText ---> ', viewAllText)
+  const handleLinkClick = () => {
+    onClose() // Close the popover when a link is clicked
+  }
 
   return (
     <Paper
@@ -74,11 +75,17 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               xs={12}
               sx={{ height: '60px', display: 'flex', justifyContent: 'space-between' }}
             >
-              <Typography variant="h3">{parentName}</Typography>
+              <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                {parentName}
+              </Typography>
               {viewAllText && (
                 <Box sx={submenuItem}>
                   <Link href={parentLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {viewAllText}
                     </Typography>
                   </Link>
@@ -95,6 +102,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <Typography
                         variant="body2"
                         sx={{ paddingLeft: '16px', color: 'primary.main' }}
+                        onClick={handleLinkClick}
                       >
                         {category.categoryName}
                       </Typography>
@@ -148,7 +156,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               {activeCategory.childCategory?.map((submenu: any, index: any) => (
                 <Box key={index} sx={submenuItem}>
                   <Link href={submenu.categoryLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {submenu.categoryName}
                     </Typography>
                   </Link>
@@ -156,7 +168,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               ))}
               <Box sx={{ ...submenuItem, marginTop: '50px' }}>
                 <Link href={activeCategory.categoryLink} passHref>
-                  <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                    onClick={handleLinkClick}
+                  >
                     View All {activeCategory.categoryName}
                   </Typography>
                 </Link>
@@ -175,7 +191,15 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     />
                   </Box>
                   <Box sx={featuredText}>
-                    <Typography variant="body2" sx={{ fontWeight: '600', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: '600',
+                        color: 'primary.main',
+                        height: 'auto',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {content.title}
                     </Typography>
                     <Link href={content.linkUrl} passHref>
@@ -186,7 +210,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textDecoration: 'underline',
                           textDecorationColor: '#30299A',
                           textUnderlineOffset: '6px',
+                          whiteSpace: 'normal',
                         }}
+                        onClick={handleLinkClick}
                       >
                         {content.linkText}
                       </Typography>
@@ -201,7 +227,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
         <Box sx={megaMenuContainer}>
           <Grid container spacing={1}>
             <Grid item xs={12} sx={{ height: '60px' }}>
-              <Typography variant="h3">{parentName}</Typography>
+              <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                {parentName}
+              </Typography>
             </Grid>
             <Divider sx={dividerStyle} />
             <Grid
@@ -213,7 +241,11 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
               {childCategory.map((category, index) => (
                 <Grid item xs={6} key={index} sx={submenuItem}>
                   <Link href={category.categoryLink} passHref>
-                    <Typography variant="body2" sx={{ paddingLeft: '28px', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      onClick={handleLinkClick}
+                    >
                       {category.categoryName}
                     </Typography>
                   </Link>
@@ -223,7 +255,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
             <Grid item xs={4} sx={menuSection}>
               {featuredContent.map((content, index) => (
                 <Box key={index} className="featured-item" sx={featuredContentColumn}>
-                  <Box sx={{ display: 'flex', borderRadius: '5px', overflow: 'hidden' }}>
+                  <Box
+                    sx={{ display: 'flex', borderRadius: '5px', overflow: 'hidden', width: '50%' }}
+                  >
                     <Image
                       src={content.image}
                       width={169}
@@ -233,7 +267,15 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     />
                   </Box>
                   <Box sx={featuredText}>
-                    <Typography variant="body2" sx={{ fontWeight: '600', color: 'primary.main' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: '600',
+                        color: 'primary.main',
+                        height: 'auto',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {content.title}
                     </Typography>
                     <Link href={content.linkUrl} passHref>
@@ -244,7 +286,9 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                           textDecoration: 'underline',
                           textDecorationColor: '#30299A',
                           textUnderlineOffset: '6px',
+                          whiteSpace: 'normal',
                         }}
+                        onClick={handleLinkClick}
                       >
                         {content.linkText}
                       </Typography>
