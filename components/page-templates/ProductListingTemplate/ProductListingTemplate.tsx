@@ -129,6 +129,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
   }
 
   const productCardProps = (product: Product): ProductCardListViewProps => {
+    const productProperties = product.properties as ProductProperties[]
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
     const resourceTypeName = productGetters.getResourceTypeName(properties)
@@ -151,6 +152,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       productDescription: productGetters.getShortDescription(product),
       showQuickViewButton: showQuickViewButton,
       badge: productGetters.getBadgeAttribute(properties),
+      productProperties,
       imageUrl:
         productGetters.getCoverImage(product) &&
         productGetters.handleProtocolRelativeUrl(productGetters.getCoverImage(product)),

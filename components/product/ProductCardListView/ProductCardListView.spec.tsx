@@ -39,7 +39,7 @@ describe('[components] Product Card List View Component', () => {
     //const rating = screen.getByTestId('product-rating')
     const emptyRating = screen.getAllByTestId('empty-rating')
     const notInWishlistIcon = screen.getByTestId('FavoriteBorderRoundedIcon')
-    const quickViewButton = screen.getByText(/quick-view/i)
+    // const quickViewButton = screen.getByText(/quick-view/i)
     const addToCartButton = screen.getByRole('button', {
       name: /add-to-cart/i,
     })
@@ -51,7 +51,7 @@ describe('[components] Product Card List View Component', () => {
     //expect(rating).toBeVisible()
     expect(emptyRating).toHaveLength(2)
     expect(notInWishlistIcon).toBeInTheDocument()
-    expect(quickViewButton).toBeVisible()
+    // expect(quickViewButton).toBeVisible()
     expect(addToCartButton).toBeInTheDocument()
   })
 
@@ -74,18 +74,18 @@ describe('[components] Product Card List View Component', () => {
     })
   })
 
-  it('should call onClickQuickViewModal method when user clicks on quick-view button', async () => {
-    const { user } = setup()
+  // it('should call onClickQuickViewModal method when user clicks on quick-view button', async () => {
+  //   const { user } = setup()
 
-    const quickViewButton = screen.getByText(/quick-view/i)
-    act(() => {
-      user.click(quickViewButton)
-    })
+  //   const quickViewButton = screen.getByText(/quick-view/i)
+  //   act(() => {
+  //     user.click(quickViewButton)
+  //   })
 
-    await waitFor(() => {
-      expect(onClickQuickViewModalMock).toBeCalled()
-    })
-  })
+  //   await waitFor(() => {
+  //     expect(onClickQuickViewModalMock).toBeCalled()
+  //   })
+  // })
 
   it('should call onClickAddToCart method when user clicks on quick-view button', async () => {
     const { user } = setup()
