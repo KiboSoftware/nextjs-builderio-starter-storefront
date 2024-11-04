@@ -15,6 +15,7 @@ export { default as QuotesHistory } from '@/components/b2b/QuotesHistory/QuotesH
 export { default as OrderSummaryEditable } from '@/components/b2b/OrderSummaryEditable/OrderSummaryEditable'
 export { default as OrderSummarySection } from '@/components/b2b/OrderSummaryEditable/OrderSummarySection/OrderSummarySection'
 export { default as B2BAccountCreateForm } from './AccountHierarchy/B2BAccountCreateForm/B2BAccountCreateForm'
+export { default as ErrorModal } from './AccountHierarchy/ErrorModal/ErrorModal'
 
 // B2b Lists
 export { default as CreateList } from '@/components/b2b/Lists/CreateList/CreateList'

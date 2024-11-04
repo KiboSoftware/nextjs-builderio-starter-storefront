@@ -41,6 +41,47 @@ const getCurrentUrlWithQueryParams = () => {
   return window.location.href // This gives the full current URL including query params
 }
 
+async function getCustomRedirects() {
+  //custom redirects from builder/io
+  const redirectsResult = await fetch(
+    `https://cdn.builder.io/api/v3/content/custom-redirects?apiKey=${process.env.BUILDER_IO_API_KEY}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-cache',
+    }
+  )
+  if (!redirectsResult.ok) {
+    console.log('Failed to fetch custom redirects')
+    return []
+  }
+  if (redirectsResult.ok) {
+    const data = await redirectsResult.json()
+    const dataResult = data.results
+
+    // Extract all redirects from the data.urlList
+    const redirects = Array.isArray(dataResult)
+      ? dataResult
+          .map((content: any) => {
+            const urlList = content.data?.urlList || []
+            return urlList.map(
+              (urlItem: { sourceUrl: any; destinationUrl: any; redirectToPermanent: any }) => ({
+                sourceUrl: urlItem.sourceUrl,
+                destinationUrl: urlItem.destinationUrl,
+                permanent: !!urlItem.redirectToPermanent,
+              })
+            )
+          })
+          .flat()
+      : []
+    return redirects // Return the parsed JSON
+  } else {
+    return []
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   if (request.nextUrl.pathname.startsWith('/my-account')) {
@@ -77,9 +118,7 @@ export async function middleware(request: NextRequest) {
           const slugUrl =
             productSlug && categoryCode
               ? `/products/${categoryCode}/${productSlug}/${productCode}`
-              : productCode
-              ? `/p/${productCode}`
-              : `/product/${productCode}`
+              : null
 
           const redirects = await getCustomRedirects()
           const customRedirect = redirects.find((redirect) => redirect.sourceUrl === pathname)
@@ -90,59 +129,23 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(finalUrl, customRedirect.permanent ? 301 : 302)
           }
 
-          if (slugUrl) {
+          if (slugUrl && request.nextUrl.pathname !== slugUrl) {
             const slugRedirectUrl = new URL(slugUrl, request.url)
             slugRedirectUrl.search = search
             const slugRedirect = NextResponse.redirect(slugRedirectUrl)
             slugRedirect.headers.set('Cache-Control', 'no-store')
             return slugRedirect
           }
+
+          // If no custom redirect and slug URL or it's the same as the current URL, continue to the product page
+          return NextResponse.next()
         }
+
+        return NextResponse.next()
       } catch (error) {
         console.error(error)
         return NextResponse.next() // Handle error as needed
       }
-    }
-  }
-
-  async function getCustomRedirects() {
-    //custom redirects from builder/io
-    const redirectsResult = await fetch(
-      `https://cdn.builder.io/api/v3/content/custom-redirects?apiKey=${process.env.BUILDER_IO_API_KEY}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-cache',
-      }
-    )
-    if (!redirectsResult.ok) {
-      console.log('Failed to fetch custom redirects')
-      return []
-    }
-    if (redirectsResult.ok) {
-      const data = await redirectsResult.json()
-      const dataResult = data.results
-
-      // Extract all redirects from the data.urlList
-      const redirects = Array.isArray(dataResult)
-        ? dataResult
-            .map((content: any) => {
-              const urlList = content.data?.urlList || []
-              return urlList.map(
-                (urlItem: { sourceUrl: any; destinationUrl: any; redirectToPermanent: any }) => ({
-                  sourceUrl: urlItem.sourceUrl,
-                  destinationUrl: urlItem.destinationUrl,
-                  permanent: !!urlItem.redirectToPermanent,
-                })
-              )
-            })
-            .flat()
-        : []
-      return redirects // Return the parsed JSON
-    } else {
-      return []
     }
   }
 }

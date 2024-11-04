@@ -1,9 +1,21 @@
 import React, { MouseEvent } from 'react'
 
+import { ArrowForwardIos } from '@mui/icons-material'
 import FavoriteBorderRounded from '@mui/icons-material/FavoriteBorderRounded'
 import FavoriteRounded from '@mui/icons-material/FavoriteRounded'
 import StarRounded from '@mui/icons-material/StarRounded'
-import { Card, Typography, Rating, CardMedia, Box, Stack, Skeleton, Button } from '@mui/material'
+import {
+  Card,
+  Typography,
+  Rating,
+  CardMedia,
+  Box,
+  Stack,
+  Skeleton,
+  Button,
+  IconButton,
+} from '@mui/material'
+import { data } from 'cheerio/dist/commonjs/api/attributes'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
@@ -11,13 +23,33 @@ import { ProductCardStyles } from './ProductCardListView.styles'
 import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
+import { ProductProperties } from '@/lib/types'
+import abcore from '@/public/Brand_Logo/abcore-logo.png'
+import arista from '@/public/Brand_Logo/arista-logo.png'
+import bethyl from '@/public/Brand_Logo/bethyl-logo.png'
+import empirical from '@/public/Brand_Logo/empirical-logo.png'
+import fortis from '@/public/Brand_Logo/fortis-logo.png'
+import ipoc from '@/public/Brand_Logo/ipoc-logo.png'
+import nanocomposix from '@/public/Brand_Logo/nanocomposix-logo.png'
+import vector from '@/public/Brand_Logo/vector-logo.png'
 import DefaultImage from '@/public/noImage.png'
 import DefaultImage1 from '@/public/product_placeholder.svg'
 
 import type { ProductPriceRange } from '@/lib/gql/types'
+const brandImages: Record<string, string> = {
+  arista: arista.src,
+  bethyl: bethyl.src,
+  abcore: abcore.src,
+  empirical: empirical.src,
+  nanocomposix: nanocomposix.src,
+  vector: vector.src,
+  ipoc: ipoc.src,
+  fortis: fortis.src,
+}
 
 export interface ProductCardListViewProps {
   title?: string
+  newProduct?: string
   link: string
   imageUrl?: string
   placeholderImageUrl?: string
@@ -26,6 +58,9 @@ export interface ProductCardListViewProps {
   salePrice?: string
   priceRange?: ProductPriceRange
   productCode?: string
+  properties?: ProductProperties[]
+  resourceTypeName?: string
+  productType?: string
   variationProductCode?: string
   rating?: number
   productDescription?: string
@@ -41,8 +76,9 @@ export interface ProductCardListViewProps {
   showQuickViewButton?: boolean
   badge?: string
   brand?: string
+  productProperties?: ProductProperties[]
+  reactivity?: string
   variantProductName?: string
-  newProduct?: string
   isATCLoading?: boolean
   fulfillmentTypesSupported?: string[]
   onAddOrRemoveWishlistItem?: () => Promise<void>
@@ -67,6 +103,12 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     salePrice,
     priceRange,
     title,
+    brand = '',
+    newProduct,
+    reactivity,
+    properties,
+    resourceTypeName,
+    categoryCode,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,
@@ -78,14 +120,23 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     isInWishlist = false,
     isShowWishlistIcon = true,
     badge,
+    productProperties,
     showQuickViewButton = false,
     productCode,
+    variantProductName,
     variationProductCode,
     fulfillmentTypesSupported,
     onAddOrRemoveWishlistItem,
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
+
+  const brandProperties = productProperties?.find(
+    (prop) => prop.attributeFQN?.toLowerCase() === 'tenant~brand'
+  )
+  const brandLabel = (
+    brandProperties?.values as { value: string; stringValue: string }[] | undefined
+  )?.[0]?.stringValue
 
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
 
@@ -123,6 +174,16 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
         <Link href={link} passHref data-testid="product-card-link">
           <Box>
             <Card sx={ProductCardStyles.cardRoot} data-testid="product-card">
+              <Box>
+                {newProduct === 'true' && (
+                  <Box
+                    sx={{ ...ProductCardStyles.listNewTag }}
+                    style={{
+                      backgroundImage: `url('/NewTag.svg')`,
+                    }}
+                  />
+                )}
+              </Box>
               {isShowWishlistIcon && (
                 <Box
                   className="wishlist-button-container"
@@ -170,7 +231,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                 }}
               >
                 <KiboImage
-                  src={imageUrl ? imageUrl : placeholderImageUrl}
+                  src={imageUrl || brandImages[brand.toLowerCase()] || placeholderImageUrl}
                   alt={imageUrl ? imageAltText : 'no-image-alt'}
                   style={{ objectFit: 'contain' }}
                   sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -178,9 +239,35 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                 />
               </CardMedia>
               <Box flexDirection="column" m={1} width="75%" className="product-info">
-                <Typography variant="body1" gutterBottom color="text.primary">
-                  {title}
-                </Typography>
+                <Box display="flex" alignItems="center" width="100%">
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    color="text.primary"
+                    sx={ProductCardStyles.productTitle}
+                  >
+                    {variationProductCode ? variantProductName : title}
+                  </Typography>
+                  {brandImages[brand.toLowerCase()] && (
+                    <Box
+                      component="img"
+                      src={brandImages[brand.toLowerCase()]}
+                      alt={`${brand}-logo`}
+                      sx={ProductCardStyles.brandLogoImage}
+                      data-testid="brand-logo"
+                    />
+                  )}
+                </Box>
+                <Box sx={ProductCardStyles.brandStyle}>
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    color="text.primary"
+                    sx={ProductCardStyles.brandLable}
+                  >
+                    {brandLabel}
+                  </Typography>
+                </Box>
                 {/* <Rating
                   name="read-only"
                   value={rating}
@@ -201,17 +288,17 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                     }}
                   />
                 </Box>
-                <Box py={1}>
+                {/* <Box py={1}>
                   <Price
                     price={price}
                     salePrice={salePrice}
                     priceRange={productPriceRange}
                     variant="body1"
                   />
-                </Box>
+                </Box> */}
 
                 <Box pt={1} display={'flex'} gap={2}>
-                  {showQuickViewButton ? (
+                  {/* {showQuickViewButton ? (
                     <Button
                       variant="contained"
                       color="primary"
@@ -219,7 +306,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                     >
                       {t('quick-view')}
                     </Button>
-                  ) : null}
+                  ) : null} */}
                   {isShowWishlistIcon && (
                     <Button variant="contained" color="primary" onClick={handleAddToCart}>
                       {t('add-to-cart')}
@@ -227,6 +314,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   )}
                 </Box>
               </Box>
+              <IconButton sx={ProductCardStyles.listIconButton}>
+                <ArrowForwardIos sx={{ color: 'white' }} />
+              </IconButton>
             </Card>
           </Box>
         </Link>

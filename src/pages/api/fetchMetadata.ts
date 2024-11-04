@@ -23,9 +23,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const html = await response.text()
     const $ = cheerio.load(html) // Load HTML into cheerio
 
-    const title = $('meta[property="og:title"]').attr('content') || $('title').text() || null
-    const image = $('meta[property="og:image"]').attr('content') || null
-    const description = $('meta[property="og:description"]').attr('content') || null
+    const title =
+      $('meta[property="og:title"]').attr('content') ||
+      $('meta[name="title"]').attr('content') ||
+      $('title').text() ||
+      null
+    const image =
+      $('meta[property="og:image"]').attr('content') ||
+      $('meta[name="image"]').attr('content') ||
+      null
+    const description =
+      $('meta[property="og:description"]').attr('content') ||
+      $('meta[name="description"]').attr('content') ||
+      null
 
     res.status(200).json({ title, image, description })
   } catch (error) {

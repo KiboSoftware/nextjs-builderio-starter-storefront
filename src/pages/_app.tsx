@@ -59,7 +59,7 @@ const App = (props: KiboAppProps) => {
   useEffect(() => {
     const fetchSettings = async () => {
       const settings = await GetThemeSettings()
-      setGoogleReCaptcha(settings.data?.googleReCaptcha)
+      setGoogleReCaptcha(settings?.data?.googleReCaptcha)
 
       if (settings?.data?.ipBasedCountryCode) {
         IpWhoIs(settings?.data?.ipBasedCountryCode)
