@@ -20,8 +20,10 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify([process.env.SalesRep_Id]),
     })
+    const data = await response.json()
     res.status(200).json({
       success: true,
+      response: data,
     })
   } catch (error) {
     console.error('Error in Adding Sails Rep', error)
