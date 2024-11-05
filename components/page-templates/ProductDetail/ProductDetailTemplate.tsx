@@ -19,6 +19,7 @@ import {
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
+import ProductSpecifications from './ProductSpecifications'
 import {
   FulfillmentOptions,
   KiboRadio,
@@ -623,7 +624,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           {children}
         </>
       )}
-
+      <ProductSpecifications product={product} />
       {!isQuickViewModal && children}
     </Grid>
   )
