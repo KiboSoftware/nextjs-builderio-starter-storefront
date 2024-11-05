@@ -4,7 +4,17 @@ import React, { SyntheticEvent, useState } from 'react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import { Box, FormControl, Button, Link, Checkbox, FormControlLabel } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  Button,
+  Link,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Typography,
+  Divider,
+} from '@mui/material'
 import { useTranslation } from 'next-i18next'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
@@ -25,6 +35,7 @@ export type LoginData = {
 export interface LoginContentProps {
   onLogin: (data: LoginData) => void
   onForgotPasswordClick: () => void
+  onRegisterNow: () => void
 }
 
 const styles = {
@@ -37,7 +48,7 @@ const styles = {
 }
 
 const LoginContent = (props: LoginContentProps) => {
-  const { onLogin, onForgotPasswordClick } = props
+  const { onLogin, onForgotPasswordClick, onRegisterNow } = props
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false)
@@ -84,10 +95,14 @@ const LoginContent = (props: LoginContentProps) => {
     e.preventDefault()
     onForgotPasswordClick()
   }
+  const registerNow = (e: SyntheticEvent<Element, Event>) => {
+    e.preventDefault()
+    onRegisterNow()
+  }
 
   return (
     <Box
-      sx={{ ...styles.contentBox }}
+      sx={{ ...styles.contentBox, padding: '0px' }}
       data-testid="kibo-login-content"
       component="form"
       onSubmit={handleSubmit(handleLogin)}
@@ -102,7 +117,7 @@ const LoginContent = (props: LoginContentProps) => {
             <KiboTextBox
               name="email"
               value={field.value}
-              label={t('email')}
+              label={t('email-address')}
               ref={null}
               required
               sx={{ ...styles.formInput }}
@@ -138,33 +153,105 @@ const LoginContent = (props: LoginContentProps) => {
             />
           )}
         />
-        <FormControlLabel
+        {/* <FormControlLabel
           sx={{ pb: 2 }}
           control={<Checkbox onChange={(_, checked) => setIsRememberMe(checked)} />}
           label={t('remember-me')}
           labelPlacement="end"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ fontSize: '18px' }}
-          disabled={!isValid}
-          type="submit"
-          form="loginForm"
-        >
-          {t('log-in')}
-        </Button>
-      </FormControl>
-      <Box pt={2} display="flex" justifyContent="center">
+        /> */}
         <Link
           component="button"
           variant="body1"
           color="text.primary"
           onClick={handleForgotPassword}
+          sx={{
+            color: 'primary.main',
+            textDecoration: 'underline',
+            fontFamily: 'Poppins',
+            fontSize: '16px',
+            fontStyle: 'normal',
+            fontWeight: '300',
+            lineHeight: '25px',
+            display: 'flex',
+          }}
         >
           {t('forgot-password')}
         </Link>
-      </Box>
+        <Grid container columnSpacing={{ md: 5 }}>
+          <Grid item sm={12} xs={12}>
+            <Divider
+              sx={{
+                borderColor: 'grey.300',
+                margin: '20px 0px',
+              }}
+            />
+          </Grid>
+          <Grid
+            item
+            sm={12}
+            xs={12}
+            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: { md: 'flex-start', xs: 'center' },
+                flexDirection: 'column',
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'grey.900' }}>
+                {t('do-not-have-an-account')}
+              </Typography>
+              <Link
+                component="button"
+                variant="body2"
+                color="text.primary"
+                onClick={registerNow}
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                  fontFamily: 'Poppins',
+                  fontSize: '16px',
+                  fontStyle: 'normal',
+                  fontWeight: '300',
+                  lineHeight: '25px',
+                  display: 'flex',
+                }}
+              >
+                {t('create-an-account')}
+              </Link>
+            </Box>
+            <Button
+              variant="contained"
+              sx={{
+                width: 'auto',
+                backgroundColor: !isValid ? 'grey.600' : 'primary.main',
+                color: 'secondary.light',
+                textAlign: 'center',
+                fontFamily: 'Poppins',
+                fontSize: '16px',
+                fontStyle: 'normal',
+                fontWeight: '500',
+                lineHeight: '24px',
+                borderRadius: '0px 26px',
+                border: !isValid ? '1px solid grey.600' : '1px solid primary.main',
+                padding: '12px 30px',
+                '&:hover': {
+                  backgroundColor: !isValid ? 'grey.600' : 'primary.light',
+                  border: !isValid ? '1px solid grey.600' : '1px solid primary.light',
+                },
+                marginLeft: '20px',
+              }}
+              disabled={!isValid}
+              type="submit"
+              form="loginForm"
+            >
+              {t('log-in')}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormControl>
     </Box>
   )
 }

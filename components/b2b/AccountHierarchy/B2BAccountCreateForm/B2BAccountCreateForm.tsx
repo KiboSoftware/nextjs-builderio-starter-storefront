@@ -402,7 +402,7 @@ const B2BAccountCreateForm = (props: AccountHierarchyFormProps) => {
           <Grid item sm={12} xs={12}>
             <Divider
               sx={{
-                borderColor: '#EDEDED',
+                borderColor: 'grey.300',
                 marginBottom: '20px',
               }}
             />
