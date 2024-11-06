@@ -43,7 +43,7 @@ const styles = {
     padding: '0.875rem',
   },
   formInput: {
-    width: '100%',
+    maxWidth: '386px',
   },
 }
 
@@ -108,7 +108,7 @@ const LoginContent = (props: LoginContentProps) => {
       onSubmit={handleSubmit(handleLogin)}
       id="loginForm"
     >
-      <FormControl sx={{ width: '100%' }}>
+      <FormControl sx={{ width: '100%', marginBottom: '20px' }}>
         <Controller
           name="email"
           control={control}

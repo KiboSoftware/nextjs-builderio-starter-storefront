@@ -36,7 +36,7 @@ const LoginFooter = (props: LoginFooterProps) => {
   return (
     <StyledActionsComponent>
       <Typography variant="h3" color={'primary'} pb={1}>
-        {t('dont-have-an-account-yet')}
+        {t('do-not-have-an-account-yet')}
       </Typography>
       <Link component="button" variant="body1" color="text.primary" onClick={onRegisterNow}>
         {t('register-now')}
@@ -109,26 +109,34 @@ const LoginDialog = () => {
         // Ensure grecaptcha is available and ready
         const siteKey = (googleReCaptcha as any)?.accountCreationSiteKey
           ? (googleReCaptcha as any)?.accountCreationSiteKey
-          : process.env.siteKeySignup
+          : process.env.accountCreationSiteKey
 
-        grecaptcha.enterprise.ready(async () => {
-          const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
-            action: 'signup',
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+          grecaptcha.enterprise.ready(async () => {
+            try {
+              const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
+                action: 'signup',
+              })
+              const payLoad = {
+                googleReCaptcha: googleReCaptcha,
+                responseKey: reCaptchaResponseCode,
+              }
+              const response = await fetch('/api/user/validate-recaptcha', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ payLoad }),
+              })
+              const data = await response.json()
+              processUpdatedVariables(data, entityResult, variables)
+            } catch (error) {
+              processUpdatedVariables(null, entityResult, variables)
+            }
           })
-          const payLoad = {
-            googleReCaptcha: googleReCaptcha,
-            responseKey: reCaptchaResponseCode,
-          }
-          const response = await fetch('/api/user/validate-recaptcha', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ payLoad }),
-          })
-          const data = await response.json()
-          processUpdatedVariables(data, entityResult, variables)
-        })
+        } else {
+          processUpdatedVariables(null, entityResult, variables)
+        }
       } catch (error) {
         processUpdatedVariables(null, entityResult, variables)
       }
