@@ -4,13 +4,20 @@ import { Typography, Box, useTheme, useMediaQuery, Stack, Link } from '@mui/mate
 import { useTranslation } from 'next-i18next'
 
 import Content, { ResetPasswordInputData } from '../Content/Content'
-import { KiboDialog } from '@/components/common'
+import { CustomDialog, KiboDialog } from '@/components/common'
 import { LoginDialog } from '@/components/layout'
 import { useModalContext } from '@/context/ModalContext'
 import { useResetPassword } from '@/hooks'
 
 const resetPasswordStyles = {
-  title: { fontWeight: 'bold', display: 'block', marginLeft: '0.75rem', color: 'text.primary' },
+  title: {
+    color: 'primary.main',
+    fontFamily: 'Poppins',
+    fontSize: '30px',
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: '45px',
+  },
   actionsContainer: {
     width: '100%',
     flexDirection: 'column',
@@ -21,11 +28,16 @@ const resetPasswordStyles = {
   },
   link: {
     textDecoration: 'underline',
-    color: 'text.primary',
+    color: 'primary.main',
+    fontFamily: 'Poppins',
+    fontSize: '16px',
+    fontStyle: 'normal',
+    fontWeight: '300',
+    lineHeight: '25px',
   },
 }
 
-const customMaxWidth = '32.375rem'
+const customMaxWidth = '600px'
 
 const ResetPasswordDialog = () => {
   const { t } = useTranslation('common')
@@ -57,22 +69,22 @@ const ResetPasswordDialog = () => {
     </Box>
   )
 
-  const Actions = (
-    <Stack data-testid="actions-component" sx={{ ...resetPasswordStyles.actionsContainer }}>
-      <Link
-        component="button"
-        variant="body1"
-        aria-label={t('login-to-your-account')}
-        onClick={gotoLogin}
-        sx={{ ...resetPasswordStyles.link }}
-      >
-        {t('login-to-your-account')}
-      </Link>
-    </Stack>
-  )
+  // const Actions = (
+  //   <Stack data-testid="actions-component" sx={{ ...resetPasswordStyles.actionsContainer }}>
+  //     <Link
+  //       component="button"
+  //       variant="body1"
+  //       aria-label={t('login-to-your-account')}
+  //       onClick={gotoLogin}
+  //       sx={{ ...resetPasswordStyles.link }}
+  //     >
+  //       {t('login-to-your-account')}
+  //     </Link>
+  //   </Stack>
+  // )
 
   return (
-    <KiboDialog
+    <CustomDialog
       Title={Title}
       Content={
         <Content
@@ -81,10 +93,13 @@ const ResetPasswordDialog = () => {
           isResetPassword={isResetPassword}
         />
       }
-      Actions={Actions}
+      Actions={''}
       isDialogCentered={true}
       customMaxWidth={customMaxWidth}
       onClose={closeModal}
+      showCloseButton
+      showContentTopDivider={false}
+      showContentBottomDivider={false}
     />
   )
 }
