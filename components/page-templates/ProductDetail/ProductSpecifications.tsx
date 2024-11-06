@@ -83,40 +83,7 @@ const ProductSpecifications = ({ product }: { product: any }) => {
                 paddingLeft: '20px',
               }}
             >
-              {value}{' '}
-              {attributeFQN === 'tenant~applications-variant' ? (
-                <Link
-                  href="/"
-                  style={{
-                    color: '#30299A',
-                    fontFamily: 'Poppins',
-                    fontSize: '16px',
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: '42px',
-                    textDecorationLine: 'underline',
-                    marginLeft: '20px',
-                  }}
-                >
-                  View Application Dilution Ranges
-                </Link>
-              ) : attributeFQN === 'tenant~buffer' ? (
-                <Link
-                  href="/"
-                  style={{
-                    display: 'block',
-                    color: '#30299A',
-                    fontFamily: 'Poppins',
-                    fontSize: '16px',
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    lineHeight: '42px',
-                    textDecorationLine: 'underline',
-                  }}
-                >
-                  Request Formulation Change
-                </Link>
-              ) : null}
+              {value}
             </TableCell>
           </TableRow>
         )
