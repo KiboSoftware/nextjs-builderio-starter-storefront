@@ -132,6 +132,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
     const productProperties = product.properties as ProductProperties[]
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
+    const sliceValue = product.sliceValue as string | undefined
     const resourceTypeName = productGetters.getResourceTypeName(properties)
     const productType = product?.productType as string | undefined
     const variationProductCode = productGetters.getVariationProductCode(product)
@@ -148,6 +149,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       categoryCode,
       productType,
       variationProductCode,
+      sliceValue,
       seoFriendlyUrl,
       productDescription: productGetters.getShortDescription(product),
       showQuickViewButton: showQuickViewButton,

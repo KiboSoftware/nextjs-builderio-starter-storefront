@@ -77,6 +77,7 @@ export interface ProductCardListViewProps {
   badge?: string
   brand?: string
   productProperties?: ProductProperties[]
+  sliceValue?: string
   reactivity?: string
   variantProductName?: string
   isATCLoading?: boolean
@@ -123,6 +124,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     productProperties,
     showQuickViewButton = false,
     productCode,
+    sliceValue,
     variantProductName,
     variationProductCode,
     fulfillmentTypesSupported,
