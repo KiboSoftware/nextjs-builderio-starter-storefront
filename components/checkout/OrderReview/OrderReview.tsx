@@ -258,8 +258,7 @@ const OrderReview = (props: OrderReviewProps) => {
                   <KiboImage
                     src={getCreditCardLogo(paymentMethod?.cardType)}
                     alt={paymentMethod?.cardType}
-                    width={45}
-                    height={35}
+                    style={{ objectFit: 'contain', width: '45px', height: '35px' }}
                   />
                   <Stack>
                     <Typography variant="body1">{paymentMethod?.cardNumberPartOrMask}</Typography>

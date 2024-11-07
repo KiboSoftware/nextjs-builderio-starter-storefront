@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
+import { useLazyQuery } from '@apollo/client'
 import builder from '@builder.io/react'
 import { Stack, Typography, Link, styled } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 
-import { KiboDialog } from '@/components/common'
+import { CustomDialog, KiboDialog } from '@/components/common'
 import { B2BAccountFormDialog } from '@/components/dialogs'
 import { RegisterAccountDialog, ResetPasswordDialog } from '@/components/layout'
 import LoginContent, { LoginData } from '@/components/layout/Login/LoginContent/LoginContent'
@@ -35,7 +36,7 @@ const LoginFooter = (props: LoginFooterProps) => {
   return (
     <StyledActionsComponent>
       <Typography variant="h3" color={'primary'} pb={1}>
-        {t('dont-have-an-account-yet')}
+        {t('do-not-have-an-account-yet')}
       </Typography>
       <Link component="button" variant="body1" color="text.primary" onClick={onRegisterNow}>
         {t('register-now')}
@@ -59,10 +60,20 @@ const LoginDialog = () => {
         isRequestAccount: true,
         primaryButtonText: t('create-account'),
         formTitle: t('b2b-account-request'),
+        isAccountCreationError: false,
         onSave: (formValues: CreateCustomerB2bAccountParams) => handleAccountRequest(formValues),
         onClose: () => closeModal(),
       },
     })
+  }
+
+  function extractDomain(email: string | string[]) {
+    // Assuming email is a valid email address
+    const atIndex = email.indexOf('@')
+    if (atIndex !== -1) {
+      return email.slice(atIndex + 1)
+    }
+    return '' // Handle invalid email format or other cases
   }
 
   const [googleReCaptcha, setGoogleReCaptcha] = useState(null)
@@ -77,49 +88,145 @@ const LoginDialog = () => {
 
   const handleAccountRequest = async (formValues: CreateCustomerB2bAccountParams) => {
     const variables = buildCreateCustomerB2bAccountParams(formValues)
+    const emailDomain = extractDomain(formValues?.emailAddress)
+    const entityListFullName = 'B2BAccountMapping@fortis'
+    const entityPayLoad = {
+      entityListFullName: entityListFullName,
+      id: emailDomain,
+    }
+    const entityResponse = await fetch('/api/user/get-entity', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ entityPayLoad }),
+    })
+
+    const entityResult = await entityResponse.json()
+
     if ((googleReCaptcha as any)?.reCaptchAccountCreation) {
       try {
-        console.log('formValues', formValues)
         // Ensure grecaptcha is available and ready
         const siteKey = (googleReCaptcha as any)?.accountCreationSiteKey
           ? (googleReCaptcha as any)?.accountCreationSiteKey
-          : process.env.siteKeySignup
+          : process.env.accountCreationSiteKey
 
-        grecaptcha.enterprise.ready(async () => {
-          const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
-            action: 'signup',
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+          grecaptcha.enterprise.ready(async () => {
+            try {
+              const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
+                action: 'signup',
+              })
+              const payLoad = {
+                googleReCaptcha: googleReCaptcha,
+                responseKey: reCaptchaResponseCode,
+              }
+              const response = await fetch('/api/user/validate-recaptcha', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ payLoad }),
+              })
+              const data = await response.json()
+              processUpdatedVariables(data, entityResult, variables)
+            } catch (error) {
+              processUpdatedVariables(null, entityResult, variables)
+            }
           })
-          const payLoad = {
-            googleReCaptcha: googleReCaptcha,
-            responseKey: reCaptchaResponseCode,
-          }
+        } else {
+          processUpdatedVariables(null, entityResult, variables)
+        }
+      } catch (error) {
+        processUpdatedVariables(null, entityResult, variables)
+      }
+    } else {
+      processUpdatedVariables(null, entityResult, variables)
+    }
+  }
 
-          const response = await fetch('/api/user/validate-recaptcha', {
+  const processUpdatedVariables = async (result: any, entityResult: any, variables: any) => {
+    const updatedVariables = {
+      ...variables,
+      b2BAccountInput: {
+        ...variables.b2BAccountInput,
+        ...(entityResult?.entityDetails?.externalID && {
+          externalId: entityResult.entityDetails.externalID,
+        }),
+        ...(result?.success
+          ? {
+              attributes: [
+                {
+                  fullyQualifiedName: 'tenant~recaptcha-score',
+                  values: result?.score,
+                },
+              ],
+            }
+          : {}),
+      },
+    }
+
+    try {
+      const createAccount = await createCustomerB2bAccount.mutateAsync(updatedVariables)
+      // Handle success
+      if (createAccount?.id) {
+        const accountId = createAccount?.id
+        const purchaseOrderPayLoad = {
+          accountId: accountId,
+        }
+        const addingSalesRep = await fetch('/api/user/addSalesRep', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ purchaseOrderPayLoad }),
+        })
+
+        const salesRepDetails = await addingSalesRep.json()
+        if (salesRepDetails?.success === true) {
+          const activeAccount = await fetch('/api/user/b2baccountActive', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ payLoad }),
+            body: JSON.stringify({ purchaseOrderPayLoad }),
           })
 
-          const result = await response.json()
-          console.log('result:', result)
-          if (result?.success === true) {
-            // Proceed with account creation API call here
-            await createCustomerB2bAccount.mutateAsync(variables)
-            closeModal()
-          } else {
-            console.log('error model')
-            closeModal()
+          const activeAccountDetails = await activeAccount.json()
+          if (activeAccountDetails?.success === true) {
+            if (
+              entityResult?.entityDetails?.creditLine === 'true' ||
+              entityResult?.entityDetails?.creditLine === true
+            ) {
+              const purchaseOrder = await fetch('/api/user/create-purchase-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ purchaseOrderPayLoad }),
+              })
+              const purchaseOrderResponse = await purchaseOrder.json()
+              if (purchaseOrderResponse?.success === true) {
+                closeModal()
+              }
+            } else {
+              closeModal()
+            }
           }
-        })
-      } catch (error) {
-        console.error('Error handling account request:', error)
+        }
+
+        closeModal()
       }
-    } else {
-      console.log('recapcha disabled')
-      await createCustomerB2bAccount.mutateAsync(variables)
-      closeModal()
+    } catch (error) {
+      showModal({
+        Component: B2BAccountFormDialog,
+        props: {
+          primaryButtonText: t('contact-us'),
+          formTitle: t('b2b-account-request'),
+          isAccountCreationError: true,
+          onClose: () => closeModal(),
+        },
+      })
     }
   }
 
@@ -132,11 +239,20 @@ const LoginDialog = () => {
   }
 
   return (
-    <KiboDialog
+    <CustomDialog
+      showCloseButton
+      showContentTopDivider={false}
+      showContentBottomDivider={false}
+      Actions={''}
       Title={t('log-in')}
-      Content={<LoginContent onLogin={handleLogin} onForgotPasswordClick={onForgotPassword} />}
-      Actions={<LoginFooter onRegisterNow={onRegisterClick} />}
-      customMaxWidth="32.375rem"
+      Content={
+        <LoginContent
+          onLogin={handleLogin}
+          onForgotPasswordClick={onForgotPassword}
+          onRegisterNow={onRegisterClick}
+        />
+      }
+      customMaxWidth="600px"
       onClose={closeModal}
     />
   )

@@ -18,7 +18,7 @@ import { KeyValueDisplay, KiboDialog, KiboImage } from '@/components/common'
 import { ProductOptionList } from '@/components/product'
 import { productGetters } from '@/lib/getters'
 import { uiHelpers } from '@/lib/helpers'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import { CrProductOption, CrWishlistItem } from '@/lib/gql/types'
 
@@ -59,8 +59,7 @@ const ProductView = (props: ProductViewProps) => {
                     DefaultImage
                   }
                   alt={product?.name as string}
-                  width={80}
-                  height={80}
+                  style={{ width: '80px', height: '80px' }}
                 />
               </Link>
             </Box>

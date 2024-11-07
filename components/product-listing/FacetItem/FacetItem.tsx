@@ -44,6 +44,10 @@ const FacetItem = (props: FacetItemProps) => {
 
   const handleChange = () => {
     shouldRouteUpdate ? updateRoute(filterValue) : handleFacetSelection(filterValue)
+    window.scrollTo({
+      top: 200,
+      behavior: 'smooth',
+    })
   }
 
   const handleFacetSelection = (selectedFacetItem: string) =>

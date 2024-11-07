@@ -16,7 +16,7 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import { KiboImage } from '@/components/common'
 import { productGetters } from '@/lib/getters'
 import { swipeDetect } from '@/lib/helpers'
-import DefaultImage from '@/public/product_placeholder.svg'
+import DefaultImage from '@/public/noImage.png'
 
 import type { ProductImage } from '@/lib/gql/types'
 
@@ -189,9 +189,9 @@ const ImageGallery = (props: ImageGalleryProps) => {
                         placeholderImageUrl
                       }
                       alt={(image?.altText as string) || t('product-image-alt')}
-                      layout="fill"
-                      objectFit="contain"
-                      errorimage={placeholderImageUrl}
+                      fill
+                      sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      style={{ objectFit: 'contain' }}
                     />
                   </Box>
                 )
@@ -291,8 +291,9 @@ const ImageGallery = (props: ImageGalleryProps) => {
                           ? (images[selectedImage.selectedIndex]?.altText as string)
                           : 'placeholder-image'
                       }
-                      layout="fill"
-                      objectFit="contain"
+                      fill
+                      sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      style={{ objectFit: 'contain' }}
                       data-testid={`selected-image`}
                     />
                   </Box>

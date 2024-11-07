@@ -1,23 +1,11 @@
 import React, { useState } from 'react'
 
-import {
-  Collapse,
-  Box,
-  AppBar,
-  Backdrop,
-  Container,
-  useMediaQuery,
-  useTheme,
-  styled,
-  Theme,
-} from '@mui/material'
+import { Collapse, Box, AppBar, Backdrop, Container, useMediaQuery, useTheme } from '@mui/material'
 import getConfig from 'next/config'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
 import { headerActionAreaStyles, kiboHeaderStyles, topHeaderStyles } from './FortisHeader.styles'
-import { KiboLogo } from '@/components/common'
 import { AccountHierarchyFormDialog } from '@/components/dialogs'
 import {
   AccountIcon,
@@ -25,13 +13,12 @@ import {
   CheckoutHeader,
   HamburgerMenu,
   LoginDialog,
-  MegaMenu,
   MobileHeader,
   NavigationBar,
   SearchSuggestions,
 } from '@/components/layout'
 import { useAuthContext, useHeaderContext, useModalContext } from '@/context'
-import { useCreateCustomerB2bAccountMutation, useGetCategoryTree } from '@/hooks'
+import { useCreateCustomerB2bAccountMutation } from '@/hooks'
 import { buildCreateCustomerB2bAccountParams } from '@/lib/helpers'
 import type { CreateCustomerB2bAccountParams, NavigationLink } from '@/lib/types'
 
@@ -99,14 +86,8 @@ const HeaderActionArea = (props: HeaderActionAreaProps) => {
   )
 }
 
-const StyledLink = styled(Link)(({ theme }: { theme: Theme }) => ({
-  color: theme?.palette.common.black,
-  fontSize: theme?.typography.body1.fontSize,
-}))
-
 const KiboHeader = (props: KiboHeaderProps) => {
-  const { navLinks, categoriesTree: initialCategoryTree, isSticky = true } = props
-  const { data: categoriesTree } = useGetCategoryTree(initialCategoryTree)
+  const { navLinks, isSticky = true } = props
   const { headerState, toggleMobileSearchPortal, toggleHamburgerMenu } = useHeaderContext()
   const { isAuthenticated } = useAuthContext()
   const { showModal, closeModal } = useModalContext()
@@ -158,7 +139,7 @@ const KiboHeader = (props: KiboHeaderProps) => {
 
     if (!mdScreen)
       return (
-        <MobileHeader>
+        <MobileHeader hideIcons={isHamburgerMenuVisible}>
           <Collapse in={isMobileSearchPortalVisible}>
             <Box
               height={'80px'}
@@ -172,7 +153,6 @@ const KiboHeader = (props: KiboHeaderProps) => {
             </Box>
           </Collapse>
           <HamburgerMenu
-            categoryTree={categoriesTree || []}
             isDrawerOpen={isHamburgerMenuVisible}
             setIsDrawerOpen={() => toggleHamburgerMenu()}
             navLinks={navLinks}
@@ -216,7 +196,7 @@ const KiboHeader = (props: KiboHeaderProps) => {
               disableGutters
               sx={{
                 position: 'relative', // Ensure the parent remains stable
-                overflow: 'hidden', // Avoid overflow-induced layout shifts
+                // overflow: 'hidden', // Avoid overflow-induced layout shifts
                 width: '100%',
               }}
             >

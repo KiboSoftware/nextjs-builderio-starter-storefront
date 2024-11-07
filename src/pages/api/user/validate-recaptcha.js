@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     ? googleReCaptcha.accountCreationRecaptchaErrorMsg
     : process.env.accountCreationRecaptchaErrorMsg
   if (enableB2BAccountCreationRecaptcha && responseKey) {
-    const projectId = process.env.recapchaProjectId
-    const apiKey =  process.env.recapchaApiKey
+    const projectId = process.env.recaptchaProjectId
+    const apiKey = process.env.recaptchaApiKey
     const minScore = googleReCaptcha.minScore ? googleReCaptcha.minScore : process.env.minScore
     const siteKey = googleReCaptcha.accountCreationSiteKey
       ? googleReCaptcha.accountCreationSiteKey
@@ -64,6 +64,7 @@ export default async function handler(req, res) {
       res.status(500).json({
         message: 'Internal server error',
         success: false,
+        error: error,
       })
     }
   } else {

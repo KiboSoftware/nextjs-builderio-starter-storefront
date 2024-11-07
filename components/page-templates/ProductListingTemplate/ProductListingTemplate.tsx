@@ -114,26 +114,49 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
 
   const handleClearAllFilters = () => {
     updateRoute('')
+    window.scrollTo({
+      top: 200,
+      behavior: 'smooth',
+    })
   }
 
   const handleSelectedTileRemoval = (selectedTile: string) => {
     updateRoute(selectedTile)
+    window.scrollTo({
+      top: 200,
+      behavior: 'smooth',
+    })
   }
 
   const productCardProps = (product: Product): ProductCardListViewProps => {
+    const productProperties = product.properties as ProductProperties[]
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
+    const resourceTypeName = productGetters.getResourceTypeName(properties)
+    const productType = product?.productType as string | undefined
     const variationProductCode = productGetters.getVariationProductCode(product)
+    const categoryCode = product?.categories?.[0]?.categoryCode as string | undefined
+    const seoFriendlyUrl = productGetters.getSeoFriendlyUrl(product)
+    const listItemUrl =
+      categoryCode !== undefined && seoFriendlyUrl
+        ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
+        : `/product/${productCode}`
     return {
       productCode,
+      properties,
+      resourceTypeName,
+      categoryCode,
+      productType,
       variationProductCode,
+      seoFriendlyUrl,
       productDescription: productGetters.getShortDescription(product),
       showQuickViewButton: showQuickViewButton,
       badge: productGetters.getBadgeAttribute(properties),
+      productProperties,
       imageUrl:
         productGetters.getCoverImage(product) &&
         productGetters.handleProtocolRelativeUrl(productGetters.getCoverImage(product)),
-      link: getProductLink(productCode, product?.content?.seoFriendlyUrl as string),
+      link: listItemUrl as string,
       price: t<string>('currency', {
         val: productGetters.getPrice(product).regular,
       }),
@@ -144,6 +167,9 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       }),
       priceRange: productGetters.getPriceRange(product),
       title: productGetters.getName(product),
+      brand: productGetters.getBrandName(properties),
+      newProduct: productGetters.getNewProductAttrName(properties),
+      variantProductName: productGetters.getVariantProductAttributeName(properties),
       rating: productGetters.getRating(product),
       isInWishlist: checkProductInWishlist({
         productCode,
@@ -158,11 +184,16 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       onClickAddToCart: (payload: any) => handleAddToCart(payload),
     }
   }
+  // Update breadcrumbs links
+  const updatedBreadcrumbsList = breadCrumbsList.map((breadcrumb) => ({
+    ...breadcrumb,
+    link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
+  }))
 
   return (
     <>
       <Box sx={{ ...PLPStyles.breadcrumbsClass }}>
-        <KiboBreadcrumbs breadcrumbs={breadCrumbsList} />
+        <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
       </Box>
 
       {productListingHeader && !showFilterBy ? (
@@ -198,7 +229,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                 />
               )}
               <Box pt={4} textAlign={'center'}>
-                <Button variant="contained" color="secondary" onClick={handleClearAllFilters}>
+                <Button variant="contained" color="primary" onClick={handleClearAllFilters}>
                   {t('clear-settings')}
                 </Button>
               </Box>
