@@ -20,6 +20,10 @@ interface MetadataComponentProps {
   manualDescription?: string
 }
 
+const truncateDescription = (desc: string | null | undefined): string | null => {
+  return desc && desc.length > 160 ? `${desc.slice(0, 160)}…` : desc || null
+}
+
 const MetadataComponent: React.FC<MetadataComponentProps> = ({
   url,
   styleType,
@@ -48,7 +52,7 @@ const MetadataComponent: React.FC<MetadataComponentProps> = ({
 
   const resolvedImage = metadata?.image || manualImage
   const resolvedTitle = metadata?.title || manualTitle
-  const resolvedDescription = metadata?.description || manualDescription
+  const resolvedDescription = truncateDescription(metadata?.description || manualDescription)
 
   if (!resolvedImage && !resolvedTitle && !resolvedDescription) {
     return <div>Loading...</div>
