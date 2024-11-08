@@ -1,11 +1,12 @@
 import * as cookieNext from 'cookies-next'
 
 const IpWhoIs = async (countryCode: string) => {
+  let expiryDate: any
   try {
     const ipWhoIsApiKey = process.env.IP_WHO_IS_API_KEY
 
     if (!cookieNext.getCookie('ipBasedCountryCode')) {
-      const expiryDate = new Date()
+      expiryDate = new Date()
       expiryDate.setMonth(expiryDate.getMonth() + 1)
 
       // Make sure countryCode is not undefined or null
@@ -29,6 +30,10 @@ const IpWhoIs = async (countryCode: string) => {
       }
     }
   } catch (error) {
+    cookieNext.setCookie('ipBasedCountryCode', 'US', {
+      expires: expiryDate,
+      secure: true,
+    })
     console.error('Error fetching IP-based country code:', error)
   }
 }
