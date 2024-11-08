@@ -138,10 +138,15 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
     const variationProductCode = productGetters.getVariationProductCode(product)
     const categoryCode = product?.categories?.[0]?.categoryCode as string | undefined
     const seoFriendlyUrl = productGetters.getSeoFriendlyUrl(product)
-    const listItemUrl =
+    let listItemUrl =
       categoryCode !== undefined && seoFriendlyUrl
         ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
         : `/product/${productCode}`
+    // Append query parameter if sliceValue is present
+    if (product?.sliceValue) {
+      const separator = listItemUrl.includes('?') ? '&' : '?' // Check if the URL already has query params
+      listItemUrl += `${separator}sliceValue=${encodeURIComponent(product?.sliceValue)}`
+    }
     return {
       productCode,
       properties,
