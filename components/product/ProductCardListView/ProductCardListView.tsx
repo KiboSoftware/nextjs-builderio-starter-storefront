@@ -283,12 +283,12 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   data-testid="product-rating"
                 /> */}
                 <Box>
-                  <Box
+                  {/* <Box
                     data-testid="short-description"
                     dangerouslySetInnerHTML={{
                       __html: productDescription,
                     }}
-                  />
+                  /> */}
                 </Box>
                 {/* <Box py={1}>
                   <Price
