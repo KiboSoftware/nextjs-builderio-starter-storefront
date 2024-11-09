@@ -22,6 +22,7 @@ import { useTranslation } from 'next-i18next'
 
 import { ProductCardStyles } from './ProductCard.styles'
 import { KiboImage, Price } from '@/components/common'
+import resourceTypeArr from '@/components/common/ResourceTypeArr'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
 import abcore from '@/public/Brand_Logo/abcore-logo.png'
@@ -59,6 +60,7 @@ export interface ProductCardProps {
   productCode?: string
   resourceTypeName?: string
   categoryCode?: string
+  parentCategoryName?: string
   productType?: string
   variantProductName?: string
   variationProductCode?: string
@@ -89,7 +91,7 @@ const ProductCardSkeleton = () => {
     </Stack>
   )
 }
-const ProductCard = (props: ProductCardProps) => {
+const ResourceProductCardGridView = (props: ProductCardProps) => {
   const {
     productCode,
     variationProductCode,
@@ -102,6 +104,7 @@ const ProductCard = (props: ProductCardProps) => {
     newProduct,
     resourceTypeName,
     categoryCode,
+    parentCategoryName,
     productType,
     link,
     imageUrl,
@@ -121,9 +124,7 @@ const ProductCard = (props: ProductCardProps) => {
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
-
   const isResourceType = productType === 'Resources' ? true : false
-
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
   const { t } = useTranslation('common')
   const handleAddOrRemoveWishlistItem = (event: MouseEvent<HTMLElement>) => {
@@ -158,6 +159,25 @@ const ProductCard = (props: ProductCardProps) => {
         <Link href={link} passHref data-testid="product-card-link">
           <Box>
             <Card sx={{ ...ProductCardStyles.cardRoot, minHeight: 321 }} data-testid="product-card">
+              {isResourceType &&
+                resourceTypeName &&
+                resourceTypeArr.map((data) => {
+                  return data.resourceType === resourceTypeName ? (
+                    <Box
+                      sx={{
+                        ...ProductCardStyles.resourceIcon,
+                        '&::before': {
+                          content: `'${data.value}'`,
+                          fontFamily: 'Material Icons',
+                          fontSize: '24px',
+                        },
+                      }}
+                    ></Box>
+                  ) : (
+                    ''
+                  )
+                })}
+
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} pb={1}>
                 {newProduct && (
                   <Box
@@ -182,7 +202,7 @@ const ProductCard = (props: ProductCardProps) => {
                   </Box>
                 ) : null}
                 {/* Badge End */}
-                {isShowWishlistIcon && (
+                {/* {isShowWishlistIcon && (
                   <Box
                     className="wishlist-button-container"
                     ml={'auto'}
@@ -195,7 +215,7 @@ const ProductCard = (props: ProductCardProps) => {
                       <FavoriteBorderRounded sx={{ color: 'grey.600' }} />
                     )}
                   </Box>
-                )}
+                )} */}
               </Box>
               <CardMedia
                 className="product-image"
@@ -218,7 +238,7 @@ const ProductCard = (props: ProductCardProps) => {
               </CardMedia>
               <Box flexDirection="column" m={1}>
                 <Typography variant="body1" gutterBottom color="text.primary">
-                  {brand}
+                  {isResourceType ? parentCategoryName : brand}
                 </Typography>
                 <Typography variant="body1" gutterBottom color="text.primary">
                   {variationProductCode ? variantProductName : title}
@@ -277,4 +297,4 @@ const ProductCard = (props: ProductCardProps) => {
       </Box>
     )
 }
-export default ProductCard
+export default ResourceProductCardGridView

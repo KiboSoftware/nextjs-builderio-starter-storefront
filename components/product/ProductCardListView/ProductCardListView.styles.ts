@@ -88,7 +88,7 @@ export const ProductCardStyles = {
     width: 'auto',
     display: 'flex',
     justifyContent: 'flexStart',
-    paddingLeft: '10px',
+    padding: '0px 10px',
     alignItems: 'end',
     marginBottom: '30px',
   },

@@ -19,8 +19,10 @@ import { data } from 'cheerio/dist/commonjs/api/attributes'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
+import { ProductCardListViewProps } from './ProductCardListView'
 import { ProductCardStyles } from './ProductCardListView.styles'
 import { KiboImage, Price } from '@/components/common'
+import resourceTypeArr from '@/components/common/ResourceTypeArr'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
 import { ProductProperties } from '@/lib/types'
@@ -47,46 +49,6 @@ const brandImages: Record<string, string> = {
   fortis: fortis.src,
 }
 
-export interface ProductCardListViewProps {
-  title?: string
-  newProduct?: string
-  link: string
-  imageUrl?: string
-  placeholderImageUrl?: string
-  imageAltText?: string
-  price?: string
-  salePrice?: string
-  priceRange?: ProductPriceRange
-  productCode?: string
-  properties?: ProductProperties[]
-  resourceTypeName?: string
-  productType?: string
-  variationProductCode?: string
-  rating?: number
-  productDescription?: string
-  seoFriendlyUrl?: string
-  categoryCode?: string
-  parentCategoryName?: string
-  imageHeight?: number
-  imageLayout?: string
-  isInWishlist?: boolean
-  isInCart?: boolean
-  isLoading?: boolean
-  isShopNow?: boolean
-  isShowWishlistIcon?: boolean
-  showQuickViewButton?: boolean
-  badge?: string
-  brand?: string
-  productProperties?: ProductProperties[]
-  reactivity?: string
-  variantProductName?: string
-  isATCLoading?: boolean
-  fulfillmentTypesSupported?: string[]
-  onAddOrRemoveWishlistItem?: () => Promise<void>
-  onClickQuickViewModal?: () => void
-  onClickAddToCart?: (payload: any) => Promise<void>
-}
-
 const ProductCardSkeleton = () => {
   return (
     <Stack spacing={1} sx={ProductCardStyles.cardRoot} data-testid="product-card-skeleton">
@@ -98,7 +60,7 @@ const ProductCardSkeleton = () => {
   )
 }
 
-const ProductCardListView = (props: ProductCardListViewProps) => {
+const ResourceProductCardListView = (props: ProductCardListViewProps) => {
   const {
     price,
     salePrice,
@@ -111,6 +73,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     resourceTypeName,
     categoryCode,
     parentCategoryName,
+    productType,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,
@@ -132,7 +95,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
-
+  const isResourceType = productType === 'Resources' ? true : false
   const brandProperties = productProperties?.find(
     (prop) => prop.attributeFQN?.toLowerCase() === 'tenant~brand'
   )
@@ -143,31 +106,6 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
 
   const { t } = useTranslation('common')
-
-  const handleAddOrRemoveWishlistItem = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault()
-    onAddOrRemoveWishlistItem?.()
-  }
-  const handleOpenProductQuickViewModal = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault()
-    onClickQuickViewModal?.()
-  }
-
-  const handleAddToCart = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault()
-    const payload = {
-      product: {
-        productCode: productCode,
-        variationProductCode: variationProductCode,
-        fulfillmentMethod: fulfillmentTypesSupported?.includes(FulfillmentOptionsConstant.DIGITAL)
-          ? FulfillmentOptionsConstant.DIGITAL
-          : FulfillmentOptionsConstant.SHIP,
-        purchaseLocationCode: '',
-      },
-      quantity: 1,
-    }
-    onClickAddToCart?.(payload)
-  }
 
   if (isLoading) return <ProductCardSkeleton />
   else
@@ -186,21 +124,22 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   />
                 )}
               </Box>
-              {isShowWishlistIcon && (
-                <Box
-                  className="wishlist-button-container"
-                  textAlign={'right'}
-                  position={'absolute'}
-                  right={16}
-                  onClick={handleAddOrRemoveWishlistItem}
-                >
-                  {isInWishlist ? (
-                    <FavoriteRounded sx={{ color: 'red.900' }} />
-                  ) : (
-                    <FavoriteBorderRounded sx={{ color: 'grey.600' }} />
-                  )}
-                </Box>
-              )}
+              {/* In figma design the wishlist icon not available so comment this code */}
+              {/* {isShowWishlistIcon && (
+                                <Box
+                                    className="wishlist-button-container"
+                                    textAlign={'right'}
+                                    position={'absolute'}
+                                    right={16}
+                                    onClick={handleAddOrRemoveWishlistItem}
+                                >
+                                    {isInWishlist ? (
+                                        <FavoriteRounded sx={{ color: 'red.900' }} />
+                                    ) : (
+                                        <FavoriteBorderRounded sx={{ color: 'grey.600' }} />
+                                    )}
+                                </Box>
+                            )} */}
 
               {/* Badge start */}
               {badge ? (
@@ -248,26 +187,63 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                     color="text.primary"
                     sx={ProductCardStyles.productTitle}
                   >
-                    {variationProductCode ? variantProductName : title}
+                    {title}
                   </Typography>
-                  {brandImages[brand.toLowerCase()] && (
-                    <Box
-                      component="img"
-                      src={brandImages[brand.toLowerCase()]}
-                      alt={`${brand}-logo`}
-                      sx={ProductCardStyles.brandLogoImage}
-                      data-testid="brand-logo"
-                    />
-                  )}
+                  {isResourceType && resourceTypeName
+                    ? resourceTypeArr.map((data) => {
+                        return data.resourceType === resourceTypeName ? (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              right: '10px',
+                              top: '12px',
+                              zIndex: 2,
+                              width: '42px',
+                              height: '42px',
+                              '&::before': {
+                                content: `'${data.value}'`,
+                                fontFamily: 'Material Icons',
+                                fontSize: '42px',
+                                color: 'primary.main',
+                              },
+                            }}
+                          ></Box>
+                        ) : (
+                          ''
+                        )
+                      })
+                    : brandImages[brand.toLowerCase()] && (
+                        <Box
+                          component="img"
+                          src={brandImages[brand.toLowerCase()]}
+                          alt={`${brand}-logo`}
+                          sx={ProductCardStyles.brandLogoImage}
+                          data-testid="brand-logo"
+                        />
+                      )}
                 </Box>
-                <Box sx={ProductCardStyles.brandStyle}>
+                <Box
+                  sx={{
+                    ...ProductCardStyles.brandStyle,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Typography
                     variant="body1"
                     gutterBottom
                     color="text.primary"
                     sx={ProductCardStyles.brandLable}
                   >
-                    {brandLabel}
+                    {isResourceType && resourceTypeName ? parentCategoryName : brandLabel}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    color="text.primary"
+                    sx={ProductCardStyles.brandLable}
+                  >
+                    {isResourceType && resourceTypeName ? resourceTypeName : null}
                   </Typography>
                 </Box>
                 {/* <Rating
@@ -291,30 +267,30 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   />
                 </Box>
                 {/* <Box py={1}>
-                  <Price
-                    price={price}
-                    salePrice={salePrice}
-                    priceRange={productPriceRange}
-                    variant="body1"
-                  />
-                </Box> */}
+                                    <Price
+                                        price={price}
+                                        salePrice={salePrice}
+                                        priceRange={productPriceRange}
+                                        variant="body1"
+                                    />
+                                </Box> */}
 
-                <Box pt={1} display={'flex'} gap={2}>
-                  {/* {showQuickViewButton ? (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleOpenProductQuickViewModal}
-                    >
-                      {t('quick-view')}
-                    </Button>
-                  ) : null} */}
-                  {isShowWishlistIcon && (
-                    <Button variant="contained" color="primary" onClick={handleAddToCart}>
-                      {t('add-to-cart')}
-                    </Button>
-                  )}
-                </Box>
+                {/* <Box pt={1} display={'flex'} gap={2}>
+                                    {showQuickViewButton ? (
+                                        <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleOpenProductQuickViewModal}
+                                        >
+                                        {t('quick-view')}
+                                        </Button>
+                                    ) : null}
+                                    {isShowWishlistIcon && (
+                                        <Button variant="contained" color="primary" onClick={handleAddToCart}>
+                                            {t('add-to-cart')}
+                                        </Button>
+                                    )}
+                                </Box> */}
               </Box>
               <IconButton sx={ProductCardStyles.listIconButton}>
                 <ArrowForwardIos sx={{ color: 'white' }} />
@@ -326,4 +302,4 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     )
 }
 
-export default ProductCardListView
+export default ResourceProductCardListView
