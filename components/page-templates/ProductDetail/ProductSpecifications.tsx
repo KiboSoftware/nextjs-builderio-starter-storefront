@@ -93,9 +93,9 @@ const ProductSpecifications = ({ product }: { product: any }) => {
   }
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'left' }}>
       <Box sx={{ width: '100%', maxWidth: '1200px' }}>
-        <Typography variant="h3" sx={{ marginBottom: '10px' }}>
+        <Typography variant="h3" pt={2} sx={{ marginBottom: '10px' }}>
           Specifications
         </Typography>
         <TableContainer
