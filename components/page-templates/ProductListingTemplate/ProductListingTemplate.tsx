@@ -11,9 +11,11 @@ import { PLPStyles } from './ProductListingTemplate.styles'
 import { FilterTiles, FullWidthDivider, KiboPagination, KiboSelect } from '@/components/common'
 import { KiboBreadcrumbs } from '@/components/core'
 import { ProductCard } from '@/components/product'
+import ResourceProductCardGridView from '@/components/product/ProductCard/ResourceProductCardGridView'
 import ProductCardListView, {
   ProductCardListViewProps,
 } from '@/components/product/ProductCardListView/ProductCardListView'
+import ResourceProductCardListView from '@/components/product/ProductCardListView/ResourceProductCardListView'
 import {
   CategoryFacet,
   CategoryFilterByMobile,
@@ -137,6 +139,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
     const productType = product?.productType as string | undefined
     const variationProductCode = productGetters.getVariationProductCode(product)
     const categoryCode = product?.categories?.[0]?.categoryCode as string | undefined
+    const parentCategoryName = product?.categories?.[0]?.content?.name as string | undefined
     const seoFriendlyUrl = productGetters.getSeoFriendlyUrl(product)
     let listItemUrl =
       categoryCode !== undefined && seoFriendlyUrl
@@ -152,6 +155,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       properties,
       resourceTypeName,
       categoryCode,
+      parentCategoryName,
       productType,
       variationProductCode,
       sliceValue,
@@ -375,7 +379,13 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                       xs={isListView ? 12 : 6}
                     >
                       {isListView ? (
-                        <ProductCardListView {...productCardProps(product)} />
+                        product?.productType === 'Resources' ? (
+                          <ResourceProductCardListView {...productCardProps(product)} />
+                        ) : (
+                          <ProductCardListView {...productCardProps(product)} />
+                        )
+                      ) : product?.productType === 'Resources' ? (
+                        <ResourceProductCardGridView {...productCardProps(product)} />
                       ) : (
                         <ProductCard {...productCardProps(product)} />
                       )}

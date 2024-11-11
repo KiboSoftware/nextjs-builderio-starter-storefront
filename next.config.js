@@ -61,6 +61,7 @@ module.exports = {
     variantProductAttributeName: 'tenant~variant-product-name',
     brandAttrName: 'tenant~brand',
     newProductAttrName: 'tenant~new-product',
+    resourceTypeName: 'tenant~resourcetype',
     occasionAttributeFQN: 'Tenant~occasion',
     colorAttributeFQN: 'Tenant~Color',
     sizeAttributeFQN: 'Tenant~Size',
