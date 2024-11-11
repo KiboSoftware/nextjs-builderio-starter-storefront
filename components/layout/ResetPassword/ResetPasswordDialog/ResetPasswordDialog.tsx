@@ -64,7 +64,7 @@ const ResetPasswordDialog = () => {
   const Title = (
     <Box display={'flex'} alignItems={'center'} data-testid="title-component">
       <Typography variant={mdScreen ? 'h3' : 'h2'} sx={{ ...resetPasswordStyles.title }}>
-        {t('reset-password')}
+        {t('reset-your-password')}
       </Typography>
     </Box>
   )
