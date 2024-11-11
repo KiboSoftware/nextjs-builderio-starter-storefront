@@ -24,6 +24,7 @@ import { ProductCardStyles } from './ProductCard.styles'
 import { KiboImage, Price } from '@/components/common'
 import { usePriceRangeFormatter } from '@/hooks'
 import { FulfillmentOptions as FulfillmentOptionsConstant } from '@/lib/constants'
+import { ProductProperties } from '@/lib/types'
 import abcore from '@/public/Brand_Logo/abcore-logo.png'
 import arista from '@/public/Brand_Logo/arista-logo.png'
 import bethyl from '@/public/Brand_Logo/bethyl-logo.png'
@@ -62,6 +63,7 @@ export interface ProductCardProps {
   productType?: string
   variantProductName?: string
   variationProductCode?: string
+  sliceValue?: string
   rating?: number
   imageHeight?: number
   imageLayout?: string
@@ -70,6 +72,7 @@ export interface ProductCardProps {
   isLoading?: boolean
   isShowWishlistIcon?: boolean
   product?: Product
+  productProperties?: ProductProperties[]
   showQuickViewButton?: boolean
   badge?: string
   isATCLoading?: boolean
@@ -93,6 +96,7 @@ const ProductCard = (props: ProductCardProps) => {
   const {
     productCode,
     variationProductCode,
+    sliceValue,
     variantProductName,
     price,
     salePrice,
@@ -103,6 +107,7 @@ const ProductCard = (props: ProductCardProps) => {
     resourceTypeName,
     categoryCode,
     productType,
+    productProperties,
     link,
     imageUrl,
     placeholderImageUrl = DefaultImage,
@@ -121,6 +126,14 @@ const ProductCard = (props: ProductCardProps) => {
     onClickQuickViewModal,
     onClickAddToCart,
   } = props
+
+  const brandProperties = productProperties?.find(
+    (prop) => prop.attributeFQN?.toLowerCase() === 'tenant~brand'
+  )
+
+  const brandLabel = (
+    brandProperties?.values as { value: string; stringValue: string }[] | undefined
+  )?.[0]?.stringValue
 
   const isResourceType = productType === 'Resources' ? true : false
 
@@ -159,7 +172,7 @@ const ProductCard = (props: ProductCardProps) => {
           <Box>
             <Card sx={{ ...ProductCardStyles.cardRoot, minHeight: 321 }} data-testid="product-card">
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} pb={1}>
-                {newProduct && (
+                {newProduct === 'true' && (
                   <Box
                     sx={{ ...ProductCardStyles.newTag }}
                     style={{
@@ -217,11 +230,22 @@ const ProductCard = (props: ProductCardProps) => {
                 />
               </CardMedia>
               <Box flexDirection="column" m={1}>
-                <Typography variant="body1" gutterBottom color="text.primary">
-                  {brand}
+                <Typography
+                  variant="body1"
+                  gutterBottom
+                  color="text.primary"
+                  sx={ProductCardStyles.brandLabel}
+                >
+                  {brandLabel}
                 </Typography>
-                <Typography variant="body1" gutterBottom color="text.primary">
-                  {variationProductCode ? variantProductName : title}
+                <Typography
+                  variant="body2"
+                  gutterBottom
+                  fontWeight={500}
+                  className="productNameStyle"
+                  sx={ProductCardStyles.productNameStyle}
+                >
+                  {sliceValue ? variantProductName : title}
                 </Typography>
                 {/* <Price
                   price={price}

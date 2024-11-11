@@ -78,6 +78,7 @@ export interface ProductCardListViewProps {
   badge?: string
   brand?: string
   productProperties?: ProductProperties[]
+  sliceValue?: string
   reactivity?: string
   variantProductName?: string
   isATCLoading?: boolean
@@ -125,6 +126,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     productProperties,
     showQuickViewButton = false,
     productCode,
+    sliceValue,
     variantProductName,
     variationProductCode,
     fulfillmentTypesSupported,
@@ -243,9 +245,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
               <Box flexDirection="column" m={1} width="75%" className="product-info">
                 <Box display="flex" alignItems="center" width="100%">
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     gutterBottom
-                    color="text.primary"
+                    fontWeight={500}
                     sx={ProductCardStyles.productTitle}
                   >
                     {variationProductCode ? variantProductName : title}
@@ -283,12 +285,12 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   data-testid="product-rating"
                 /> */}
                 <Box>
-                  <Box
+                  {/* <Box
                     data-testid="short-description"
                     dangerouslySetInnerHTML={{
                       __html: productDescription,
                     }}
-                  />
+                  /> */}
                 </Box>
                 {/* <Box py={1}>
                   <Price

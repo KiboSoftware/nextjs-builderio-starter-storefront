@@ -125,6 +125,8 @@ fragment productInfo on Product {
             value
           }
         }
+        slicingAttributeFQN
+        sliceValue
         ...productPrices
         ...productAttributes
         ...productContent

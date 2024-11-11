@@ -7,9 +7,11 @@ import {
   AccordionDetails,
   styled,
 } from '@mui/material'
+import { color } from 'framer-motion'
 import { useTranslation } from 'next-i18next'
 
 import { ProductOptionList } from '@/components/product'
+import theme from '@/styles/theme'
 
 import type { CrProductOption } from '@/lib/gql/types'
 
@@ -46,18 +48,19 @@ const ProductInformation = (props: ProductInformationProps) => {
 
   return (
     <>
-      <Typography variant="h3" fontWeight={700} pb={1}>
-        {t('product-information')}
-      </Typography>
+      {/* <Typography variant="h2" fontWeight={500} pb={1}
+        sx={{color: (theme) => theme.palette.primary.main}}
+      >
+        {t('product-details')}
+      </Typography> */}
       <Box
-        sx={{ fontSize: (theme) => theme.typography.body2 }}
+        sx={{ fontSize: (theme) => theme.typography.body2, color: 'grey.900' }}
         dangerouslySetInnerHTML={{
           __html: productFullDescription as string,
         }}
-        py={2}
         data-testid="product-content"
       />
-      {options.length > 0 && (
+      {/* {options.length > 0 && (
         <StyledAccordion>
           <AccordionSummary data-testid="accordian" expandIcon={<ExpandMore />}>
             <Typography variant="subtitle2" fontWeight={700}>
@@ -68,7 +71,7 @@ const ProductInformation = (props: ProductInformationProps) => {
             <ProductOptionList options={options} />
           </AccordionDetails>
         </StyledAccordion>
-      )}
+      )} */}
     </>
   )
 }
