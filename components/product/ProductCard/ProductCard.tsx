@@ -290,7 +290,13 @@ const ProductCard = (props: ProductCardProps) => {
                 >
                   {brandLabel}
                 </Typography>
-                <Typography variant="body1" gutterBottom color="text.primary">
+                <Typography
+                  variant="body2"
+                  gutterBottom
+                  fontWeight={500}
+                  className="productNameStyle"
+                  sx={ProductCardStyles.productNameStyle}
+                >
                   {sliceValue ? variantProductName : title}
                 </Typography>
                 {/* <Price

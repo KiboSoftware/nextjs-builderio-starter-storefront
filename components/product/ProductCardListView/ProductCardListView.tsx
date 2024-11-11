@@ -243,9 +243,9 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
               <Box flexDirection="column" m={1} width="75%" className="product-info">
                 <Box display="flex" alignItems="center" width="100%">
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     gutterBottom
-                    color="text.primary"
+                    fontWeight={500}
                     sx={ProductCardStyles.productTitle}
                   >
                     {variationProductCode ? variantProductName : title}
