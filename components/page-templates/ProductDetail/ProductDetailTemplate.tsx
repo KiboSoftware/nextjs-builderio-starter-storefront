@@ -407,7 +407,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
         <Box paddingY={1} display={shortDescription ? 'block' : 'none'}>
           <Box
-            sx={{ color: '#000', fontSize: '16px', fontWeight: 300, lineHeight: '25px' }}
+            sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
             data-testid="short-description"
             dangerouslySetInnerHTML={{
               __html: shortDescription,
