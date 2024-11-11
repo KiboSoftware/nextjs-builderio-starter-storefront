@@ -111,5 +111,6 @@ export const ProductCardStyles = {
   productTitle: {
     width: '85%',
     height: 'auto',
+    color: '#2B2B2B',
   },
 }
