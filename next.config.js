@@ -227,7 +227,6 @@ module.exports = {
   staticPageGenerationTimeout: 1000,
   experimental: {
     workerThreads: false,
-    cpus: 1,
   },
   async rewrites() {
     //custom routes
