@@ -61,6 +61,7 @@ const ExistingUserDialog = () => {
 
   const contactUs = async () => {
     router.push('/contact-us')
+    closeModal()
   }
 
   const onForgotPassword = () => {
