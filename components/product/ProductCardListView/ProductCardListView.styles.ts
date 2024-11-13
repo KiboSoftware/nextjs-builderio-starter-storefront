@@ -88,7 +88,7 @@ export const ProductCardStyles = {
     width: 'auto',
     display: 'flex',
     justifyContent: 'flexStart',
-    paddingLeft: '10px',
+    padding: '0px 10px',
     alignItems: 'end',
     marginBottom: '30px',
   },
@@ -111,5 +111,6 @@ export const ProductCardStyles = {
   productTitle: {
     width: '85%',
     height: 'auto',
+    color: '#2B2B2B',
   },
 }

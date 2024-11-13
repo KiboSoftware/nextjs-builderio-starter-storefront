@@ -119,7 +119,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     getCurrentProduct,
   } = props
   const { t } = useTranslation('common')
-
   const isDigitalFulfillment = product.fulfillmentTypesSupported?.some(
     (type) => type === FulfillmentOptionsConstant.DIGITAL
   )
@@ -407,6 +406,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
         <Box paddingY={1} display={shortDescription ? 'block' : 'none'}>
           <Box
+            sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
             data-testid="short-description"
             dangerouslySetInnerHTML={{
               __html: shortDescription,
@@ -615,8 +615,16 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             <Divider />
           </Grid>
           <Grid item xs={12}>
+            <Typography
+              variant="h2"
+              fontWeight={500}
+              pb={2}
+              sx={{ color: (theme) => theme.palette.primary.main }}
+            >
+              {t('product-details')}
+            </Typography>
             {description && (
-              <Box paddingY={3}>
+              <Box paddingY={1}>
                 <ProductInformation productFullDescription={description} options={properties} />
               </Box>
             )}

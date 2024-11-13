@@ -36,9 +36,11 @@ const getApiAuthToken = async () => {
   return data.access_token
 }
 
-// Function to get the current URL with query parameters
-const getCurrentUrlWithQueryParams = () => {
-  return window.location.href // This gives the full current URL including query params
+// Utility function to clean up query parameters
+const cleanQueryParams = (search: string) => {
+  const urlSearchParams = new URLSearchParams(search)
+  urlSearchParams.delete('productCode') // Remove the unwanted productCode param
+  return urlSearchParams.toString() // Return the cleaned query string
 }
 
 async function getCustomRedirects() {
@@ -125,13 +127,21 @@ export async function middleware(request: NextRequest) {
 
           if (customRedirect) {
             const finalUrl = new URL(customRedirect.destinationUrl, request.url)
-            finalUrl.search = search
+            // Clean query parameters to remove productCode and keep others
+            const cleanedSearch = cleanQueryParams(search)
+            if (cleanedSearch) {
+              finalUrl.search = `?${cleanedSearch}`
+            }
             return NextResponse.redirect(finalUrl, customRedirect.permanent ? 301 : 302)
           }
 
           if (slugUrl && request.nextUrl.pathname !== slugUrl) {
             const slugRedirectUrl = new URL(slugUrl, request.url)
-            slugRedirectUrl.search = search
+            // Clean query parameters to remove productCode and append others
+            const cleanedSearch = cleanQueryParams(search)
+            if (cleanedSearch) {
+              slugRedirectUrl.search = `?${cleanedSearch}`
+            }
             const slugRedirect = NextResponse.redirect(slugRedirectUrl)
             slugRedirect.headers.set('Cache-Control', 'no-store')
             return slugRedirect
