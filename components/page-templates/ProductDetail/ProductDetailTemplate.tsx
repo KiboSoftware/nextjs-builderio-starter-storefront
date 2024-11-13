@@ -38,6 +38,7 @@ import {
   ProductQuickViewDialog,
   ProductVariantSizeSelector,
 } from '@/components/product'
+import PdpIconAttributes from '@/components/product/PdpIconAttributes'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -505,6 +506,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             )
           })}
         </Box>
+
+        <PdpIconAttributes product={product} />
 
         <Box paddingY={1}>
           <QuantitySelector
