@@ -58,9 +58,14 @@ export default async function getProductSearchVariations(
   // Transform and filter the product items as required
   const result: FilteredProduct[] = products.map((product) => {
     // Flatten and filter options to only include values with isSelected: true
-    const selectedValues = product.options
-      .flatMap((option) => option.values)
-      .filter((value) => value.isSelected)
+    // const selectedValues = product.options
+    //   .flatMap((option) => option.values)
+    //   .filter((value) => value.isSelected)
+
+    const selectedValues =
+      product.options
+        ?.flatMap((option) => option.values || [])
+        ?.filter((value) => value.isSelected) || []
 
     // Find the property where attributeFQN is tenant~child-priority
     const childPriorityProperty = product.properties.find(
