@@ -5,6 +5,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import { ProductDetailTemplate, ProductDetailSkeleton } from '@/components/page-templates'
 import { ProductRecommendations } from '@/components/product'
+import { useGetProduct } from '@/hooks/queries/product/useGetProduct/useGetProduct'
 import {
   getProduct,
   getCategoryTree,
@@ -106,22 +107,29 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 const ProductDetailPage: NextPage<ProductPageType> = (props) => {
   const { product, productVariations } = props
   const router = useRouter()
-  const { isFallback } = router
 
-  if (isFallback) {
+  const { isFallback, query } = router
+
+  const { data: productResponseData, isLoading: isProductLoading } = useGetProduct(query)
+
+  if (isFallback || isProductLoading) {
     return <ProductDetailSkeleton />
   }
   const pdpBuilderSectionKey = publicRuntimeConfig?.builderIO?.modelKeys?.productDetailSection || ''
   const breadcrumbs = product ? productGetters.getBreadcrumbs(product) : []
   return (
     <>
-      <ProductDetailTemplate
-        product={product as ProductCustom}
-        productVariations={productVariations}
-        breadcrumbs={breadcrumbs}
-      >
-        <BuilderComponent model={pdpBuilderSectionKey} content={props.section} />
-      </ProductDetailTemplate>
+      {productResponseData ? (
+        <ProductDetailTemplate
+          product={{ ...product, ...productResponseData }}
+          productVariations={productVariations}
+          breadcrumbs={breadcrumbs}
+        >
+          <BuilderComponent model={pdpBuilderSectionKey} content={props.section} />
+        </ProductDetailTemplate>
+      ) : (
+        <ProductDetailSkeleton />
+      )}
     </>
   )
 }
