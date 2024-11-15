@@ -19,6 +19,7 @@ import {
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
+import ProductSpecifications from './ProductSpecifications'
 import {
   FulfillmentOptions,
   KiboRadio,
@@ -28,6 +29,7 @@ import {
 } from '@/components/common'
 import { KiboBreadcrumbs, ImageGallery } from '@/components/core'
 import { AddToCartDialog, StoreLocatorDialog } from '@/components/dialogs'
+import { ProductRecentDocuments } from '@/components/product'
 import {
   ColorSelector,
   ProductInformation,
@@ -37,6 +39,7 @@ import {
   ProductQuickViewDialog,
   ProductVariantSizeSelector,
 } from '@/components/product'
+import PdpIconAttributes from '@/components/product/PdpIconAttributes'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -104,6 +107,32 @@ const StyledLink = styled(Link)(({ theme }: { theme: Theme }) => ({
   fontSize: theme?.typography.body2.fontSize,
 }))
 
+/**
+ * fetches the document list data from specified documentListName based on filter
+ */
+const getDocumentListDocuments = async (documentListName: string, filter: string) => {
+  try {
+    const response = await fetch('/api/custom-schema/get-documentlist-documents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ documentListName, filter }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+
+    return data.response.items
+  } catch (error) {
+    console.error('Error fetching document list documents:', error)
+    throw error
+  }
+}
+
 const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { getProductLink } = uiHelpers()
   const {
@@ -122,7 +151,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     getCurrentProduct,
   } = props
   const { t } = useTranslation('common')
-
   const isDigitalFulfillment = product.fulfillmentTypesSupported?.some(
     (type) => type === FulfillmentOptionsConstant.DIGITAL
   )
@@ -138,6 +166,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     product?.productCode as string,
     isSubscriptionPricingSelected
   )
+
+  const [digitalDocumentData, setDigitalDocumentData] = useState([])
 
   const { showModal, closeModal } = useModalContext()
   const { addToCart } = useAddCartItem()
@@ -441,6 +471,18 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       })
     }
   }, [])
+
+  useEffect(() => {
+    const fetchDocumentData = async () => {
+      const digitalDocRes = await getDocumentListDocuments(
+        'digitalassets@Fortis',
+        `name eq ${variationProductCode} or name eq ${productCode}`
+      )
+      setDigitalDocumentData(digitalDocRes)
+    }
+    fetchDocumentData()
+  }, [variationProductCode, productCode])
+
   // Update breadcrumbs links
   const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
     ...breadcrumb,
@@ -470,6 +512,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
         <Box paddingY={1} display={shortDescription ? 'block' : 'none'}>
           <Box
+            sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
             data-testid="short-description"
             dangerouslySetInnerHTML={{
               __html: shortDescription,
@@ -597,6 +640,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             )
           })}
         </Box>
+        <PdpIconAttributes product={product} />
         <Box paddingY={1}>
           <QuantitySelector
             label="Qty"
@@ -705,8 +749,16 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             <Divider />
           </Grid>
           <Grid item xs={12}>
+            <Typography
+              variant="h2"
+              fontWeight={500}
+              pb={2}
+              sx={{ color: (theme) => theme.palette.primary.main }}
+            >
+              {t('product-details')}
+            </Typography>
             {description && (
-              <Box paddingY={3}>
+              <Box paddingY={1}>
                 <ProductInformation productFullDescription={description} options={properties} />
               </Box>
             )}
@@ -714,7 +766,14 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           {children}
         </>
       )}
-
+      <ProductSpecifications product={product} />
+      {digitalDocumentData && digitalDocumentData.length > 0 ? (
+        <ProductRecentDocuments
+          code={variationProductCode || productCode}
+          properties={properties}
+          documents={digitalDocumentData}
+        />
+      ) : null}
       {!isQuickViewModal && children}
     </Grid>
   )

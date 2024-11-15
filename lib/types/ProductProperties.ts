@@ -4,4 +4,5 @@ export interface ProductProperties {
   name: Maybe<string> | undefined
   value: string | undefined
   attributeFQN?: string
+  values?: Maybe<object> | undefined
 }

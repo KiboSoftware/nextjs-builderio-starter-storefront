@@ -61,9 +61,14 @@ module.exports = {
     variantProductAttributeName: 'tenant~variant-product-name',
     brandAttrName: 'tenant~brand',
     newProductAttrName: 'tenant~new-product',
+    resourceTypeName: 'tenant~resourcetype',
     occasionAttributeFQN: 'Tenant~occasion',
     colorAttributeFQN: 'Tenant~Color',
     sizeAttributeFQN: 'Tenant~Size',
+    validationTextAttrFQN: 'tenant~validation-text',
+    citationCountVariantAttrFQN: 'tenant~citation-count-variant',
+    mfgCertificationAttrFQN: 'tenant~mfgcertification',
+    mfgAvailabilityAttrFQN: 'tenant~mfgavailability',
     paymentTypes: [
       {
         id: 'PurchaseOrder',
@@ -226,7 +231,6 @@ module.exports = {
   staticPageGenerationTimeout: 1000,
   experimental: {
     workerThreads: false,
-    cpus: 1,
   },
   async rewrites() {
     //custom routes

@@ -37,7 +37,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       $('meta[name="description"]').attr('content') ||
       null
 
-    res.status(200).json({ title, image, description })
+    const truncatedDescription =
+      description && description.length > 160 ? `${description.slice(0, 160)}…` : description
+
+    res.status(200).json({ title, image, description: truncatedDescription })
   } catch (error) {
     console.error('Error occurred:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'

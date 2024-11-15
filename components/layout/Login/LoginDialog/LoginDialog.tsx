@@ -5,9 +5,9 @@ import builder from '@builder.io/react'
 import { Stack, Typography, Link, styled } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 
-import { KiboDialog } from '@/components/common'
+import { CustomDialog, KiboDialog } from '@/components/common'
 import { B2BAccountFormDialog } from '@/components/dialogs'
-import { RegisterAccountDialog, ResetPasswordDialog } from '@/components/layout'
+import { RegisterAccountDialog, ResetPasswordDialog, ExistingUserDialog } from '@/components/layout'
 import LoginContent, { LoginData } from '@/components/layout/Login/LoginContent/LoginContent'
 import { useAuthContext } from '@/context'
 import { useModalContext } from '@/context/ModalContext'
@@ -36,7 +36,7 @@ const LoginFooter = (props: LoginFooterProps) => {
   return (
     <StyledActionsComponent>
       <Typography variant="h3" color={'primary'} pb={1}>
-        {t('dont-have-an-account-yet')}
+        {t('do-not-have-an-account-yet')}
       </Typography>
       <Link component="button" variant="body1" color="text.primary" onClick={onRegisterNow}>
         {t('register-now')}
@@ -88,52 +88,76 @@ const LoginDialog = () => {
 
   const handleAccountRequest = async (formValues: CreateCustomerB2bAccountParams) => {
     const variables = buildCreateCustomerB2bAccountParams(formValues)
-    const emailDomain = extractDomain(formValues?.emailAddress)
+    const emailAddress = formValues?.emailAddress
+    const emailDomain = extractDomain(emailAddress)
     const entityListFullName = 'B2BAccountMapping@fortis'
     const entityPayLoad = {
       entityListFullName: entityListFullName,
       id: emailDomain,
     }
-    const entityResponse = await fetch('/api/user/get-entity', {
+
+    const getExistingUser = await fetch('/api/user/getAccountsByUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ entityPayLoad }),
+      body: JSON.stringify({ emailAddress }),
     })
 
-    const entityResult = await entityResponse.json()
+    const userDetails = await getExistingUser.json()
 
-    if ((googleReCaptcha as any)?.reCaptchAccountCreation) {
-      try {
-        // Ensure grecaptcha is available and ready
-        const siteKey = (googleReCaptcha as any)?.accountCreationSiteKey
-          ? (googleReCaptcha as any)?.accountCreationSiteKey
-          : process.env.siteKeySignup
+    if (userDetails.success === true) {
+      showModal({ Component: ExistingUserDialog })
+    } else {
+      const entityResponse = await fetch('/api/user/get-entity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ entityPayLoad }),
+      })
 
-        grecaptcha.enterprise.ready(async () => {
-          const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
-            action: 'signup',
-          })
-          const payLoad = {
-            googleReCaptcha: googleReCaptcha,
-            responseKey: reCaptchaResponseCode,
+      const entityResult = await entityResponse.json()
+
+      if ((googleReCaptcha as any)?.reCaptchAccountCreation) {
+        try {
+          // Ensure grecaptcha is available and ready
+          const siteKey = (googleReCaptcha as any)?.accountCreationSiteKey
+            ? (googleReCaptcha as any)?.accountCreationSiteKey
+            : process.env.accountCreationSiteKey
+
+          if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+            grecaptcha.enterprise.ready(async () => {
+              try {
+                const reCaptchaResponseCode = await grecaptcha.enterprise.execute(siteKey, {
+                  action: 'signup',
+                })
+                const payLoad = {
+                  googleReCaptcha: googleReCaptcha,
+                  responseKey: reCaptchaResponseCode,
+                }
+                const response = await fetch('/api/user/validate-recaptcha', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ payLoad }),
+                })
+                const data = await response.json()
+                processUpdatedVariables(data, entityResult, variables)
+              } catch (error) {
+                processUpdatedVariables(null, entityResult, variables)
+              }
+            })
+          } else {
+            processUpdatedVariables(null, entityResult, variables)
           }
-          const response = await fetch('/api/user/validate-recaptcha', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ payLoad }),
-          })
-          const data = await response.json()
-          processUpdatedVariables(data, entityResult, variables)
-        })
-      } catch (error) {
+        } catch (error) {
+          processUpdatedVariables(null, entityResult, variables)
+        }
+      } else {
         processUpdatedVariables(null, entityResult, variables)
       }
-    } else {
-      processUpdatedVariables(null, entityResult, variables)
     }
   }
 
@@ -198,7 +222,9 @@ const LoginDialog = () => {
                 body: JSON.stringify({ purchaseOrderPayLoad }),
               })
               const purchaseOrderResponse = await purchaseOrder.json()
-              closeModal()
+              if (purchaseOrderResponse?.success === true) {
+                closeModal()
+              }
             } else {
               closeModal()
             }
@@ -229,11 +255,20 @@ const LoginDialog = () => {
   }
 
   return (
-    <KiboDialog
+    <CustomDialog
+      showCloseButton
+      showContentTopDivider={false}
+      showContentBottomDivider={false}
+      Actions={''}
       Title={t('log-in')}
-      Content={<LoginContent onLogin={handleLogin} onForgotPasswordClick={onForgotPassword} />}
-      Actions={<LoginFooter onRegisterNow={onRegisterClick} />}
-      customMaxWidth="32.375rem"
+      Content={
+        <LoginContent
+          onLogin={handleLogin}
+          onForgotPasswordClick={onForgotPassword}
+          onRegisterNow={onRegisterClick}
+        />
+      }
+      customMaxWidth="600px"
       onClose={closeModal}
     />
   )

@@ -1,4 +1,5 @@
 import zIndex from '@mui/material/styles/zIndex'
+import { color } from 'framer-motion'
 
 export const ProductCardStyles = {
   main: {
@@ -24,12 +25,16 @@ export const ProductCardStyles = {
     // },
     '&:hover': {
       boxShadow: '0 2px 16px 4px rgb(11 32 61 / 7%)',
+      borderColor: 'primary.light',
       // '.quick-view': {
       //   opacity: 1,
       // },
     },
     '&:hover .MuiIconButton-root': {
       opacity: 1,
+    },
+    '&:hover .productNameStyle': {
+      color: 'grey.900',
     },
   },
 
@@ -100,5 +105,16 @@ export const ProductCardStyles = {
     color: 'common.white',
     width: '46px',
     height: '46px',
+  },
+  brandLabel: {
+    color: 'grey.900',
+    fontSize: '14px',
+    fontStyle: 'normal',
+    fontWeight: '300',
+    lineHeight: 'normal',
+    fontFamily: 'Poppins',
+  },
+  productNameStyle: {
+    color: '#2B2B2B',
   },
 }
