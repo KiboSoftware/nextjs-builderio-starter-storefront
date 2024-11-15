@@ -62,10 +62,13 @@ import type {
   ProductOptionValue,
   CrProduct,
   ProductPrice,
+  Product,
+  Maybe,
 } from '@/lib/gql/types'
 
 interface ProductDetailTemplateProps {
   product: ProductCustom
+  productVariations?: Product[]
   breadcrumbs?: BreadCrumb[]
   isQuickViewModal?: boolean
   children?: any
@@ -134,6 +137,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { getProductLink } = uiHelpers()
   const {
     product,
+    productVariations,
     breadcrumbs = [],
     isQuickViewModal = false,
     children,
@@ -154,6 +158,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const [purchaseType, setPurchaseType] = useState<string>(PurchaseTypes.ONETIMEPURCHASE)
   const [selectedFrequency, setSelectedFrequency] = useState<string>('')
   const [isSubscriptionPricingSelected, setIsSubscriptionPricingSelected] = useState<boolean>(false)
+  // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
   const isSubscriptionOnly = subscriptionGetters.isSubscriptionOnly(product)
@@ -213,6 +218,65 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     (variationProductCode || productCode) as string,
     selectedFulfillmentOption?.location?.code as string
   )
+
+  const getModifiedOptionData = (options: any) => {
+    const variationMap = new Map()
+    productVariations?.forEach((variation) => {
+      if (variation?.option && variation.option.length > 0) {
+        const variationValue = variation.option[0]?.value
+        variationMap.set(variationValue, {
+          childPriority: variation.childPriority,
+          price: variation.price,
+          variationProductCode: variation.variationProductCode, // Add this if it exists
+        })
+      }
+    })
+
+    options?.selectOptions?.forEach((selectOption: { values: any[] }) => {
+      selectOption?.values?.forEach((optionValue) => {
+        if (optionValue && variationMap.has(optionValue.value)) {
+          const variationData = variationMap.get(optionValue.value)
+
+          if (variationData) {
+            // Directly assign properties since optionValue is checked
+            optionValue.childPriority = variationData.childPriority
+            optionValue.price = { ...variationData.price }
+            optionValue.variationProductCode = variationData.variationProductCode
+          }
+        }
+      })
+
+      // Sort `values` array based on `childPriority`
+      selectOption?.values?.sort((a, b) => {
+        // If `childPriority` is undefined, place it at the end
+        if (a?.childPriority === undefined && b?.childPriority === undefined) return 0
+        if (a?.childPriority === undefined) return 1
+        if (b?.childPriority === undefined) return -1
+        return a?.childPriority - b?.childPriority
+      })
+    })
+    return options
+  }
+
+  useEffect(() => {
+    const fetchOptionData = async () => {
+      const optionData = getModifiedOptionData(productOptions)
+      const selectedValue = optionData?.selectOptions?.[0]?.values?.[0]?.value
+
+      await selectProductOption(
+        optionData?.selectOptions?.[0]?.attributeFQN as string,
+        selectedValue,
+        undefined,
+        optionData?.selectOptions?.[0]?.values?.find(
+          (value: { value: any }) => value?.value === selectedValue
+        )?.isEnabled as boolean
+      )
+    }
+
+    fetchOptionData()
+  }, [])
+
+  const factoredProductData = getModifiedOptionData(productOptions)
 
   const quantityLeft = productGetters.getAvailableItemCount(
     currentProduct,
@@ -465,7 +529,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             </StyledLink>
           )}
         </Box>
-
         {/* <Box data-testid="product-rating">  //commented rating as per WEB-920, in future if needed one can reuse this block
           <Rating
             name="read-only"
@@ -477,7 +540,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             emptyIcon={<StarRounded />}
           />
         </Box> */}
-
         <Box paddingX={1} paddingY={3} display={optionsVisibility.color ? 'block' : 'none'}>
           <ColorSelector
             attributeFQN={productOptions?.colourOptions?.attributeFQN as string}
@@ -485,7 +547,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             onColorChange={selectProductOption}
           />
         </Box>
-
         <Box paddingY={1} display={optionsVisibility.size ? 'block' : 'none'}>
           <ProductVariantSizeSelector
             values={productOptions?.sizeOptions?.values as ProductOptionValue[]}
@@ -493,8 +554,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             onSizeChange={selectProductOption}
           />
         </Box>
-
-        <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
+        {/* <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
           {productOptions?.selectOptions?.map((option) => {
             return (
               <Box key={option?.attributeDetail?.name} paddingY={1}>
@@ -517,8 +577,42 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
               </Box>
             )
           })}
-        </Box>
+        </Box> */}
+        <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
+          {factoredProductData?.selectOptions?.map((option: any) => {
+            // Mapping product options to radio button options
+            const radioOptions = (option?.values ?? []).map((value: any) => ({
+              childPriority: value?.childPriority,
+              price: value?.price,
+              variationProductCode: value?.variationProductCode,
+              label: value?.stringValue || value?.value,
+              value: value?.value,
+              name: option?.attributeDetail?.name || '',
+              disabled: !value?.isEnabled,
+            }))
 
+            return (
+              <Box key={option?.attributeDetail?.name} paddingY={1}>
+                <KiboRadio
+                  name={option?.attributeDetail?.name || ''}
+                  title={option?.attributeDetail?.name}
+                  selected={productGetters.getOptionSelectedValue(option as ProductOption)}
+                  radioOptions={radioOptions}
+                  onChange={async (selectedValue) => {
+                    await selectProductOption(
+                      option?.attributeFQN as string,
+                      selectedValue,
+                      undefined,
+                      option?.values?.find((value: any) => value?.value === selectedValue)
+                        ?.isEnabled as boolean
+                    )
+                  }}
+                />
+              </Box>
+            )
+          })}
+        </Box>
+        ;
         <Box paddingY={1} display={optionsVisibility.checkbox ? 'block' : 'none'}>
           {productOptions?.yesNoOptions.map((option: ProductOption | null) => {
             const attributeDetail = option?.attributeDetail as AttributeDetail
@@ -535,7 +629,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             )
           })}
         </Box>
-
         <Box paddingY={1} display={optionsVisibility.textbox ? 'block' : 'none'}>
           {productOptions?.textBoxOptions.map((option) => {
             return (
@@ -547,9 +640,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             )
           })}
         </Box>
-
         <PdpIconAttributes product={product} />
-
         <Box paddingY={1}>
           <QuantitySelector
             label="Qty"
@@ -597,7 +688,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
               />
             )}
         </Box>
-
         {!addItemToList && (
           <Box pt={2} display="flex" sx={{ justifyContent: 'space-between' }}>
             <Typography fontWeight="600" variant="body2">
