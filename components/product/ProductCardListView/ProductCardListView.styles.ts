@@ -109,7 +109,7 @@ export const ProductCardStyles = {
     position: 'absolute',
   },
   productTitle: {
-    width: '85%',
+    width: '75%',
     height: 'auto',
     color: '#2B2B2B',
   },
