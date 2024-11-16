@@ -35,7 +35,6 @@ export const ProductCardStyles = {
     },
     position: 'relative',
     zIndex: 1,
-    mt: 3,
   },
   shopNow: { width: '100%', marginTop: '3.063rem' },
   hoveredButtons: {
@@ -91,6 +90,7 @@ export const ProductCardStyles = {
     padding: '0px 10px',
     alignItems: 'end',
     marginBottom: '30px',
+    marginTop: '30px',
   },
   brandLable: {
     color: '#020027',
