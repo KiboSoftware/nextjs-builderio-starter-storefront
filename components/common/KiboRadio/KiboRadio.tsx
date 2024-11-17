@@ -61,7 +61,6 @@ export const KiboRadio = (props: KiboRadioProps) => {
         row={row}
       >
         {radioOptions?.map((radio, index) => {
-          console.log('This is radio ---> ', radio)
           return (
             <Box key={radio.value + index}>
               {radio.optionIndicator && (
