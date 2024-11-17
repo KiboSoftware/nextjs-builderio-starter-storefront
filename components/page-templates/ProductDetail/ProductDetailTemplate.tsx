@@ -55,6 +55,14 @@ import { FulfillmentOptions as FulfillmentOptionsConstant, PurchaseTypes } from 
 import { productGetters, subscriptionGetters, wishlistGetters } from '@/lib/getters'
 import { uiHelpers } from '@/lib/helpers'
 import type { ProductCustom, BreadCrumb, LocationCustom } from '@/lib/types'
+import abcore from '@/public/Brand_Logo/abcore-logo.png'
+import arista from '@/public/Brand_Logo/arista-logo.png'
+import bethyl from '@/public/Brand_Logo/bethyl-logo.png'
+import empirical from '@/public/Brand_Logo/empirical-logo.png'
+import fortis from '@/public/Brand_Logo/fortis-logo.png'
+import ipoc from '@/public/Brand_Logo/ipoc-logo.png'
+import nanocomposix from '@/public/Brand_Logo/nanocomposix-logo.png'
+import vector from '@/public/Brand_Logo/vector-logo.png'
 
 import type {
   AttributeDetail,
@@ -67,8 +75,19 @@ import type {
   Maybe,
 } from '@/lib/gql/types'
 
+const brandImages: Record<string, string> = {
+  arista: arista.src,
+  bethyl: bethyl.src,
+  abcore: abcore.src,
+  empirical: empirical.src,
+  nanocomposix: nanocomposix.src,
+  vector: vector.src,
+  ipoc: ipoc.src,
+  fortis: fortis.src,
+}
 interface ProductDetailTemplateProps {
   product: ProductCustom
+  sliceValue?: string
   productVariations?: Product[]
   breadcrumbs?: BreadCrumb[]
   isQuickViewModal?: boolean
@@ -138,6 +157,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { getProductLink } = uiHelpers()
   const {
     product,
+    sliceValue,
     productVariations,
     breadcrumbs = [],
     isQuickViewModal = false,
@@ -215,6 +235,10 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     },
     productPriceResponse?.price as ProductPrice
   )
+  const newProduct = productGetters.getNewProductAttrName(properties)
+  const brand = productGetters.getBrandName(properties)
+  const variantProductName = productGetters.getVariantProductAttributeName(properties)
+
   const { data: locationInventory } = useGetProductInventory(
     (variationProductCode || productCode) as string,
     selectedFulfillmentOption?.location?.code as string
@@ -489,7 +513,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     ...breadcrumb,
     link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
   }))
-
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -497,13 +520,80 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
         </Grid>
       )}
+
+      <Grid item xs={12}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flexStart',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginBottom: '16px',
+          }}
+        >
+          <Box
+            sx={{
+              width: { md: '80%', sm: '80%', xs: '100%' },
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
+            <Box>
+              {newProduct === 'true' && (
+                <Box
+                  sx={{
+                    width: { md: '80px', sm: '80px', xs: '60px' },
+                    height: { md: '41px', sm: '41px', xs: '30px' },
+                    backgroundSize: { md: 'cover', sm: 'cover', xs: 'cover' },
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    marginRight: '15px',
+                    marginTop: '12px',
+                  }}
+                  style={{
+                    backgroundImage: `url('/NewTag.svg')`,
+                  }}
+                ></Box>
+              )}
+            </Box>
+            <Box>
+              <Typography variant="h1" sx={{ color: 'primary.main' }}>
+                {sliceValue ? variantProductName : productName}
+              </Typography>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              width: {
+                xs: '0',
+                sm: newProduct === 'true' ? '20%' : '20%',
+                md: newProduct === 'true' ? '20%' : '20%',
+              },
+              display: { xs: 'none', sm: 'block' },
+              textAlign: 'right',
+            }}
+          >
+            {brand && brandImages[brand.toLowerCase()] && (
+              <Box
+                component="img"
+                src={brandImages[brand.toLowerCase()]}
+                alt={`${brand}-logo`}
+                sx={{
+                  width: '100%',
+                  maxWidth: { sm: '150px', md: '200px' },
+                  height: { sm: '50px', md: '65px' },
+                }}
+                data-testid="brand-logo"
+              />
+            )}
+          </Box>
+        </Box>
+      </Grid>
+
       <Grid item xs={12} md={6} sx={{ pb: { xs: 3, md: 0 } }}>
         <ImageGallery images={productGallery as ProductImage[]} title={''} />
       </Grid>
       <Grid item xs={12} md={6} sx={{ width: '100%', pl: { xs: 0, md: 5 } }}>
-        <Typography variant="h1" gutterBottom>
-          {productName}
-        </Typography>
         <Price
           price={t<string>('currency', { val: productPrice.regular })}
           {...(productPrice.special && {
