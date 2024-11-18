@@ -20,6 +20,15 @@ const styles = {
     color: '#30299A',
     textDecoration: 'underline',
   },
+  text: {
+    color: `${grey[900]}`,
+    fontFamily: 'Poppins',
+    fontSize: '16px',
+    fontWeight: 500,
+    lineHeight: '42px',
+    padding: 0,
+    paddingLeft: '20px',
+  },
 }
 
 // Define TypeScript types
@@ -163,29 +172,20 @@ const ProductApplications = (props: any) => {
                       <TableCell
                         variant="head"
                         sx={{
+                          ...styles.text,
                           width: '25%',
                           backgroundColor: `${grey[300]}`,
-                          color: `${grey[900]}`,
-                          fontFamily: 'Poppins',
-                          fontSize: '16px',
                           fontWeight: 500,
-                          lineHeight: '42px',
-                          padding: 0,
-                          paddingLeft: '20px',
                         }}
                       >
                         {data?.Application}
                       </TableCell>
                       <TableCell
                         sx={{
+                          ...styles.text,
                           width: '75%',
                           color: `${grey[900]}`,
-                          fontFamily: 'Poppins',
-                          fontSize: '16px',
                           fontWeight: 300,
-                          lineHeight: '42px',
-                          padding: 0,
-                          paddingLeft: '20px',
                         }}
                         dangerouslySetInnerHTML={{
                           __html: data?.ApplicationDilutionRange,

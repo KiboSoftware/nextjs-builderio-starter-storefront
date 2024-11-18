@@ -526,9 +526,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         ?.concat(currentProduct.properties || []) // Add currentProduct values
 
       // Update the product properties immutably
-      const updatedProductproperties = { ...product, properties: mergedProperties }
-
-      setUpdatedProduct(updatedProductproperties)
+      setUpdatedProduct({ ...product, properties: mergedProperties })
     }
 
     mergeProductProperties()
