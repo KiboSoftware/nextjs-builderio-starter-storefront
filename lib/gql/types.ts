@@ -10227,6 +10227,7 @@ export type ProductOptionValue = {
   stringValue?: Maybe<Scalars['String']>
   value?: Maybe<Scalars['Object']>
   variationProductCode?: string
+  properties?: Maybe<Scalars['Object']>
 }
 
 export type ProductOptionValue_GetArgs = {

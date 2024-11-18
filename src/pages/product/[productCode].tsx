@@ -110,7 +110,13 @@ const ProductDetailPage: NextPage<ProductPageType> = (props) => {
 
   const { isFallback, query } = router
 
-  const { data: productResponseData, isLoading: isProductLoading } = useGetProduct(query)
+  const {
+    data: productResponseData,
+    isLoading: isProductLoading,
+    queryParams: queryParams,
+  } = useGetProduct(query)
+
+  const { sliceValue } = queryParams
 
   if (isFallback || isProductLoading) {
     return <ProductDetailSkeleton />
@@ -124,6 +130,7 @@ const ProductDetailPage: NextPage<ProductPageType> = (props) => {
           product={{ ...product, ...productResponseData }}
           productVariations={productVariations}
           breadcrumbs={breadcrumbs}
+          sliceValue={sliceValue}
         >
           <BuilderComponent model={pdpBuilderSectionKey} content={props.section} />
         </ProductDetailTemplate>

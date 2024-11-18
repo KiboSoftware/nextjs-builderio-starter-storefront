@@ -10,6 +10,7 @@ const getProductSearchVariationsQuery = /* GraphQL */ `
             isSelected
           }
         }
+        sliceValue
         price {
           price
         }

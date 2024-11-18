@@ -278,6 +278,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         if (b?.childPriority === undefined) return -1
         return a?.childPriority - b?.childPriority
       })
+
+      // Move the item that matches `sliceValue` to the top
+      const matchedIndex = selectOption?.values?.findIndex((item) => item.value === sliceValue)
+      if (matchedIndex !== -1) {
+        const matchedItem = selectOption?.values?.splice(matchedIndex, 1)[0] // Remove the matched item
+        selectOption?.values?.unshift(matchedItem) // Insert the matched item at the top
+      }
     })
     return options
   }
@@ -702,7 +709,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             )
           })}
         </Box>
-        ;
         <Box paddingY={1} display={optionsVisibility.checkbox ? 'block' : 'none'}>
           {productOptions?.yesNoOptions.map((option: ProductOption | null) => {
             const attributeDetail = option?.attributeDetail as AttributeDetail

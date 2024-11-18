@@ -17,6 +17,7 @@ export interface UseProductResponse {
   isSuccess: boolean
   isFetching: boolean
   isError: boolean
+  queryParams: Record<string, string | undefined>
 }
 
 const fetchProduct = async (productCode: string) => {
@@ -40,5 +41,5 @@ export const useGetProduct = (query?: any): UseProductResponse => {
     enabled: !!query?.productCode,
   })
 
-  return { data, isLoading, isSuccess, isFetching, isError }
+  return { data, isLoading, isSuccess, isFetching, isError, queryParams: query || {} }
 }
