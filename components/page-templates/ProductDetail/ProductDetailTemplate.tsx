@@ -21,6 +21,7 @@ import { useTranslation } from 'next-i18next'
 
 import ProductSpecifications from './ProductSpecifications'
 import {
+  FortisRadio,
   FulfillmentOptions,
   KiboRadio,
   KiboSelect,
@@ -533,9 +534,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         ?.concat(currentProduct.properties || []) // Add currentProduct values
 
       // Update the product properties immutably
-      const updatedProductproperties = { ...product, properties: mergedProperties }
-
-      setUpdatedProduct(updatedProductproperties)
+      setUpdatedProduct({ ...product, properties: mergedProperties })
     }
 
     mergeProductProperties()
@@ -717,7 +716,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
             return (
               <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <KiboRadio
+                <FortisRadio
                   name={option?.attributeDetail?.name || ''}
                   title={option?.attributeDetail?.name}
                   selected={productGetters.getOptionSelectedValue(option as ProductOption)}
@@ -890,7 +889,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         </>
       )}
       <ProductSpecifications product={updatedProduct} />
-      <ProductApplications product={updatedProduct} />
+      <ProductApplications product={updatedProduct} currentProduct={currentProduct} />
       {digitalDocumentData && digitalDocumentData.length > 0 ? (
         <ProductRecentDocuments
           code={variationProductCode || productCode}
