@@ -517,6 +517,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     fetchDocumentData()
   }, [variationProductCode, productCode])
 
+  // console.log("digital data",digitalDocumentData)
+  // console.log("productGallery", productGallery as ProductImage[])
   useEffect(() => {
     const mergeProductProperties = () => {
       if (!product || !currentProduct) return
@@ -545,6 +547,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     ...breadcrumb,
     link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
   }))
+
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -623,7 +626,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       </Grid>
 
       <Grid item xs={12} md={6} sx={{ pb: { xs: 3, md: 0 } }}>
-        <ImageGallery images={productGallery as ProductImage[]} title={''} />
+        <ImageGallery
+          digitalAssets={digitalDocumentData}
+          kiboImages={productGallery as ProductImage[]}
+          title={'HI Image'}
+          brandImage={brandImages[brand.toLowerCase()]}
+        />
+        {/* <ImageGallery images={productGallery as ProductImage[]} title={'HI Image'} /> */}
       </Grid>
       <Grid item xs={12} md={6} sx={{ width: '100%', pl: { xs: 0, md: 5 } }}>
         <Price
