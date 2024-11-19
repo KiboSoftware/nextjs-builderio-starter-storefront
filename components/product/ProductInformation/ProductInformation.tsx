@@ -37,7 +37,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 interface ProductInformationProps {
-  productFullDescription: string | undefined
+  productFullDescription: any
   options: CrProductOption[]
 }
 
@@ -56,7 +56,7 @@ const ProductInformation = (props: ProductInformationProps) => {
       <Box
         sx={{ fontSize: (theme) => theme.typography.body2, color: 'grey.900' }}
         dangerouslySetInnerHTML={{
-          __html: productFullDescription as string,
+          __html: productFullDescription,
         }}
         data-testid="product-content"
       />
