@@ -53,6 +53,7 @@ const ProductInformation = (props: ProductInformationProps) => {
       >
         {t('product-details')}
       </Typography> */}
+      {/* productFullDescription removed from string*/}
       <Box
         sx={{ fontSize: (theme) => theme.typography.body2, color: 'grey.900' }}
         dangerouslySetInnerHTML={{
