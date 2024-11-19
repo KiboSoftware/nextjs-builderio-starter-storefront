@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
+import { RttOutlined } from '@mui/icons-material'
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded'
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded'
 import StarRounded from '@mui/icons-material/StarRounded'
@@ -16,10 +17,13 @@ import {
   Theme,
   MenuItem,
 } from '@mui/material'
+import { data } from 'cheerio/dist/commonjs/api/attributes'
+import { any } from 'jest-mock-extended'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
 import ProductSpecifications from './ProductSpecifications'
+import { SortingValues } from '../../../lib/types/B2bTypes'
 import {
   FortisRadio,
   FulfillmentOptions,
@@ -644,7 +648,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
         <Box paddingY={1} display={shortDescription ? 'block' : 'none'}>
           <Box
-            sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
             data-testid="short-description"
             dangerouslySetInnerHTML={{
               __html: shortDescription,
@@ -769,6 +772,21 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 onBlur={selectProductOption}
               />
             )
+          })}
+        </Box>
+        <Box>
+          {currentProduct.properties?.map((item: any, index: number) => {
+            if (item?.attributeFQN === 'tenant~description-variant') {
+              return (
+                <Typography
+                  key={index}
+                  dangerouslySetInnerHTML={{
+                    __html: item?.values[0]?.stringValue,
+                  }}
+                  sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
+                />
+              )
+            }
           })}
         </Box>
         <PdpIconAttributes product={product} />
