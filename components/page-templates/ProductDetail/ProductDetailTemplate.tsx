@@ -178,6 +178,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     (type) => type === FulfillmentOptionsConstant.DIGITAL
   )
 
+  console.log('This is updatedProduct ---> ', updatedProduct)
+
   const [purchaseType, setPurchaseType] = useState<string>(PurchaseTypes.ONETIMEPURCHASE)
   const [selectedFrequency, setSelectedFrequency] = useState<string>('')
   const [isSubscriptionPricingSelected, setIsSubscriptionPricingSelected] = useState<boolean>(false)
