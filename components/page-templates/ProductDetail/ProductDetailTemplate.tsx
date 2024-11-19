@@ -889,7 +889,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         </>
       )}
       <ProductSpecifications product={updatedProduct} />
-      <ProductApplications product={updatedProduct} />
+      <ProductApplications product={updatedProduct} currentProduct={currentProduct} />
       {digitalDocumentData && digitalDocumentData.length > 0 ? (
         <ProductRecentDocuments
           code={variationProductCode || productCode}
