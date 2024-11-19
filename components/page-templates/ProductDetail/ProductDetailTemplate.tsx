@@ -632,7 +632,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           digitalAssets={digitalDocumentData}
           kiboImages={productGallery as ProductImage[]}
           title={'HI Image'}
-          brandImage={brandImages[brand.toLowerCase()]}
+          brandImage={brand && typeof brand === 'string' ? brandImages[brand.toLowerCase()] : null}
         />
         {/* <ImageGallery images={productGallery as ProductImage[]} title={'HI Image'} /> */}
       </Grid>
