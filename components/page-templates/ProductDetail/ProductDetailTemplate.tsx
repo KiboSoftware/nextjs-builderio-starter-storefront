@@ -41,6 +41,7 @@ import {
   ProductVariantSizeSelector,
 } from '@/components/product'
 import PdpIconAttributes from '@/components/product/PdpIconAttributes'
+import ProductApplications from '@/components/product/ProductApplication/ProductApplications'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -171,6 +172,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     shouldFetchShippingMethods,
     getCurrentProduct,
   } = props
+  const [updatedProduct, setUpdatedProduct] = useState(product)
   const { t } = useTranslation('common')
   const isDigitalFulfillment = product.fulfillmentTypesSupported?.some(
     (type) => type === FulfillmentOptionsConstant.DIGITAL
@@ -514,6 +516,29 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     }
     fetchDocumentData()
   }, [variationProductCode, productCode])
+
+  useEffect(() => {
+    const mergeProductProperties = () => {
+      if (!product || !currentProduct) return
+
+      // Create a map of currentProduct properties by attributeFQN for quick lookup
+      const currentProductMap = new Map(
+        currentProduct.properties?.map((item: any) => [item.attributeFQN, item])
+      )
+
+      // Merge properties from product and currentProduct
+      const mergedProperties = product.properties
+        ?.filter(
+          (item: any) => !currentProductMap.has(item.attributeFQN) // Remove duplicates from product
+        )
+        ?.concat(currentProduct.properties || []) // Add currentProduct values
+
+      // Update the product properties immutably
+      setUpdatedProduct({ ...product, properties: mergedProperties })
+    }
+
+    mergeProductProperties()
+  }, [product, currentProduct])
 
   // Update breadcrumbs links
   const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
@@ -863,7 +888,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           {children}
         </>
       )}
-      <ProductSpecifications product={product} />
+      <ProductSpecifications product={updatedProduct} />
+      <ProductApplications product={updatedProduct} />
       {digitalDocumentData && digitalDocumentData.length > 0 ? (
         <ProductRecentDocuments
           code={variationProductCode || productCode}
