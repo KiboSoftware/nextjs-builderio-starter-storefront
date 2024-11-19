@@ -21,6 +21,7 @@ import { useTranslation } from 'next-i18next'
 
 import ProductSpecifications from './ProductSpecifications'
 import {
+  FortisRadio,
   FulfillmentOptions,
   KiboRadio,
   KiboSelect,
@@ -690,7 +691,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
             return (
               <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <KiboRadio
+                <FortisRadio
                   name={option?.attributeDetail?.name || ''}
                   title={option?.attributeDetail?.name}
                   selected={productGetters.getOptionSelectedValue(option as ProductOption)}
