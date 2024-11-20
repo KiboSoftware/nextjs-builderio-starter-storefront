@@ -183,6 +183,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const [purchaseType, setPurchaseType] = useState<string>(PurchaseTypes.ONETIMEPURCHASE)
   const [selectedFrequency, setSelectedFrequency] = useState<string>('')
   const [isSubscriptionPricingSelected, setIsSubscriptionPricingSelected] = useState<boolean>(false)
+  const [skuStatusText, setSkuStatusText] = useState<string | null>('')
+  const [showPrices, setShowPrices] = useState<boolean | null>()
   // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
@@ -544,6 +546,22 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     mergeProductProperties()
   }, [product, currentProduct])
 
+  useEffect(() => {
+    const skuStatusTextProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~sku-status-text'
+    )
+
+    const showPricesProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~show-prices'
+    )
+
+    setSkuStatusText(
+      skuStatusTextProperty ? String(skuStatusTextProperty?.values?.[0]?.value) : null
+    )
+
+    setShowPrices(showPricesProperty ? Boolean(showPricesProperty?.values?.[0]?.value) : null)
+  }, [updatedProduct])
+
   // Update breadcrumbs links
   const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
     ...breadcrumb,
@@ -688,30 +706,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             onSizeChange={selectProductOption}
           />
         </Box>
-        {/* <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
-          {productOptions?.selectOptions?.map((option) => {
-            return (
-              <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <ProductOptionSelect
-                  name={option?.attributeDetail?.name}
-                  optionValues={option?.values as ProductOptionValue[]}
-                  value={productGetters.getOptionSelectedValue(option as ProductOption)}
-                  label={productGetters.getOptionName(option as ProductOption)}
-                  attributeFQN={option?.attributeFQN as string}
-                  onDropdownChange={async (attributeFQN, selectedValue) =>
-                    await selectProductOption(
-                      attributeFQN,
-                      selectedValue,
-                      undefined,
-                      option?.values?.find((value) => value?.value === selectedValue)
-                        ?.isEnabled as boolean
-                    )
-                  }
-                />
-              </Box>
-            )
-          })}
-        </Box> */}
         <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
           {factoredProductData?.selectOptions?.map((option: any) => {
             // Mapping product options to radio button options
@@ -732,6 +726,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                   title={option?.attributeDetail?.name}
                   selected={productGetters.getOptionSelectedValue(option as ProductOption)}
                   radioOptions={radioOptions}
+                  skuStatusText={skuStatusText}
+                  showPrices={showPrices}
                   onChange={async (selectedValue) => {
                     await selectProductOption(
                       option?.attributeFQN as string,
