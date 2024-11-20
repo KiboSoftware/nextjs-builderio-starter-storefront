@@ -116,9 +116,11 @@ export async function getStaticProps(
 const CategoryPage: NextPage<CategoryPageType> = (props) => {
   const router = useRouter()
   const { publicRuntimeConfig } = getConfig()
-  const code = props.categoryCode
+  const { categoryCode } = router.query
+  const code = props.categoryCode || categoryCode
+
   const [searchParams, setSearchParams] = useState<CategorySearchParams>({
-    categoryCode: props.categoryCode,
+    categoryCode: code,
   } as unknown as CategorySearchParams)
 
   useEffect(() => {
@@ -140,24 +142,31 @@ const CategoryPage: NextPage<CategoryPageType> = (props) => {
     props.results
   )
 
+  const [breadcrumbs, setBreadcrumbs] = useState<any[]>([])
+
+  useEffect(() => {
+    // Set breadcrumbs when categoryCode changes
+    if (props.category) {
+      const newBreadcrumbs = facetGetters.getBreadcrumbs(props.category)
+      setBreadcrumbs(newBreadcrumbs)
+    }
+  }, [props.category, code]) // Re-run when category or categoryCode changes
+
   if (isError) {
     return <ErrorPage statusCode={404} />
   }
 
-  const breadcrumbs = facetGetters.getBreadcrumbs(props.category)
-
   const facetList = productSearchResult?.facets as Facet[]
   const products = productSearchResult?.items as Product[]
 
-  const categoryFacet = productSearchGetters.getCategoryFacet(
-    productSearchResult,
-    props.categoryCode
-  )
+  const categoryFacet = productSearchGetters.getCategoryFacet(productSearchResult, code)
   const appliedFilters = facetGetters.getSelectedFacets(productSearchResult?.facets as Facet[])
 
   const categoryPageHeading = categoryFacet.header
     ? categoryFacet.header
-    : breadcrumbs[breadcrumbs.length - 1].text
+    : breadcrumbs.length > 0
+    ? breadcrumbs[breadcrumbs.length - 1]?.text
+    : categoryFacet.header
 
   const sortingValues = facetGetters.getSortOptions(
     {
