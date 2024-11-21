@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState, PropsWithChildren } from 'react'
 
 import { BuilderComponent, builder } from '@builder.io/react'
-import { Box } from '@mui/material'
 import getConfig from 'next/config'
 import ErrorPage from 'next/error'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-import { KiboBreadcrumbs } from '@/components/core'
 import { ProductListingTemplate } from '@/components/page-templates'
-import { PLPStyles } from '@/components/page-templates/ProductListingTemplate/ProductListingTemplate.styles'
 import { useGetSearchedProducts } from '@/hooks'
 import { getCategoryTree, productSearch } from '@/lib/api/operations'
 import { productSearchGetters, facetGetters } from '@/lib/getters'
@@ -145,29 +142,11 @@ const CategoryPage: NextPage<CategoryPageType> = (props) => {
     props.results
   )
 
-  const [breadcrumbs, setBreadcrumbs] = useState<any[]>([])
-  const [loadingBreadcrumbs, setLoadingBreadcrumbs] = useState(true)
-
-  useEffect(() => {
-    // Define a function to fetch breadcrumbs asynchronously
-    const fetchBreadcrumbs = async () => {
-      try {
-        setLoadingBreadcrumbs(true)
-        const fetchedBreadcrumbs = await facetGetters.getBreadcrumbs(props.category)
-        setBreadcrumbs(fetchedBreadcrumbs)
-      } catch (error) {
-        console.error('Error loading breadcrumbs:', error)
-      } finally {
-        setLoadingBreadcrumbs(false)
-      }
-    }
-
-    fetchBreadcrumbs()
-  }, [props.category])
-
   if (isError) {
     return <ErrorPage statusCode={404} />
   }
+
+  const breadcrumbs = facetGetters.getBreadcrumbs(props.category)
 
   const facetList = productSearchResult?.facets as Facet[]
   const products = productSearchResult?.items as Product[]
@@ -234,20 +213,9 @@ const CategoryPage: NextPage<CategoryPageType> = (props) => {
       { scroll: false, shallow: true }
     )
   }
-  //Update breadcrumbs links
-  const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
-    ...breadcrumb,
-    link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
-  }))
+
   return (
     <>
-      {loadingBreadcrumbs ? (
-        <div>Loading breadcrumbs...</div>
-      ) : (
-        <Box sx={{ ...PLPStyles.breadcrumbsClass }}>
-          <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
-        </Box>
-      )}
       <ProductListingTemplate
         productListingHeader={categoryPageHeading as string}
         categoryFacet={categoryFacet}
