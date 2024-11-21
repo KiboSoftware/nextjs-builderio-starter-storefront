@@ -245,8 +245,12 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     },
     productPriceResponse?.price as ProductPrice
   )
-  const newProduct = productGetters.getNewProductAttrName(properties)
-  const brand = productGetters.getBrandName(properties)
+  const newProductData = product?.properties?.find(
+    (data: any) => data?.attributeFQN === 'tenant~new-product'
+  )
+  const newProduct = (newProductData?.values?.[0]?.value as string) ?? null
+  const brandValue = product?.properties?.find((data: any) => data?.attributeFQN === 'tenant~brand')
+  const brand = (brandValue?.values?.[0]?.value as string) ?? null
   const variantProductName = productGetters.getVariantProductAttributeName(properties)
 
   const { data: locationInventory } = useGetProductInventory(
@@ -598,7 +602,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             }}
           >
             <Box>
-              {newProduct === 'true' && (
+              {newProduct && (
                 <Box
                   sx={{
                     width: { md: '80px', sm: '80px', xs: '60px' },
