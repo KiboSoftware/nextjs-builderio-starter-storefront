@@ -161,6 +161,7 @@ const LoginContent = (props: LoginContentProps) => {
         /> */}
         <Link
           component="button"
+          type="button"
           variant="body1"
           color="text.primary"
           onClick={handleForgotPassword}
@@ -205,6 +206,7 @@ const LoginContent = (props: LoginContentProps) => {
               </Typography>
               <Link
                 component="button"
+                type="button"
                 variant="body2"
                 color="text.primary"
                 onClick={registerNow}
