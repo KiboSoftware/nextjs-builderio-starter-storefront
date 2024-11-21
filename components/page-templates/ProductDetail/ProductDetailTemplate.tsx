@@ -21,6 +21,7 @@ import { useTranslation } from 'next-i18next'
 
 import ProductSpecifications from './ProductSpecifications'
 import {
+  FortisRadio,
   FulfillmentOptions,
   KiboRadio,
   KiboSelect,
@@ -40,6 +41,7 @@ import {
   ProductVariantSizeSelector,
 } from '@/components/product'
 import PdpIconAttributes from '@/components/product/PdpIconAttributes'
+import ProductApplications from '@/components/product/ProductApplication/ProductApplications'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -170,14 +172,19 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     shouldFetchShippingMethods,
     getCurrentProduct,
   } = props
+  const [updatedProduct, setUpdatedProduct] = useState(product)
   const { t } = useTranslation('common')
   const isDigitalFulfillment = product.fulfillmentTypesSupported?.some(
     (type) => type === FulfillmentOptionsConstant.DIGITAL
   )
 
+  console.log('This is updatedProduct ---> ', updatedProduct)
+
   const [purchaseType, setPurchaseType] = useState<string>(PurchaseTypes.ONETIMEPURCHASE)
   const [selectedFrequency, setSelectedFrequency] = useState<string>('')
   const [isSubscriptionPricingSelected, setIsSubscriptionPricingSelected] = useState<boolean>(false)
+  const [skuStatusText, setSkuStatusText] = useState<string | null>('')
+  const [showPrices, setShowPrices] = useState<boolean | null>()
   // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
@@ -514,11 +521,53 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     fetchDocumentData()
   }, [variationProductCode, productCode])
 
+  // console.log("digital data",digitalDocumentData)
+  // console.log("productGallery", productGallery as ProductImage[])
+  useEffect(() => {
+    const mergeProductProperties = () => {
+      if (!product || !currentProduct) return
+
+      // Create a map of currentProduct properties by attributeFQN for quick lookup
+      const currentProductMap = new Map(
+        currentProduct.properties?.map((item: any) => [item.attributeFQN, item])
+      )
+
+      // Merge properties from product and currentProduct
+      const mergedProperties = product.properties
+        ?.filter(
+          (item: any) => !currentProductMap.has(item.attributeFQN) // Remove duplicates from product
+        )
+        ?.concat(currentProduct.properties || []) // Add currentProduct values
+
+      // Update the product properties immutably
+      setUpdatedProduct({ ...product, properties: mergedProperties })
+    }
+
+    mergeProductProperties()
+  }, [product, currentProduct])
+
+  useEffect(() => {
+    const skuStatusTextProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~sku-status-text'
+    )
+
+    const showPricesProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~show-prices'
+    )
+
+    setSkuStatusText(
+      skuStatusTextProperty ? String(skuStatusTextProperty?.values?.[0]?.value) : null
+    )
+
+    setShowPrices(showPricesProperty ? Boolean(showPricesProperty?.values?.[0]?.value) : null)
+  }, [updatedProduct])
+
   // Update breadcrumbs links
   const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
     ...breadcrumb,
     link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
   }))
+
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -597,7 +646,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       </Grid>
 
       <Grid item xs={12} md={6} sx={{ pb: { xs: 3, md: 0 } }}>
-        <ImageGallery images={productGallery as ProductImage[]} title={''} />
+        <ImageGallery
+          digitalAssets={digitalDocumentData}
+          kiboImages={productGallery as ProductImage[]}
+          title={'HI Image'}
+          brandImage={brand && typeof brand === 'string' ? brandImages[brand.toLowerCase()] : null}
+        />
+        {/* <ImageGallery images={productGallery as ProductImage[]} title={'HI Image'} /> */}
       </Grid>
       <Grid item xs={12} md={6} sx={{ width: '100%', pl: { xs: 0, md: 5 } }}>
         <Price
@@ -651,30 +706,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             onSizeChange={selectProductOption}
           />
         </Box>
-        {/* <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
-          {productOptions?.selectOptions?.map((option) => {
-            return (
-              <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <ProductOptionSelect
-                  name={option?.attributeDetail?.name}
-                  optionValues={option?.values as ProductOptionValue[]}
-                  value={productGetters.getOptionSelectedValue(option as ProductOption)}
-                  label={productGetters.getOptionName(option as ProductOption)}
-                  attributeFQN={option?.attributeFQN as string}
-                  onDropdownChange={async (attributeFQN, selectedValue) =>
-                    await selectProductOption(
-                      attributeFQN,
-                      selectedValue,
-                      undefined,
-                      option?.values?.find((value) => value?.value === selectedValue)
-                        ?.isEnabled as boolean
-                    )
-                  }
-                />
-              </Box>
-            )
-          })}
-        </Box> */}
         <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
           {factoredProductData?.selectOptions?.map((option: any) => {
             // Mapping product options to radio button options
@@ -690,11 +721,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
             return (
               <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <KiboRadio
+                <FortisRadio
                   name={option?.attributeDetail?.name || ''}
                   title={option?.attributeDetail?.name}
                   selected={productGetters.getOptionSelectedValue(option as ProductOption)}
                   radioOptions={radioOptions}
+                  skuStatusText={skuStatusText}
+                  showPrices={showPrices}
                   onChange={async (selectedValue) => {
                     await selectProductOption(
                       option?.attributeFQN as string,
@@ -862,7 +895,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           {children}
         </>
       )}
-      <ProductSpecifications product={product} />
+      <ProductSpecifications product={updatedProduct} />
+      <ProductApplications product={updatedProduct} currentProduct={currentProduct} />
       {digitalDocumentData && digitalDocumentData.length > 0 ? (
         <ProductRecentDocuments
           code={variationProductCode || productCode}
