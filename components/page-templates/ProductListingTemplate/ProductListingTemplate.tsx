@@ -195,12 +195,17 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       onClickAddToCart: (payload: any) => handleAddToCart(payload),
     }
   }
+  // Update breadcrumbs links
+  const updatedBreadcrumbsList = breadCrumbsList.map((breadcrumb) => ({
+    ...breadcrumb,
+    link: breadcrumb.link ? breadcrumb.link.replace('/category/', '/products/') : breadcrumb.link,
+  }))
 
   return (
     <>
-      {/* <Box sx={{ ...PLPStyles.breadcrumbsClass }}>
+      <Box sx={{ ...PLPStyles.breadcrumbsClass }}>
         <KiboBreadcrumbs breadcrumbs={updatedBreadcrumbsList} />
-      </Box> */}
+      </Box>
 
       {productListingHeader && !showFilterBy ? (
         <>
