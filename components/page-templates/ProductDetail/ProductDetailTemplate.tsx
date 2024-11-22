@@ -529,8 +529,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     fetchDocumentData()
   }, [variationProductCode, productCode])
 
-  // console.log("digital data",digitalDocumentData)
-  // console.log("productGallery", productGallery as ProductImage[])
   useEffect(() => {
     const mergeProductProperties = () => {
       if (!product || !currentProduct) return
