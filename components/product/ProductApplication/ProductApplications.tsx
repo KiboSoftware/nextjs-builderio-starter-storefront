@@ -32,6 +32,15 @@ const styles = {
 }
 
 // Define TypeScript types
+interface Property {
+  attributeFQN: string
+  values: { stringValue: string }[]
+}
+
+interface Product {
+  properties?: Property[]
+}
+
 interface ApplicationRange {
   Application: string
   ApplicationDilutionRange: string
@@ -42,9 +51,12 @@ interface ThemeMapping {
   longName: string
 }
 
-const ProductApplications = (props: any) => {
-  const { product } = props
+interface ProductApplicationsProps {
+  product: Product
+  currentProduct: Product
+}
 
+const ProductApplications = ({ product, currentProduct }: any) => {
   const [themeCodeMapping, setThemeCodeMapping] = useState<ThemeMapping[]>([])
   const [applicationText, setApplicationText] = useState<string | null>(null)
   const [applicationTextVariant, setApplicationTextVariant] = useState<string | null>(null)
@@ -52,17 +64,16 @@ const ProductApplications = (props: any) => {
   const [newArray, setNewArray] = useState<ApplicationRange[]>([])
   const [showView, setShowView] = useState(false)
 
-  // Update state from product properties
   useEffect(() => {
     const properties = product?.properties || []
     const getApplicationText = properties.find(
-      (data: any) => data.attributeFQN === 'tenant~application-text'
+      (data: Property) => data.attributeFQN === 'tenant~application-text'
     )
-    const getApplicationTextVariant = properties.find(
-      (data: any) => data.attributeFQN === 'tenant~application-text-variant'
+    const getApplicationTextVariant = currentProduct?.properties?.find(
+      (data: Property) => data.attributeFQN === 'tenant~application-text-variant'
     )
-    const getApplicationDilutionRange = properties.find(
-      (data: any) => data.attributeFQN === 'tenant~application-dilution-range'
+    const getApplicationDilutionRange = currentProduct?.properties?.find(
+      (data: Property) => data.attributeFQN === 'tenant~application-dilution-range'
     )
 
     setApplicationText(getApplicationText?.values[0]?.stringValue || null)
@@ -74,60 +85,48 @@ const ProductApplications = (props: any) => {
     const hasRelevantData =
       !!getApplicationText || !!getApplicationTextVariant || !!getApplicationDilutionRange
     setShowView(hasRelevantData)
-  }, [product])
+  }, [product, currentProduct])
 
-  // Generate updated array when dependencies change
   useEffect(() => {
-    const updateNewArray = () => {
-      if (!applicationDilutionRange.length || !themeCodeMapping.length) return
+    if (!applicationDilutionRange.length || !themeCodeMapping.length) return
 
-      const updatedArray = applicationDilutionRange.map((data) => {
-        const matchedItem = themeCodeMapping.find(
-          (item) => data?.Application?.toLowerCase() === item?.applId?.toLowerCase()
-        )
-        return matchedItem
-          ? {
-              Application: matchedItem?.longName,
-              ApplicationDilutionRange: data?.ApplicationDilutionRange,
-            }
-          : data
-      })
+    const updatedArray = applicationDilutionRange.map((data: ApplicationRange) => {
+      const matchedItem = themeCodeMapping.find(
+        (item) => data.Application.toLowerCase() === item.applId.toLowerCase()
+      )
+      return matchedItem
+        ? {
+            Application: matchedItem.longName,
+            ApplicationDilutionRange: data.ApplicationDilutionRange,
+          }
+        : data
+    })
 
-      setNewArray(updatedArray)
-    }
-
-    updateNewArray()
+    setNewArray(updatedArray)
   }, [applicationDilutionRange, themeCodeMapping])
 
-  // Fetch theme settings on mount
   useEffect(() => {
-    async function fetchThemeSettings() {
-      const settings = await GetThemeSettings()
-      setThemeCodeMapping(settings?.data?.themeCodeMapping || [])
+    const fetchThemeSettings = async () => {
+      try {
+        const settings = await GetThemeSettings()
+        setThemeCodeMapping(settings?.data?.themeCodeMapping || [])
+      } catch (error) {
+        console.error('Error fetching theme settings:', error)
+      }
     }
     fetchThemeSettings()
   }, [])
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
       {showView && (
-        <Box
-          sx={{
-            width: '100%',
-            maxWidth: '1200px',
-          }}
-        >
+        <Box sx={{ width: '100%', maxWidth: '1200px' }}>
           <Typography variant="h3" sx={{ marginBottom: '10px' }}>
             Applications
           </Typography>
 
           {applicationText && (
-            <Box
-              sx={{
-                marginBottom: '22px',
-                color: `${grey[900]}`,
-              }}
-            >
+            <Box sx={{ marginBottom: '22px', color: `${grey[900]}` }}>
               <Typography
                 variant="body2"
                 gutterBottom
@@ -140,12 +139,7 @@ const ProductApplications = (props: any) => {
           )}
 
           {applicationTextVariant && (
-            <Box
-              sx={{
-                marginBottom: '22px',
-                color: `${grey[900]}`,
-              }}
-            >
+            <Box sx={{ marginBottom: '22px', color: `${grey[900]}` }}>
               <Typography
                 variant="body2"
                 gutterBottom
@@ -157,7 +151,7 @@ const ProductApplications = (props: any) => {
             </Box>
           )}
 
-          {applicationDilutionRange && (
+          {applicationDilutionRange.length > 0 && (
             <TableContainer
               component={Paper}
               sx={{
@@ -167,7 +161,7 @@ const ProductApplications = (props: any) => {
             >
               <Table>
                 <TableBody>
-                  {newArray.map((data: any, index: number) => (
+                  {newArray.map((data, index) => (
                     <TableRow key={index}>
                       <TableCell
                         variant="head"
@@ -178,7 +172,7 @@ const ProductApplications = (props: any) => {
                           fontWeight: 500,
                         }}
                       >
-                        {data?.Application}
+                        {data.Application}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -188,7 +182,7 @@ const ProductApplications = (props: any) => {
                           fontWeight: 300,
                         }}
                         dangerouslySetInnerHTML={{
-                          __html: data?.ApplicationDilutionRange,
+                          __html: data.ApplicationDilutionRange,
                         }}
                       />
                     </TableRow>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
+import { RttOutlined } from '@mui/icons-material'
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded'
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded'
 import StarRounded from '@mui/icons-material/StarRounded'
@@ -16,10 +17,13 @@ import {
   Theme,
   MenuItem,
 } from '@mui/material'
+import { data } from 'cheerio/dist/commonjs/api/attributes'
+import { any } from 'jest-mock-extended'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
 import ProductSpecifications from './ProductSpecifications'
+import { SortingValues } from '../../../lib/types/B2bTypes'
 import {
   FortisRadio,
   FulfillmentOptions,
@@ -178,9 +182,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     (type) => type === FulfillmentOptionsConstant.DIGITAL
   )
 
+  console.log('This is updatedProduct ---> ', updatedProduct)
+
   const [purchaseType, setPurchaseType] = useState<string>(PurchaseTypes.ONETIMEPURCHASE)
   const [selectedFrequency, setSelectedFrequency] = useState<string>('')
   const [isSubscriptionPricingSelected, setIsSubscriptionPricingSelected] = useState<boolean>(false)
+  const [skuStatusText, setSkuStatusText] = useState<string | null>('')
+  const [showPrices, setShowPrices] = useState<boolean | null>()
   // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
@@ -237,8 +245,12 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     },
     productPriceResponse?.price as ProductPrice
   )
-  const newProduct = productGetters.getNewProductAttrName(properties)
-  const brand = productGetters.getBrandName(properties)
+  const newProductData = product?.properties?.find(
+    (data: any) => data?.attributeFQN === 'tenant~new-product'
+  )
+  const newProduct = (newProductData?.values?.[0]?.value as string) ?? null
+  const brandValue = product?.properties?.find((data: any) => data?.attributeFQN === 'tenant~brand')
+  const brand = (brandValue?.values?.[0]?.value as string) ?? null
   const variantProductName = productGetters.getVariantProductAttributeName(properties)
 
   const { data: locationInventory } = useGetProductInventory(
@@ -540,6 +552,22 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     mergeProductProperties()
   }, [product, currentProduct])
 
+  useEffect(() => {
+    const skuStatusTextProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~sku-status-text'
+    )
+
+    const showPricesProperty = updatedProduct?.properties?.find(
+      (prop) => prop?.attributeFQN === 'tenant~show-prices'
+    )
+
+    setSkuStatusText(
+      skuStatusTextProperty ? String(skuStatusTextProperty?.values?.[0]?.value) : null
+    )
+
+    setShowPrices(showPricesProperty ? Boolean(showPricesProperty?.values?.[0]?.value) : null)
+  }, [updatedProduct])
+
   // Update breadcrumbs links
   const updatedBreadcrumbsList = breadcrumbs.map((breadcrumb) => ({
     ...breadcrumb,
@@ -572,7 +600,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             }}
           >
             <Box>
-              {newProduct === 'true' && (
+              {newProduct && (
                 <Box
                   sx={{
                     width: { md: '80px', sm: '80px', xs: '60px' },
@@ -642,7 +670,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
         <Box paddingY={1} display={shortDescription ? 'block' : 'none'}>
           <Box
-            sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
             data-testid="short-description"
             dangerouslySetInnerHTML={{
               __html: shortDescription,
@@ -684,30 +711,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
             onSizeChange={selectProductOption}
           />
         </Box>
-        {/* <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
-          {productOptions?.selectOptions?.map((option) => {
-            return (
-              <Box key={option?.attributeDetail?.name} paddingY={1}>
-                <ProductOptionSelect
-                  name={option?.attributeDetail?.name}
-                  optionValues={option?.values as ProductOptionValue[]}
-                  value={productGetters.getOptionSelectedValue(option as ProductOption)}
-                  label={productGetters.getOptionName(option as ProductOption)}
-                  attributeFQN={option?.attributeFQN as string}
-                  onDropdownChange={async (attributeFQN, selectedValue) =>
-                    await selectProductOption(
-                      attributeFQN,
-                      selectedValue,
-                      undefined,
-                      option?.values?.find((value) => value?.value === selectedValue)
-                        ?.isEnabled as boolean
-                    )
-                  }
-                />
-              </Box>
-            )
-          })}
-        </Box> */}
         <Box paddingY={1} display={optionsVisibility.select ? 'block' : 'none'}>
           {factoredProductData?.selectOptions?.map((option: any) => {
             // Mapping product options to radio button options
@@ -728,6 +731,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                   title={option?.attributeDetail?.name}
                   selected={productGetters.getOptionSelectedValue(option as ProductOption)}
                   radioOptions={radioOptions}
+                  skuStatusText={skuStatusText}
+                  showPrices={showPrices}
                   onChange={async (selectedValue) => {
                     await selectProductOption(
                       option?.attributeFQN as string,
@@ -767,6 +772,21 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 onBlur={selectProductOption}
               />
             )
+          })}
+        </Box>
+        <Box>
+          {currentProduct.properties?.map((item: any, index: number) => {
+            if (item?.attributeFQN === 'tenant~description-variant') {
+              return (
+                <Typography
+                  key={index}
+                  dangerouslySetInnerHTML={{
+                    __html: item?.values[0]?.stringValue,
+                  }}
+                  sx={{ fontSize: (theme) => theme.typography.body2, color: '#000' }}
+                />
+              )
+            }
           })}
         </Box>
         <PdpIconAttributes product={product} />
@@ -896,7 +916,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         </>
       )}
       <ProductSpecifications product={updatedProduct} />
-      <ProductApplications product={updatedProduct} />
+      <ProductApplications product={updatedProduct} currentProduct={currentProduct} />
       {digitalDocumentData && digitalDocumentData.length > 0 ? (
         <ProductRecentDocuments
           code={variationProductCode || productCode}
