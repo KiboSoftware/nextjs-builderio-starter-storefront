@@ -14,6 +14,8 @@ import { useTranslation } from 'next-i18next'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 import { KiboImage } from '@/components/common'
+import { PdpImageGalleryDialog } from '@/components/dialogs'
+import { useModalContext } from '@/context/ModalContext'
 import { productGetters } from '@/lib/getters'
 import { swipeDetect } from '@/lib/helpers'
 import DefaultImage from '@/public/noImage.png'
@@ -46,7 +48,6 @@ const styles = {
 }
 
 const ImageGallery = (props: ImageGalleryProps) => {
-  // console.log("Image Galary Props", props)
   const {
     digitalAssets,
     kiboImages,
@@ -58,6 +59,8 @@ const ImageGallery = (props: ImageGalleryProps) => {
   } = props
   const [isLoading, setIsLoading] = useState(true)
 
+  const { showModal, closeModal } = useModalContext()
+
   const imageAssets = digitalAssets
     .filter(
       (asset: { properties: { assettype: string } }) =>
@@ -65,8 +68,6 @@ const ImageGallery = (props: ImageGalleryProps) => {
     )
     .map((asset: { properties: any }) => asset.properties)
     .sort((a: { sortorder: number }, b: { sortorder: number }) => a.sortorder - b.sortorder)
-
-  console.log('brandImage', brandImage)
 
   function mergeAndSortArrays(array1: any[], array2: ProductImage[]) {
     // Create a map to efficiently find objects in array2 by cmsid
@@ -97,33 +98,11 @@ const ImageGallery = (props: ImageGalleryProps) => {
     }
   }, [images])
 
-  console.log('imageAssets merge', images)
-
   const { t } = useTranslation('common')
 
   const [selectedImage, setSelectedImage] = useState({
     selectedIndex: 0,
   })
-
-  const [isImageChanged, setIsImageChanged] = useState(false)
-
-  useEffect(() => {
-    setIsImageChanged(true)
-  }, [selectedImage.selectedIndex])
-
-  console.log('selectedImage', selectedImage)
-
-  console.log(
-    'selected imageUrl',
-    images?.length
-      ? productGetters.handleProtocolRelativeUrl(
-          images[selectedImage.selectedIndex]?.imageUrl as string
-        )
-      : placeholderImageUrl
-  )
-
-  console.log('Current image data:', images[selectedImage.selectedIndex])
-  console.log('isImageChanged', isImageChanged)
 
   // handle if vertical slider arrow should be visible or not
   const [showArrow, setArrowVisibility] = useState({
@@ -174,6 +153,16 @@ const ImageGallery = (props: ImageGalleryProps) => {
             down: !isScrollAtBottom(scrollableDiv),
           }
     )
+  }
+
+  const openImageGalary = (images: any, selectedImage: any) => {
+    showModal({
+      Component: PdpImageGalleryDialog,
+      props: {
+        images: images,
+        SelectedImage: selectedImage,
+      },
+    })
   }
 
   const maxHeight = thumbnailDisplayCount * ThumbnailDimensionInPx + thumbnailDisplayCount * 12 + 60
@@ -308,7 +297,7 @@ const ImageGallery = (props: ImageGalleryProps) => {
                     sx={{
                       borderWidth: i === selectedImage.selectedIndex ? 3 : 1,
                       borderStyle: 'solid',
-                      borderColor: '#30299A',
+                      borderColor: 'primary.main',
                       cursor: 'pointer',
                     }}
                     aria-label={(image?.imagealt as string) || t('product-image-alt')}
@@ -406,9 +395,36 @@ const ImageGallery = (props: ImageGalleryProps) => {
                     display: 'flex',
                   }}
                 >
-                  <IconButton aria-label="zoom in" onClick={() => zoomIn()}>
-                    <ZoomIn />
-                  </IconButton>
+                  {images[selectedImage.selectedIndex]?.imagetitle ? (
+                    <IconButton
+                      sx={{
+                        position: 'absolute', // Position the button relative to the parent
+                        top: '10px', // Adjust the vertical positioning
+                        right: '10px', // Adjust the horizontal positioning
+                        display: 'flex',
+                        margin: 0,
+                        alignItems: 'center',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '3px',
+                        backgroundColor: 'primary.main',
+                        zIndex: 10, // Ensure it appears above the image
+                        '& span': {
+                          color: 'secondary.light',
+                          fontSize: '32px',
+                        },
+                        '&:hover': {
+                          backgroundColor: 'primary.light',
+                        },
+                      }}
+                      aria-label="zoom in"
+                      onClick={() => openImageGalary(images, selectedImage)}
+                    >
+                      <span className="material-symbols-outlined">zoom_in</span>
+                    </IconButton>
+                  ) : (
+                    <></>
+                  )}
                 </Box>
                 <TransformComponent
                   wrapperStyle={{
