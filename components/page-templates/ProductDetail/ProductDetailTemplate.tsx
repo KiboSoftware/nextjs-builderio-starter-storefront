@@ -44,6 +44,7 @@ import {
   ProductQuickViewDialog,
   ProductVariantSizeSelector,
 } from '@/components/product'
+import AdditionalProductInfo from '@/components/product/AdditionalProductInfo'
 import PdpIconAttributes from '@/components/product/PdpIconAttributes'
 import ProductApplications from '@/components/product/ProductApplication/ProductApplications'
 import { useModalContext } from '@/context'
@@ -919,6 +920,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
       ) : null}
       {!isQuickViewModal && children}
+      <AdditionalProductInfo product={product} />
     </Grid>
   )
 }
