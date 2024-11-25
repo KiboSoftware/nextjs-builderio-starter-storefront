@@ -40,8 +40,10 @@ import {
   ProductQuickViewDialog,
   ProductVariantSizeSelector,
 } from '@/components/product'
+// import AdditionalProductInfo from '@/components/product/AdditionalProductInfo'
 import PdpIconAttributes from '@/components/product/PdpIconAttributes'
 import ProductApplications from '@/components/product/ProductApplication/ProductApplications'
+import RelatedProductsCarousel from '@/components/product/RelatedProductsCarousel'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -100,6 +102,7 @@ interface ProductDetailTemplateProps {
   title?: string
   cancel?: string
   quoteDetails?: any
+  relatedProducts: any
   shouldFetchShippingMethods?: boolean
   getCurrentProduct?: (
     addToCartPayload: any,
@@ -170,6 +173,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     cancel,
     quoteDetails,
     shouldFetchShippingMethods,
+    relatedProducts,
     getCurrentProduct,
   } = props
   const [updatedProduct, setUpdatedProduct] = useState(product)
@@ -905,6 +909,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         />
       ) : null}
       {!isQuickViewModal && children}
+      {/* <AdditionalProductInfo product={product} /> */}
+      <RelatedProductsCarousel product={relatedProducts} />
     </Grid>
   )
 }
