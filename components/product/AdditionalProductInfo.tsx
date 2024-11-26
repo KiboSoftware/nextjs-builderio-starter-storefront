@@ -79,15 +79,14 @@ const AdditionalProductInfo = (props: any) => {
             {geneId && (
               <Box sx={styles.displayFlex}>
                 <Grid sx={styles.heading}>
-                  {/* <Typography variant='body2' sx={styles.headingFont}>{geneId?.attributeDetail?.name} :</Typography> */}
                   <Typography variant="body2" sx={styles.headingFont}>
-                    Gene ID :
+                    {geneId?.attributeDetail?.name} :
                   </Typography>
                 </Grid>
                 <Grid sx={styles.value}>
                   <Typography variant="body2">
                     <Link
-                      href={`https://ncbi.nlm.nih.gov/${geneId?.values[0]?.stringValue}`}
+                      href={`https://ncbi.nlm.nih.gov/gene/${geneId?.values[0]?.stringValue}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={styles.link}
@@ -107,9 +106,8 @@ const AdditionalProductInfo = (props: any) => {
             {geneSymbol && (
               <Box sx={styles.displayFlex}>
                 <Grid sx={styles.heading}>
-                  {/* <Typography variant='body2' sx={styles.headingFont}>{geneSymbol?.attributeDetail?.name} :</Typography> */}
                   <Typography variant="body2" sx={styles.headingFont}>
-                    Gene Symbol :
+                    {geneSymbol?.attributeDetail?.name} :
                   </Typography>
                 </Grid>
                 <Grid sx={styles.value}>
@@ -120,9 +118,8 @@ const AdditionalProductInfo = (props: any) => {
             {geneName && (
               <Box sx={styles.displayFlex}>
                 <Grid sx={styles.heading}>
-                  {/* <Typography variant='body2' sx={styles.headingFont}>{geneName?.attributeDetail?.name} :</Typography> */}
                   <Typography variant="body2" sx={styles.headingFont}>
-                    Gene Name :
+                    {geneName?.attributeDetail?.name} :
                   </Typography>
                 </Grid>
                 <Grid sx={styles.value}>
@@ -135,9 +132,8 @@ const AdditionalProductInfo = (props: any) => {
             {uniportId && (
               <Box sx={styles.displayFlex}>
                 <Grid sx={styles.heading}>
-                  {/* <Typography variant='body2' sx={styles.headingFont}>{uniportId?.attributeDetail?.name} :</Typography> */}
                   <Typography variant="body2" sx={styles.headingFont}>
-                    Uniprot ID :
+                    {uniportId?.attributeDetail?.name} :
                   </Typography>
                 </Grid>
                 <Grid sx={styles.value}>
@@ -163,9 +159,8 @@ const AdditionalProductInfo = (props: any) => {
             {proteinName && (
               <Box sx={styles.displayFlex}>
                 <Grid sx={styles.heading}>
-                  {/* <Typography variant='body2' sx={styles.headingFont}>{proteinName?.attributeDetail?.name} :</Typography> */}
                   <Typography variant="body2" sx={styles.headingFont}>
-                    Protein Name :
+                    {proteinName?.attributeDetail?.name} :
                   </Typography>
                 </Grid>
                 <Grid sx={styles.value}>
