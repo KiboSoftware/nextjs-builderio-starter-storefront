@@ -51,7 +51,10 @@ const useAccountHierarchySchema = (b2BAccount: B2BAccount, isRequestAccount: boo
     companyOrOrganization: yup.string().required(t('this-field-is-required')),
     firstName: yup.string().required(t('this-field-is-required')),
     lastName: yup.string().required(t('this-field-is-required')),
-    emailAddress: yup.string().required(t('this-field-is-required')),
+    emailAddress: yup
+      .string()
+      .email(t('please-enter-a-valid-email-address'))
+      .required(t('this-field-is-required')),
   })
 }
 
@@ -282,6 +285,13 @@ const B2BAccountCreateForm = (props: AccountHierarchyFormProps) => {
             <Controller
               name="emailAddress"
               control={control}
+              rules={{
+                required: 'Email address is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Please enter a valid email address',
+                },
+              }}
               render={({ field }) => (
                 <KiboTextBox
                   type="email"

@@ -35,7 +35,7 @@ const Content = (props: ContentProps) => {
 
   const { t } = useTranslation('common')
 
-  const { showModal } = useModalContext()
+  const { showModal, closeModal } = useModalContext()
   const { isAuthenticated } = useAuthContext()
 
   const useDetailsSchema = () => {
@@ -78,27 +78,38 @@ const Content = (props: ContentProps) => {
         </Typography>
       </Box>
       <FormControl sx={{ width: '100%' }}>
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <KiboTextBox
-              name="email"
-              value={field.value}
-              label={t('email')}
-              required
-              autoFocus={setAutoFocus}
-              sx={{ ...styles.formInput }}
-              onBlur={field.onBlur}
-              onChange={(_name, value) => field.onChange(value)}
-              error={!!errors?.email}
-              helperText={errors?.email?.message}
-            />
-          )}
-        />
+        {!isResetPassword && (
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <KiboTextBox
+                name="email"
+                value={field.value}
+                label={t('email')}
+                required
+                autoFocus={setAutoFocus}
+                sx={{ ...styles.formInput }}
+                onBlur={field.onBlur}
+                onChange={(_name, value) => field.onChange(value)}
+                error={!!errors?.email}
+                helperText={errors?.email?.message}
+              />
+            )}
+          />
+        )}
 
         {isResetPassword && (
-          <Typography py={2} color="success.main">
+          <Typography
+            sx={{
+              color: 'var(--Green, #348345)',
+              fontFamily: 'Poppins',
+              fontSize: '22px',
+              fontStyle: 'normal',
+              fontWeight: 500,
+              lineHeight: '35px',
+            }}
+          >
             {t('reset-password-message')}
           </Typography>
         )}
@@ -117,62 +128,100 @@ const Content = (props: ContentProps) => {
             item
             sm={12}
             xs={12}
-            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            sx={{
+              display: 'flex',
+              justifyContent: isResetPassword ? 'flex-end' : 'space-between',
+              alignItems: 'center',
+            }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: { md: 'flex-start', xs: 'center' },
-              }}
-            >
-              <Typography variant="body2" sx={{ color: 'grey.900' }}>
-                {t('already-have-an-account')}
-              </Typography>
-              <Link
-                component="button"
-                variant="body1"
+            {!isResetPassword && (
+              <Box
                 sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: { md: 'flex-start', xs: 'center' },
+                }}
+              >
+                <Typography variant="body2" sx={{ color: 'grey.900' }}>
+                  {t('already-have-an-account')}
+                </Typography>
+                <Link
+                  component="button"
+                  variant="body1"
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontSize: '16px',
+                    fontWeight: '300',
+                    lineHeight: '25px',
+                    textAlign: 'left',
+                    color: '#30299A',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                  }}
+                  onClick={handleAccountIconClick}
+                >
+                  {t('log-in')}
+                </Link>
+              </Box>
+            )}
+
+            {!isResetPassword && (
+              <Button
+                variant="contained"
+                sx={{
+                  width: 'auto',
+                  backgroundColor: !isValid ? 'grey.600' : 'primary.main',
+                  color: 'secondary.light',
+                  textAlign: 'center',
                   fontFamily: 'Poppins',
                   fontSize: '16px',
-                  fontWeight: '300',
-                  lineHeight: '25px',
-                  textAlign: 'left',
-                  color: '#30299A',
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '24px',
+                  borderRadius: '0px 26px',
+                  border: !isValid ? '1px solid grey.600' : '1px solid primary.main',
+                  padding: '12px 30px',
+                  '&:hover': {
+                    backgroundColor: !isValid ? 'grey.600' : 'primary.light',
+                    border: !isValid ? '1px solid grey.600' : '1px solid primary.light',
+                  },
+                  marginLeft: '20px',
                 }}
-                onClick={handleAccountIconClick}
+                onClick={() => handleSubmit(handleResetPassword)()}
+                disabled={!isValid}
               >
-                {t('log-in')}
-              </Link>
-            </Box>
-            <Button
-              variant="contained"
-              sx={{
-                width: 'auto',
-                backgroundColor: !isValid ? 'grey.600' : 'primary.main',
-                color: 'secondary.light',
-                textAlign: 'center',
-                fontFamily: 'Poppins',
-                fontSize: '16px',
-                fontStyle: 'normal',
-                fontWeight: '500',
-                lineHeight: '24px',
-                borderRadius: '0px 26px',
-                border: !isValid ? '1px solid grey.600' : '1px solid primary.main',
-                padding: '12px 30px',
-                '&:hover': {
-                  backgroundColor: !isValid ? 'grey.600' : 'primary.light',
-                  border: !isValid ? '1px solid grey.600' : '1px solid primary.light',
-                },
-                marginLeft: '20px',
-              }}
-              onClick={() => handleSubmit(handleResetPassword)()}
-              disabled={!isValid}
-            >
-              {t('reset-password')}
-            </Button>
+                {t('reset-password')}
+              </Button>
+            )}
+
+            {isResetPassword && (
+              <Button
+                variant="contained"
+                sx={{
+                  width: 'auto',
+                  backgroundColor: !isValid ? 'grey.600' : 'primary.main',
+                  color: 'secondary.light',
+                  textAlign: 'center',
+                  fontFamily: 'Poppins',
+                  fontSize: '16px',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '24px',
+                  borderRadius: '0px 26px',
+                  border: !isValid ? '1px solid grey.600' : '1px solid primary.main',
+                  padding: '12px 30px',
+                  '&:hover': {
+                    backgroundColor: !isValid ? 'grey.600' : 'primary.light',
+                    border: !isValid ? '1px solid grey.600' : '1px solid primary.light',
+                  },
+                  marginLeft: '20px',
+                }}
+                onClick={closeModal}
+                disabled={!isValid}
+              >
+                {t('close-window')}
+              </Button>
+            )}
           </Grid>
         </Grid>
       </FormControl>
