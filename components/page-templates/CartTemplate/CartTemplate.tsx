@@ -299,6 +299,7 @@ const CartTemplate = (props: CartTemplateProps) => {
                   height: '330px',
                   flexShrink: '0',
                   padding: '20px',
+                  boxShadow: 'none',
                 }}
               >
                 <CardContent sx={{ padding: '0px' }}>
