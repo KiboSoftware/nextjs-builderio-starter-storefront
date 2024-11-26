@@ -49,6 +49,16 @@ const brandImages: Record<string, string> = {
   fortis: fortis.src,
 }
 
+const styles = {
+  shortDesc: {
+    fontSize: '14px',
+    fontWeight: 300,
+    fontFamily: 'poppins',
+    lineHeight: 'normal',
+    color: '#333',
+  },
+}
+
 const ProductCardSkeleton = () => {
   return (
     <Stack spacing={1} sx={ProductCardStyles.cardRoot} data-testid="product-card-skeleton">
@@ -71,6 +81,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
     reactivity,
     properties,
     resourceTypeName,
+    resourceType,
     categoryCode,
     parentCategoryName,
     productType,
@@ -182,16 +193,17 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
               <Box flexDirection="column" m={1} width="75%" className="product-info">
                 <Box display="flex" alignItems="center" width="100%">
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     gutterBottom
                     color="text.primary"
-                    sx={ProductCardStyles.productTitle}
+                    fontWeight="500"
+                    sx={{ ...ProductCardStyles.productTitle }}
                   >
                     {title}
                   </Typography>
                   {isResourceType && resourceTypeName
                     ? resourceTypeArr.map((data) => {
-                        return data.resourceType === resourceTypeName ? (
+                        return data.resourceType === resourceType?.value ? (
                           <Box
                             sx={{
                               position: 'absolute',
@@ -243,7 +255,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
                     color="text.primary"
                     sx={ProductCardStyles.brandLable}
                   >
-                    {isResourceType && resourceTypeName ? resourceTypeName : null}
+                    {isResourceType && resourceTypeName ? resourceType?.stringValue : null}
                   </Typography>
                 </Box>
                 {/* <Rating
@@ -260,6 +272,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
                 /> */}
                 <Box>
                   <Box
+                    sx={styles.shortDesc}
                     data-testid="short-description"
                     dangerouslySetInnerHTML={{
                       __html: productDescription,

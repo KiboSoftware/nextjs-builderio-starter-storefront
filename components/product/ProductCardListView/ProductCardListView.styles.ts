@@ -15,6 +15,7 @@ export const ProductCardStyles = {
     borderStyle: 'solid',
     boxShadow: 'none',
     cursor: 'pointer',
+    borderRadius: '0 0 25px 0',
     '&:hover': {
       boxShadow: '0 2px 16px 4px rgb(11 32 61 / 7%)',
       borderColor: 'primary.light',
@@ -89,8 +90,7 @@ export const ProductCardStyles = {
     justifyContent: 'flexStart',
     padding: '0px 10px',
     alignItems: 'end',
-    marginBottom: '30px',
-    marginTop: '30px',
+    margin: '10px 0',
   },
   brandLable: {
     color: '#020027',

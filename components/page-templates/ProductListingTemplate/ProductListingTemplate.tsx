@@ -131,6 +131,9 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
   }
 
   const productCardProps = (product: Product): ProductCardListViewProps => {
+    const resourceType =
+      product?.properties?.find((item: any) => item.attributeFQN === 'tenant~resourcetype')
+        ?.values?.[0] ?? null
     const productProperties = product.properties as ProductProperties[]
     const properties = productGetters.getProperties(product) as ProductProperties[]
     const productCode = productGetters.getProductId(product)
@@ -154,6 +157,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       productCode,
       properties,
       resourceTypeName,
+      resourceType,
       categoryCode,
       parentCategoryName,
       productType,

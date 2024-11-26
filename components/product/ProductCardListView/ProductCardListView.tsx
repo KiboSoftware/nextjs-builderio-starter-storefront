@@ -60,6 +60,7 @@ export interface ProductCardListViewProps {
   productCode?: string
   properties?: ProductProperties[]
   resourceTypeName?: string
+  resourceType: any
   productType?: string
   variationProductCode?: string
   rating?: number
@@ -110,6 +111,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     reactivity,
     properties,
     resourceTypeName,
+    resourceType,
     categoryCode,
     parentCategoryName,
     link,
