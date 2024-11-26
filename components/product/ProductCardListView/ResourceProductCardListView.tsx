@@ -212,14 +212,16 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
                               zIndex: 2,
                               width: '42px',
                               height: '42px',
-                              '&::before': {
-                                content: `'${data.value}'`,
-                                fontFamily: 'Material Icons',
-                                fontSize: '42px',
-                                color: 'primary.main',
-                              },
+                              color: 'primary.main',
                             }}
-                          ></Box>
+                          >
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ fontSize: '42px' }}
+                            >
+                              {data.value}
+                            </span>
+                          </Box>
                         ) : (
                           ''
                         )

@@ -168,13 +168,12 @@ const ResourceProductCardGridView = (props: ProductCardProps) => {
                     <Box
                       sx={{
                         ...ProductCardStyles.resourceIcon,
-                        '&::before': {
-                          content: `'${data.value}'`,
-                          fontFamily: 'Material Icons',
-                          fontSize: '24px',
-                        },
                       }}
-                    ></Box>
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>
+                        {data.value}
+                      </span>
+                    </Box>
                   ) : (
                     ''
                   )
