@@ -81,6 +81,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
     reactivity,
     properties,
     resourceTypeName,
+    resourceType,
     categoryCode,
     parentCategoryName,
     productType,
@@ -202,7 +203,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
                   </Typography>
                   {isResourceType && resourceTypeName
                     ? resourceTypeArr.map((data) => {
-                        return data.resourceType === resourceTypeName ? (
+                        return data.resourceType === resourceType?.value ? (
                           <Box
                             sx={{
                               position: 'absolute',
@@ -254,7 +255,7 @@ const ResourceProductCardListView = (props: ProductCardListViewProps) => {
                     color="text.primary"
                     sx={ProductCardStyles.brandLable}
                   >
-                    {isResourceType && resourceTypeName ? resourceTypeName : null}
+                    {isResourceType && resourceTypeName ? resourceType?.stringValue : null}
                   </Typography>
                 </Box>
                 {/* <Rating
