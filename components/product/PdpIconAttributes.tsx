@@ -1,6 +1,11 @@
+import { useState } from 'react'
+
 import { Box, Grid } from '@mui/material'
 import getConfig from 'next/config'
 import Link from 'next/link'
+
+import PdpValidationAttributes from './PDPValidationModal'
+import { ProductCustom } from '@/lib/types'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -45,32 +50,42 @@ const styles = {
 const PdpIconAttributes = (props: any) => {
   const { product } = props
   const properties = product.properties
+  const [isModalOpen, setModalOpen] = useState(false)
+
+  const handleOpenModal = () => setModalOpen(true)
+  const handleCloseModal = () => setModalOpen(false)
   return (
     <Grid container spacing={2} mb={2}>
       {properties.map((data: any) => {
-        return data.attributeFQN === publicRuntimeConfig?.validationTextAttrFQN ? (
-          <Grid item xs={6} md={3} sm={3}>
-            <Link href="#" style={{ textDecoration: 'none' }}>
-              <Box sx={styles.flexDirectionRow}>
-                <Box sx={{ ...styles.iconCss, color: '#348345' }}>
-                  <span className="material-symbols-outlined">verified</span>
-                </Box>
-                <Box
-                  sx={{
-                    ...styles.iconText,
-                    color: '#348345',
-                  }}
-                >
-                  Validated
-                </Box>
-              </Box>
-            </Link>
+        return data.attributeFQN === 'tenant~validation-text' ? (
+          <Grid
+            item
+            xs={6}
+            md={3}
+            sm={3}
+            sx={styles.flexDirectionRow}
+            onClick={handleOpenModal}
+            style={{ cursor: 'pointer' }}
+            key={data.attributeFQN}
+          >
+            <Box sx={{ ...styles.iconCss, color: '#348345' }}>
+              <span className="material-symbols-outlined">verified</span>
+            </Box>
+            <Box
+              sx={{
+                ...styles.iconText,
+                color: '#348345',
+              }}
+            >
+              Validated
+            </Box>
           </Grid>
         ) : null
       })}
 
+      {isModalOpen && <PdpValidationAttributes product={product} onClose={handleCloseModal} />}
       <Grid item xs={6} md={3} sm={3}>
-        <Link href="" style={{ textDecoration: 'none' }}>
+        <Link href="#">
           <Box sx={styles.flexDirectionRow}>
             <Box sx={styles.iconCss}>
               <span className="material-symbols-outlined">draft</span>
