@@ -651,6 +651,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           display: 'flex',
           flexDirection: { md: 'row', sm: 'column', xs: 'column' },
           gap: '40px',
+          width: '100%',
         }}
       >
         <Box sx={{ width: '100%' }}>
