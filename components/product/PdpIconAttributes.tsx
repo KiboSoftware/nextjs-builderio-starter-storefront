@@ -1,8 +1,6 @@
-import { Box } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import getConfig from 'next/config'
 import Link from 'next/link'
-
-import { ProductCustom } from '@/lib/types'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -38,6 +36,9 @@ const styles = {
     textDecorationThickness: 'auto',
     textUnderlineOffset: 'auto',
     textUnderlinePosition: 'from-font',
+    '&:hover': {
+      textDecorationLine: 'none',
+    },
   },
 }
 
@@ -45,47 +46,53 @@ const PdpIconAttributes = (props: any) => {
   const { product } = props
   const properties = product.properties
   return (
-    <Box sx={styles.spaceBetween}>
+    <Grid container spacing={2} mb={2}>
       {properties.map((data: any) => {
         return data.attributeFQN === publicRuntimeConfig?.validationTextAttrFQN ? (
-          <Link href="#">
-            <Box sx={styles.flexDirectionRow}>
-              <Box sx={{ ...styles.iconCss, color: '#348345' }}>
-                <span className="material-symbols-outlined">verified</span>
+          <Grid item xs={6} md={3} sm={3}>
+            <Link href="#" style={{ textDecoration: 'none' }}>
+              <Box sx={styles.flexDirectionRow}>
+                <Box sx={{ ...styles.iconCss, color: '#348345' }}>
+                  <span className="material-symbols-outlined">verified</span>
+                </Box>
+                <Box
+                  sx={{
+                    ...styles.iconText,
+                    color: '#348345',
+                  }}
+                >
+                  Validated
+                </Box>
               </Box>
-              <Box
-                sx={{
-                  ...styles.iconText,
-                  color: '#348345',
-                }}
-              >
-                Validated
-              </Box>
-            </Box>
-          </Link>
+            </Link>
+          </Grid>
         ) : null
       })}
 
-      <Link href="#">
-        <Box sx={styles.flexDirectionRow}>
-          <Box sx={styles.iconCss}>
-            <span className="material-symbols-outlined">draft</span>
+      <Grid item xs={6} md={3} sm={3}>
+        <Link href="" style={{ textDecoration: 'none' }}>
+          <Box sx={styles.flexDirectionRow}>
+            <Box sx={styles.iconCss}>
+              <span className="material-symbols-outlined">draft</span>
+            </Box>
+            <Box sx={styles.iconText}>Documents</Box>
           </Box>
-          <Box sx={styles.iconText}>Documents</Box>
-        </Box>
-      </Link>
+        </Link>
+      </Grid>
 
       {properties.map((data: any) => {
         return data.attributeFQN === publicRuntimeConfig?.citationCountVariantAttrFQN ? (
           data.values[0].value > 0 ? (
-            <Link href="#">
-              <Box sx={styles.flexDirectionRow}>
-                <Box sx={styles.iconCss}>
-                  <span className="material-symbols-outlined">note_stack</span>
+            <Grid item xs={6} md={3} sm={3}>
+              <Link href="#" style={{ textDecoration: 'none' }}>
+                <Box sx={styles.flexDirectionRow}>
+                  <Box sx={styles.iconCss}>
+                    <span className="material-symbols-outlined">note_stack</span>
+                  </Box>
+                  <Box sx={styles.iconText}>Citations({data.values[0].value})</Box>
                 </Box>
-                <Box sx={styles.iconText}>Citations({data.values[0].value})</Box>
-              </Box>
-            </Link>
+              </Link>
+            </Grid>
           ) : null
         ) : null
       })}
@@ -93,14 +100,14 @@ const PdpIconAttributes = (props: any) => {
       {properties.map((data: any) => {
         return data.attributeFQN === publicRuntimeConfig?.mfgCertificationAttrFQN ? (
           data.values[0].value === 'ISO13485' ? (
-            <Box>
+            <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
                 <Box sx={styles.iconCss}>
                   <span className="material-symbols-outlined">task_alt</span>
                 </Box>
                 <Box sx={styles.iconText}>{data.values[0].value}</Box>
               </Box>
-            </Box>
+            </Grid>
           ) : null
         ) : null
       })}
@@ -108,14 +115,16 @@ const PdpIconAttributes = (props: any) => {
       {properties.map((data: any) => {
         return data.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
           data.values[0].value === 'gmp_ready' ? (
-            <Box sx={styles.flexDirectionRow}>
+            <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
-                <Box sx={styles.iconCss}>
-                  <span className="material-symbols-outlined">manufacturing</span>
+                <Box sx={styles.flexDirectionRow}>
+                  <Box sx={styles.iconCss}>
+                    <span className="material-symbols-outlined">manufacturing</span>
+                  </Box>
+                  <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
                 </Box>
-                <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
               </Box>
-            </Box>
+            </Grid>
           ) : null
         ) : null
       })}
@@ -123,18 +132,20 @@ const PdpIconAttributes = (props: any) => {
       {properties.map((data: any) => {
         return data.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
           data.values[0].value === 'Lyo-Ready' ? (
-            <Box sx={styles.flexDirectionRow}>
+            <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
-                <Box sx={styles.iconCss}>
-                  <span className="material-symbols-outlined">grain</span>
+                <Box sx={styles.flexDirectionRow}>
+                  <Box sx={styles.iconCss}>
+                    <span className="material-symbols-outlined">grain</span>
+                  </Box>
+                  <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
                 </Box>
-                <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
               </Box>
-            </Box>
+            </Grid>
           ) : null
         ) : null
       })}
-    </Box>
+    </Grid>
   )
 }
 
