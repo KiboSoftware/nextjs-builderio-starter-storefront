@@ -3,7 +3,17 @@ import React, { useState, PropsWithChildren } from 'react'
 import Add from '@mui/icons-material/Add'
 import Apps from '@mui/icons-material/Apps'
 import ReorderRounded from '@mui/icons-material/ReorderRounded'
-import { Grid, MenuItem, Box, Button, Link, Typography, Breadcrumbs, Stack } from '@mui/material'
+import {
+  Grid,
+  MenuItem,
+  Box,
+  Button,
+  Link,
+  Typography,
+  Breadcrumbs,
+  Stack,
+  useMediaQuery,
+} from '@mui/material'
 import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
 
@@ -63,6 +73,7 @@ export interface ProductListingTemplateProps extends PropsWithChildren<any> {
 
 // Component
 const ProductListingTemplate = (props: ProductListingTemplateProps) => {
+  const isMobile = useMediaQuery('(max-width:600px)')
   const {
     breadCrumbsList,
     productListingHeader,
@@ -379,7 +390,13 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
                     >
                       {isListView ? (
                         product?.productType === 'Resources' ? (
-                          <ResourceProductCardListView {...productCardProps(product)} />
+                          isMobile ? (
+                            <ResourceProductCardGridView {...productCardProps(product)} />
+                          ) : (
+                            <ResourceProductCardListView {...productCardProps(product)} />
+                          )
+                        ) : isMobile ? (
+                          <ProductCard {...productCardProps(product)} />
                         ) : (
                           <ProductCardListView {...productCardProps(product)} />
                         )
