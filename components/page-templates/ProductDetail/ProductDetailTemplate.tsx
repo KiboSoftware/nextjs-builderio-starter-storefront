@@ -19,6 +19,7 @@ import {
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
+import ProductInventoryMessages from './ProductInventoryMessages'
 import ProductSpecifications from './ProductSpecifications'
 import {
   FortisRadio,
@@ -64,6 +65,7 @@ import fortis from '@/public/Brand_Logo/fortis-logo.png'
 import ipoc from '@/public/Brand_Logo/ipoc-logo.png'
 import nanocomposix from '@/public/Brand_Logo/nanocomposix-logo.png'
 import vector from '@/public/Brand_Logo/vector-logo.png'
+import theme from '@/styles/theme'
 
 import type {
   AttributeDetail,
@@ -506,6 +508,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     }
   }, [])
 
+  const currentlocationInventory = useGetProductInventory(
+    (currentProduct?.variationProductCode || productCode) as string,
+    'BETHYL' as string
+  )
+  const stockAvailable = currentlocationInventory?.data?.[0]?.stockAvailable ?? 0
+  console.log('currentlocationInventory', currentlocationInventory)
+
   useEffect(() => {
     const fetchDocumentData = async () => {
       const digitalDocRes = await getDocumentListDocuments(
@@ -772,13 +781,48 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
           })}
         </Box>
         <PdpIconAttributes product={product} />
-        <Box paddingY={1}>
-          <QuantitySelector
-            label="Qty"
-            quantity={quantity}
-            onIncrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) + 1)}
-            onDecrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) - 1)}
-          />
+        <Box
+          display="flex"
+          sx={{ padding: '20px', bgcolor: theme?.palette.secondary.main, margin: '30px 0' }}
+        >
+          {/* Column for ProductInventoryMessages */}
+          <Box flex={1}>
+            {' '}
+            {/* Adjust padding as needed */}
+            <ProductInventoryMessages
+              product={currentProduct}
+              inventoryInfo={currentlocationInventory}
+              stockAvailable={stockAvailable}
+            />
+          </Box>
+
+          {/* Column for QuantitySelector and LoadingButton */}
+          <Box display="flex" flexDirection="column" justifyContent="flex-start">
+            {' '}
+            {/* Align items in a column */}
+            <QuantitySelector
+              label="Quantity"
+              quantity={quantity}
+              onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
+              onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
+            />
+            <LoadingButton
+              variant="contained"
+              color="primary"
+              fullWidth
+              className="add-to-cart-button"
+              onClick={() => handleAddToCart()}
+              loading={addToCart.isPending}
+              {...(!isValidForAddToCart() && { disabled: true })}
+              sx={{
+                marginTop: 1,
+                bgcolor: theme?.palette.primary.main,
+                fontSize: '16px !important',
+              }} // Add margin top for spacing between QuantitySelector and LoadingButton
+            >
+              {t('add-to-cart')}
+            </LoadingButton>
+          </Box>
         </Box>
         {isSubscriptionModeAvailable && (
           <Box paddingY={1}>
@@ -838,16 +882,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         )}
         {!isB2B && (
           <Box paddingY={1} display="flex" flexDirection={'column'} gap={2}>
-            <LoadingButton
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={() => handleAddToCart()}
-              loading={addToCart.isPending}
-              {...(!isValidForAddToCart() && { disabled: true })}
-            >
-              {t('add-to-cart')}
-            </LoadingButton>
             <Box display="flex" gap={3}>
               <LoadingButton
                 variant="contained"
