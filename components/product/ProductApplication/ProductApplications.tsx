@@ -66,7 +66,7 @@ const ProductApplications = ({ product, currentProduct }: any) => {
 
   useEffect(() => {
     const properties = product?.properties || []
-    const getApplicationText = properties.find(
+    const getApplicationText = properties?.find(
       (data: Property) => data.attributeFQN === 'tenant~application-text'
     )
     const getApplicationTextVariant = currentProduct?.properties?.find(
@@ -90,14 +90,14 @@ const ProductApplications = ({ product, currentProduct }: any) => {
   useEffect(() => {
     if (!applicationDilutionRange.length || !themeCodeMapping.length) return
 
-    const updatedArray = applicationDilutionRange.map((data: ApplicationRange) => {
-      const matchedItem = themeCodeMapping.find(
-        (item) => data.Application.toLowerCase() === item.applId.toLowerCase()
+    const updatedArray = applicationDilutionRange?.map((data: ApplicationRange) => {
+      const matchedItem = themeCodeMapping?.find(
+        (item) => data?.Application?.toLowerCase() === item?.applId?.toLowerCase()
       )
       return matchedItem
         ? {
-            Application: matchedItem.longName,
-            ApplicationDilutionRange: data.ApplicationDilutionRange,
+            Application: matchedItem?.longName,
+            ApplicationDilutionRange: data?.ApplicationDilutionRange,
           }
         : data
     })
@@ -118,9 +118,9 @@ const ProductApplications = ({ product, currentProduct }: any) => {
   }, [])
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+    <Box sx={{ width: '100%', maxWidth: '1200px', margin: '16px auto' }}>
       {showView && (
-        <Box sx={{ width: '100%', maxWidth: '1200px' }}>
+        <Box sx={{ width: '100%' }}>
           <Typography variant="h3" sx={{ marginBottom: '10px' }}>
             Applications
           </Typography>
@@ -161,18 +161,18 @@ const ProductApplications = ({ product, currentProduct }: any) => {
             >
               <Table>
                 <TableBody>
-                  {newArray.map((data, index) => (
+                  {newArray?.map((data, index) => (
                     <TableRow key={index}>
                       <TableCell
                         variant="head"
                         sx={{
                           ...styles.text,
                           width: '25%',
-                          backgroundColor: `${grey[300]}`,
+                          backgroundColor: 'grey.300',
                           fontWeight: 500,
                         }}
                       >
-                        {data.Application}
+                        {data?.Application}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -182,7 +182,7 @@ const ProductApplications = ({ product, currentProduct }: any) => {
                           fontWeight: 300,
                         }}
                         dangerouslySetInnerHTML={{
-                          __html: data.ApplicationDilutionRange,
+                          __html: data?.ApplicationDilutionRange,
                         }}
                       />
                     </TableRow>
