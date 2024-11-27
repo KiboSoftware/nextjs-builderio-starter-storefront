@@ -49,15 +49,15 @@ const styles = {
 
 const PdpIconAttributes = (props: any) => {
   const { product } = props
-  const properties = product.properties
+  const properties = product?.properties
   const [isModalOpen, setModalOpen] = useState(false)
 
   const handleOpenModal = () => setModalOpen(true)
   const handleCloseModal = () => setModalOpen(false)
   return (
     <Grid container spacing={2} mb={2}>
-      {properties.map((data: any) => {
-        return data.attributeFQN === 'tenant~validation-text' ? (
+      {properties?.map((data: any) => {
+        return data?.attributeFQN === 'tenant~validation-text' ? (
           <Grid
             item
             xs={6}
@@ -95,16 +95,16 @@ const PdpIconAttributes = (props: any) => {
         </Link>
       </Grid>
 
-      {properties.map((data: any) => {
-        return data.attributeFQN === publicRuntimeConfig?.citationCountVariantAttrFQN ? (
-          data.values[0].value > 0 ? (
+      {properties?.map((data: any) => {
+        return data?.attributeFQN === publicRuntimeConfig?.citationCountVariantAttrFQN ? (
+          data?.values[0]?.value > 0 ? (
             <Grid item xs={6} md={3} sm={3}>
               <Link href="#" style={{ textDecoration: 'none' }}>
                 <Box sx={styles.flexDirectionRow}>
                   <Box sx={styles.iconCss}>
                     <span className="material-symbols-outlined">note_stack</span>
                   </Box>
-                  <Box sx={styles.iconText}>Citations({data.values[0].value})</Box>
+                  <Box sx={styles.iconText}>Citations({data?.values[0]?.value})</Box>
                 </Box>
               </Link>
             </Grid>
@@ -112,31 +112,31 @@ const PdpIconAttributes = (props: any) => {
         ) : null
       })}
 
-      {properties.map((data: any) => {
-        return data.attributeFQN === publicRuntimeConfig?.mfgCertificationAttrFQN ? (
-          data.values[0].value === 'ISO13485' ? (
+      {properties?.map((data: any) => {
+        return data?.attributeFQN === publicRuntimeConfig?.mfgCertificationAttrFQN ? (
+          data?.values[0]?.value === 'ISO13485' ? (
             <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
                 <Box sx={styles.iconCss}>
                   <span className="material-symbols-outlined">task_alt</span>
                 </Box>
-                <Box sx={styles.iconText}>{data.values[0].value}</Box>
+                <Box sx={styles.iconText}>{data?.values[0]?.value}</Box>
               </Box>
             </Grid>
           ) : null
         ) : null
       })}
 
-      {properties.map((data: any) => {
-        return data.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
-          data.values[0].value === 'gmp_ready' ? (
+      {properties?.map((data: any) => {
+        return data?.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
+          data?.values[0]?.value === 'gmp_ready' ? (
             <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
                 <Box sx={styles.flexDirectionRow}>
                   <Box sx={styles.iconCss}>
                     <span className="material-symbols-outlined">manufacturing</span>
                   </Box>
-                  <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
+                  <Box sx={styles.iconText}>{data?.values[0]?.stringValue}</Box>
                 </Box>
               </Box>
             </Grid>
@@ -144,16 +144,16 @@ const PdpIconAttributes = (props: any) => {
         ) : null
       })}
 
-      {properties.map((data: any) => {
-        return data.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
-          data.values[0].value === 'Lyo-Ready' ? (
+      {properties?.map((data: any) => {
+        return data?.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
+          data?.values[0]?.value === 'Lyo-Ready' ? (
             <Grid item xs={6} md={3} sm={3}>
               <Box sx={styles.flexDirectionRow}>
                 <Box sx={styles.flexDirectionRow}>
                   <Box sx={styles.iconCss}>
                     <span className="material-symbols-outlined">grain</span>
                   </Box>
-                  <Box sx={styles.iconText}>{data.values[0].stringValue}</Box>
+                  <Box sx={styles.iconText}>{data?.values[0]?.stringValue}</Box>
                 </Box>
               </Box>
             </Grid>
