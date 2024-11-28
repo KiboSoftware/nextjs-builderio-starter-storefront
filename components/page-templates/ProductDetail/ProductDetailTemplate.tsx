@@ -527,7 +527,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     (currentProduct?.variationProductCode || productCode) as string,
     'BETHYL' as string
   )
-  const stockAvailable = currentlocationInventory?.data?.[0]?.stockAvailable ?? 0
+  const stockAvailable = currentlocationInventory?.data?.[0]?.stockAvailable || 0
   //console.log('currentlocationInventory', currentlocationInventory)
 
   useEffect(() => {
