@@ -238,10 +238,6 @@ module.exports = {
     //custom routes
     return [
       {
-        source: '/products/:categoryCode', // Match category URLs of categories
-        destination: '/category/:categoryCode', // Destination of category handler
-      },
-      {
         source: '/products/:categoryCode/:productSlug/:productCode', // Match product URLs under categories
         destination: '/product/:productCode', // Destination for the product page
       },
