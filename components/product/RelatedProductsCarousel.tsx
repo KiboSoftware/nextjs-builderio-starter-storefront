@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import { ArrowBackIos } from '@mui/icons-material'
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos'
 import {
   Card,
@@ -55,54 +56,79 @@ const RelatedProductsCarousel = (props: any) => {
     return 4
   }
 
+  const [isBeginning, setIsBeginning] = useState(true)
+  const [isEnd, setIsEnd] = useState(false)
+  const swiperRef = useRef<any>(null)
+
+  const shouldShowArrows =
+    (isDesktop && product.length > 4) ||
+    (isTablet && product.length > 3) ||
+    (isMobile && product.length > 1)
+  const handleSwiperInit = (swiper: any) => {
+    swiperRef.current = swiper
+    setIsBeginning(swiper.isBeginning)
+    setIsEnd(swiper.isEnd)
+  }
+
+  const handleSwiperSlideChange = (swiper: any) => {
+    setIsBeginning(swiper.isBeginning)
+    setIsEnd(swiper.isEnd)
+  }
+
   if (product.length > 0)
     return (
       <Box
         sx={{
-          maxWidth: '1200px', // Limit the width
           width: '100%',
-          margin: '0 auto', // Center the component
+          maxWidth: '1200px',
+          margin: '30px auto',
         }}
       >
-        <Box sx={{ display: 'block', width: '100%', marginBottom: '18px' }}>
-          <Typography variant="h3">Related Products</Typography>
-        </Box>
-        <Swiper
-          modules={[Navigation]}
-          spaceBetween={26}
-          slidesPerView={slidesPerView()}
-          navigation={true}
+        <Typography variant="h3" sx={{ marginBottom: '18px' }}>
+          Related Products
+        </Typography>
+        <Box
+          sx={{
+            padding: '0 41px',
+            position: 'relative',
+          }}
         >
-          {product.map((data: any, index: number) => {
-            const productName = data?.title
-            const productCode = data?.productCode
-            const brandImg = data?.brand?.value
-            const brandName = data?.brand?.stringValue
-            const categoryCode = data?.categoryCode
-            const seoFriendlyUrl = data?.seoFriendlyUrl
-            const imgUrl = productGetters.handleProtocolRelativeUrl(
-              data?.productImages[0]?.imageUrl as string
-            )
-            const altText = 'product-image-alt'
-            const productUrl =
-              categoryCode !== undefined && seoFriendlyUrl
-                ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
-                : `/product/${productCode}`
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={26}
+            slidesPerView={slidesPerView()}
+            navigation={{
+              prevEl: '.custom-prev', // Custom arrow classes
+              nextEl: '.custom-next',
+            }}
+            onInit={handleSwiperInit}
+            onSlideChange={handleSwiperSlideChange}
+          >
+            {product.map((data: any, index: number) => {
+              const productName = data?.title
+              const productCode = data?.productCode
+              const brandImg = data?.brand?.value
+              const brandName = data?.brand?.stringValue
+              const categoryCode = data?.categoryCode
+              const seoFriendlyUrl = data?.seoFriendlyUrl
+              const imgUrl = productGetters.handleProtocolRelativeUrl(
+                data?.productImages[0]?.imageUrl as string
+              )
+              const altText = 'product-image-alt'
+              const productUrl =
+                categoryCode !== undefined && seoFriendlyUrl
+                  ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
+                  : `/product/${productCode}`
 
-            return (
-              <SwiperSlide key={index} style={{ width: '260px' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              return (
+                <SwiperSlide key={index} style={{ width: '260px' }}>
                   <Link href={productUrl} passHref data-testid="product-card-link">
                     <Box>
                       <Card
                         sx={{
                           ...ProductCardStyles.cardRoot,
-                          minHeight: 360,
-                          [theme.breakpoints.down('md')]: {
-                            width: '100%',
-                            maxWidth: '230px',
-                            padding: '0.5rem',
-                          },
+                          minHeight: 321,
+                          maxWidth: { xs: '260px', sm: '195px', md: '260px' },
                         }}
                         data-testid="product-card"
                       >
@@ -155,11 +181,46 @@ const RelatedProductsCarousel = (props: any) => {
                       </Card>
                     </Box>
                   </Link>
-                </Box>
-              </SwiperSlide>
-            )
-          })}
-        </Swiper>
+                </SwiperSlide>
+              )
+            })}
+          </Swiper>
+          {shouldShowArrows && (
+            <>
+              {/* Custom Navigation Arrows */}
+              <IconButton
+                className="custom-prev"
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  backgroundColor: isBeginning ? 'grey.300' : '#fff',
+                  pointerEvents: isBeginning ? 'none' : 'auto',
+                  color: isBeginning ? 'grey.500' : 'grey.900',
+                }}
+              >
+                <ArrowBackIos />
+              </IconButton>
+              <IconButton
+                className="custom-next"
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: 0,
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  backgroundColor: isEnd ? 'grey.300' : '#fff',
+                  pointerEvents: isEnd ? 'none' : 'auto',
+                  color: isEnd ? 'grey.500' : 'grey.900',
+                }}
+              >
+                <ArrowForwardIos />
+              </IconButton>
+            </>
+          )}
+        </Box>
       </Box>
     )
 
