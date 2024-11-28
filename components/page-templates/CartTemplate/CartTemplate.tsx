@@ -187,7 +187,8 @@ const CartTemplate = (props: CartTemplateProps) => {
       props: {
         onConfirm: handleDeleteCurrentCart,
         contentText: t('clear-cart-confirmation-text'),
-        primaryButtonText: t('delete'),
+        primaryButtonText: t('clear-cart'),
+        title: t('clear-cart'),
       },
     })
   }
