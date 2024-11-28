@@ -49,8 +49,12 @@ const findProperty = (product: any, attributeFQN: string) => {
   return product?.properties?.find((data: Property) => data.attributeFQN === attributeFQN)
 }
 
-const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvailable }: any) => {
-  console.log('product in inventry', product)
+const ProductInventoryMessages = ({
+  product,
+  currentlocationInventory,
+  stockAvailable,
+  availabilityMessageArr,
+}: any) => {
   //   let manageStock = product?.inventoryInfo?.manageStock,
   //     //itemCode = product.get('variationProductCode') || product.get('productCode'),
   //     locationCode = 'BETHYL'
@@ -58,24 +62,17 @@ const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvai
   let cartDisplayStatus = false
   let scenario: number | null = null
   let skuStatus: string | null = null
-
   let stockBehaviour: string | null = null
-  let availabilityMessage: string | null = null
+  const availabilityMessage: string | null = availabilityMessageArr ? availabilityMessageArr : null
   let minimumStock = 0
   let restockDate: Date | null = null
   // Use the helper function to extract the necessary properties
   const skuStatusArr = findProperty(product, 'tenant~sku-status-text')
   const stockBehaviourArr = findProperty(product, 'tenant~stock-behavior-option')
-  const availabilityMessageArr = findProperty(product, 'tenant~availability-message')
   const restockDateArr = findProperty(product, 'tenant~restock-date')
   const minimumStockArr = findProperty(product, 'tenant~minimum-stock')
   // Extract value for skuStatus if skuStatusArr exists
-  if (skuStatusArr) {
-    skuStatus = skuStatusArr.values[0].value
-  }
-  console.log('skuStatusArr', skuStatusArr)
-  console.log('restockDateArr', restockDateArr)
-  console.log('minimumStockArr', minimumStockArr)
+  skuStatus = skuStatusArr?.values?.[0]?.value || null
 
   const getInventoryMessageText = (
     product: Product,
@@ -104,9 +101,6 @@ const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvai
       }
       if (restockDateArr) {
         restockDate = restockDateArr?.values?.[0]?.value
-      }
-      if (availabilityMessageArr) {
-        availabilityMessage = availabilityMessageArr?.values?.[0]?.value
       }
       // Handle restock date logic
       const today = new Date()
@@ -212,8 +206,6 @@ const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvai
           stockAvailable <= minimumStock &&
           restockDate !== null
         ) {
-          //selectCountryCode = Hypr.getThemeSetting("preselectCountryCode");
-          // selectCountryCode = product.get('selectedCountry');
           //console.log("selectCountryCode inside inventory:"+selectCountryCode);
           USShippingCutOffTime = inventorySettings?.USShippingCutOffTime
           CAShippingCutOffTime = inventorySettings?.CAShippingCutOffTime
@@ -336,7 +328,8 @@ const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvai
 
     // Initialize cutoff time
     const cutoffTime = new Date(shippingTime)
-
+    // console.log('cutoffTime',cutoffTime)
+    // console.log('timeNow',timeNow)
     // Function to calculate shipping day
     const shippingday: any = getShippingDate(
       usWeekDays,
@@ -533,25 +526,35 @@ const ProductInventoryMessages = ({ product, currentlocationInventory, stockAvai
 
   // Get inventory message based on current product and stock
   const inventoryResponse = getInventoryMessageText(product, stockAvailable)
-  console.log('inevntory message final', inventoryResponse)
+  //console.log('inevntory message final', inventoryResponse)
+  const MessageBox = ({ message }: { message: string }) => (
+    <StyledBox>
+      <span
+        className="material-symbols-outlined"
+        style={{ fontSize: '28px', fontWeight: 500, lineHeight: '20px' }}
+      >
+        local_shipping
+      </span>
+      <Typography
+        variant="body1"
+        sx={{
+          margin: '0 35px 0 10px',
+          fontSize: 16,
+          lineHeight: '25px',
+          color: '#000000',
+        }}
+      >
+        {message}
+      </Typography>
+    </StyledBox>
+  )
+
   return (
     <div>
       {inventoryResponse && inventoryResponse.inventoryMessage && (
-        <StyledBox>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: '28px', fontWeight: 500, lineHeight: '20px' }}
-          >
-            local_shipping
-          </span>
-          <Typography
-            variant="body1"
-            sx={{ margin: '0 35px 0 10px', fontSize: 16, lineHeight: '25px', color: '#000000' }}
-          >
-            {inventoryResponse.inventoryMessage}
-          </Typography>
-        </StyledBox>
+        <MessageBox message={inventoryResponse.inventoryMessage} />
       )}
+      {availabilityMessageArr && <MessageBox message={availabilityMessageArr} />}
     </div>
   )
 }

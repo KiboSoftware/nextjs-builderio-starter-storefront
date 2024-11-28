@@ -16,7 +16,7 @@ import { grey } from '@mui/material/colors'
 import GetThemeSettings from '@/src/pages/api/getThemeSettings'
 
 const styles = {
-  a: {
+  '.htmlMarkUp a': {
     color: '#30299A',
     textDecoration: 'underline',
   },
@@ -126,7 +126,7 @@ const ProductApplications = ({ product, currentProduct }: any) => {
           </Typography>
 
           {applicationText && (
-            <Box sx={{ marginBottom: '22px', color: `${grey[900]}` }}>
+            <Box sx={{ marginBottom: '22px', color: `${grey[900]}` }} className="htmlMarkUp">
               <Typography
                 variant="body2"
                 gutterBottom
