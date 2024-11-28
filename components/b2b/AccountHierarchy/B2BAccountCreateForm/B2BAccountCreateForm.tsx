@@ -44,17 +44,18 @@ interface AccountHierarchyFormProps {
 const useAccountHierarchySchema = (b2BAccount: B2BAccount, isRequestAccount: boolean) => {
   const { t } = useTranslation('common')
   return yup.object({
-    parentAccount:
-      b2BAccount || isRequestAccount
-        ? yup.string()
-        : yup.string().required(t('this-field-is-required')),
+    parentAccount: yup.string().when([], {
+      is: () => !(b2BAccount || isRequestAccount),
+      then: yup.string().required(t('this-field-is-required')),
+      otherwise: yup.string(),
+    }),
     companyOrOrganization: yup.string().required(t('this-field-is-required')),
     firstName: yup.string().required(t('this-field-is-required')),
     lastName: yup.string().required(t('this-field-is-required')),
     emailAddress: yup
       .string()
-      .email(t('please-enter-a-valid-email-address'))
-      .required(t('this-field-is-required')),
+      .email(t('please-enter-a-valid-email-address')) // Validation for email format
+      .required(t('this-field-is-required')), // Validation for empty field
   })
 }
 
@@ -95,8 +96,8 @@ const B2BAccountCreateForm = (props: AccountHierarchyFormProps) => {
       mailingList: false,
       termsConditionCheck: false,
     },
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: 'all',
+    reValidateMode: 'onBlur',
     criteriaMode: 'firstError',
     resolver: yupResolver(accountHierarchySchema),
     shouldFocusError: true,
