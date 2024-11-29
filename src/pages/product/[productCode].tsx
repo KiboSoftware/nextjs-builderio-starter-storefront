@@ -71,7 +71,7 @@ export async function getStaticProps(
   const relatedProducts = []
   const relatedProductData = product?.properties?.find(
     (item: any) => item.attributeFQN === 'tenant~related-products'
-  )?.values[0].stringValue
+  )?.values[0]?.stringValue
   if (relatedProductData) {
     const relatedProductCodes = relatedProductData?.split('|')
     for (const data of relatedProductCodes) {
