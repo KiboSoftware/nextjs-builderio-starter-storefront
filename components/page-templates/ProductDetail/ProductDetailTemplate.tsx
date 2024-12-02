@@ -17,6 +17,7 @@ import {
   Theme,
   MenuItem,
 } from '@mui/material'
+import * as cookieNext from 'cookies-next'
 import Link from 'next/link'
 import router from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -209,6 +210,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { data: purchaseLocation } = useGetPurchaseLocation()
 
   const { addOrRemoveWishlistItem, checkProductInWishlist, isWishlistLoading } = useWishlist()
+
+  const countryCode = cookieNext.getCookie('ipBasedCountryCode')
 
   const {
     currentProduct,
@@ -605,6 +608,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     const targetPath = `${customCTATarget}${currentProduct?.variationProductCode}`
     router.push(targetPath)
   }
+
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -831,77 +835,78 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
               })}
             </Box>
             <PdpIconAttributes product={product} />
-            <Box
-              display="flex"
-              sx={{
-                padding: '20px',
-                bgcolor: theme?.palette.secondary.main,
-                margin: '30px 0',
-                flexDirection: { xs: 'column', lg: 'row' },
-              }}
-            >
-              {/* Column for ProductInventoryMessages */}
+            {countryCode && countryCode === 'US' && (
               <Box
-                flex={1}
-                sx={{ minWidth: '0', [theme.breakpoints.up('lg')]: { minWidth: '333px' } }}
+                display="flex"
+                sx={{
+                  padding: '20px',
+                  bgcolor: theme?.palette.secondary.main,
+                  margin: '30px 0',
+                  flexDirection: { xs: 'column', lg: 'row' },
+                }}
               >
-                {/* Adjust padding as needed */}
-                <ProductInventoryMessages
-                  product={currentProduct}
-                  inventoryInfo={currentlocationInventory}
-                  stockAvailable={stockAvailable}
-                  availabilityMessageArr={availabilityMessageArr}
-                />
-              </Box>
-
-              {/* Column for QuantitySelector and LoadingButton */}
-              {skuStatusText && skuStatusText === 'CustomCTA' && (
-                <LoadingButton
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  className="add-to-cart-button"
-                  onClick={() => handleCustomCTATarget()}
-                  sx={{
-                    marginTop: 1,
-                    bgcolor: theme?.palette.primary.main,
-                    fontSize: '16px !important',
-                    width: '100%',
-                  }} // Add margin top for spacing between QuantitySelector and LoadingButton
+                {/* Column for ProductInventoryMessages */}
+                <Box
+                  flex={1}
+                  sx={{ minWidth: '0', [theme.breakpoints.up('lg')]: { minWidth: '333px' } }}
                 >
-                  {customCTALabel}
-                </LoadingButton>
-              )}
-              {skuStatusText && skuStatusText !== 'CustomCTA' && (
-                <Box display="flex" flexDirection="column" justifyContent="flex-start">
-                  {/* Align items in a column */}
-                  <Box sx={{ width: '100%' }}>
-                    <QuantitySelector
-                      label="Quantity"
-                      quantity={quantity}
-                      onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
-                      onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
-                    />
-                  </Box>
+                  <ProductInventoryMessages
+                    product={currentProduct}
+                    inventoryInfo={currentlocationInventory}
+                    stockAvailable={stockAvailable}
+                    availabilityMessageArr={availabilityMessageArr}
+                  />
+                </Box>
+
+                {/* Column for QuantitySelector and LoadingButton */}
+                {skuStatusText && skuStatusText === 'CustomCTA' && (
                   <LoadingButton
                     variant="contained"
                     color="primary"
                     fullWidth
                     className="add-to-cart-button"
-                    onClick={() => handleAddToCart()}
-                    loading={addToCart.isPending}
-                    {...(!isValidForAddToCart() && { disabled: true })}
+                    onClick={() => handleCustomCTATarget()}
                     sx={{
-                      marginTop: '20px',
+                      marginTop: 1,
                       bgcolor: theme?.palette.primary.main,
                       fontSize: '16px !important',
+                      width: '100%',
                     }} // Add margin top for spacing between QuantitySelector and LoadingButton
                   >
-                    {t('add-to-cart')}
+                    {customCTALabel}
                   </LoadingButton>
-                </Box>
-              )}
-            </Box>
+                )}
+                {skuStatusText && skuStatusText !== 'CustomCTA' && (
+                  <Box display="flex" flexDirection="column" justifyContent="flex-start">
+                    {/* Align items in a column */}
+                    <Box sx={{ width: '100%' }}>
+                      <QuantitySelector
+                        label="Quantity"
+                        quantity={quantity}
+                        onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
+                        onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
+                      />
+                    </Box>
+                    <LoadingButton
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      className="add-to-cart-button"
+                      onClick={() => handleAddToCart()}
+                      loading={addToCart.isPending}
+                      {...(!isValidForAddToCart() && { disabled: true })}
+                      sx={{
+                        marginTop: '20px',
+                        bgcolor: theme?.palette.primary.main,
+                        fontSize: '16px !important',
+                      }} // Add margin top for spacing between QuantitySelector and LoadingButton
+                    >
+                      {t('add-to-cart')}
+                    </LoadingButton>
+                  </Box>
+                )}
+              </Box>
+            )}
             <Box paddingY={1}>
               <QuantitySelector
                 label="Qty"
