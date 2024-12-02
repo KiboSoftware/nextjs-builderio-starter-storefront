@@ -348,7 +348,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     } else if (isDigitalFulfillment) {
       return isValidForOneTime
     }
-    return isValidForOneTime && !(quantityLeft < 1)
+    return true
   }
 
   const isProductInWishlist = checkProductInWishlist({
@@ -605,6 +605,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     const targetPath = `${customCTATarget}${currentProduct?.variationProductCode}`
     router.push(targetPath)
   }
+
+  console.log('selectedFulfillmentOption', selectedFulfillmentOption)
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -867,15 +869,21 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                     bgcolor: theme?.palette.primary.main,
                     fontSize: '16px !important',
                     width: '100%',
-                  }} // Add margin top for spacing between QuantitySelector and LoadingButton
+                  }}
                 >
                   {customCTALabel}
                 </LoadingButton>
               )}
               {skuStatusText && skuStatusText !== 'CustomCTA' && (
                 <Box display="flex" flexDirection="column" justifyContent="flex-start">
-                  {/* Align items in a column */}
-                  <Box sx={{ width: '100%' }}>
+                  <Box
+                    sx={{
+                      width: '100%',
+                      '@media (max-width: 1023px)': {
+                        marginTop: '20px',
+                      },
+                    }}
+                  >
                     <QuantitySelector
                       label="Quantity"
                       quantity={quantity}
@@ -890,28 +898,27 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                     className="add-to-cart-button"
                     onClick={() => handleAddToCart()}
                     loading={addToCart.isPending}
-                    {...(!isValidForAddToCart() && { disabled: true })}
                     sx={{
                       marginTop: '20px',
                       bgcolor: theme?.palette.primary.main,
                       fontSize: '16px !important',
-                    }} // Add margin top for spacing between QuantitySelector and LoadingButton
+                      transition: 'none',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        bgcolor: theme?.palette.primary.light,
+                      },
+                      '@media (max-width: 1023px)': {
+                        width: '52%', // Ensure full width on mobile
+                      },
+                    }}
                   >
                     {t('add-to-cart')}
                   </LoadingButton>
                 </Box>
               )}
             </Box>
-            <Box paddingY={1}>
-              <QuantitySelector
-                label="Qty"
-                quantity={quantity}
-                onIncrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) + 1)}
-                onDecrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) - 1)}
-              />
-            </Box>
             {isSubscriptionModeAvailable && (
-              <Box paddingY={1}>
+              <Box paddingY={1} sx={{ display: 'none' }}>
                 <KiboRadio
                   radioOptions={purchaseTypeRadioOptions}
                   selected={purchaseType}
@@ -919,7 +926,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 />
               </Box>
             )}
-            <Box paddingY={1}>
+            <Box paddingY={1} sx={{ display: 'none' }}>
               {purchaseType === PurchaseTypes.SUBSCRIPTION && (
                 <KiboSelect
                   name={t('subscription-frequency')}
@@ -952,11 +959,11 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 )}
             </Box>
             {!addItemToList && (
-              <Box pt={2} display="flex" sx={{ justifyContent: 'space-between' }}>
+              <Box pt={2} display="flex" sx={{ justifyContent: 'space-between', display: 'none' }}>
                 <Typography fontWeight="600" variant="body2">
                   {selectedFulfillmentOption?.method && `${quantityLeft} ${t('item-left')}`}
                 </Typography>
-                {!isDigitalFulfillment && (
+                {/* {!isDigitalFulfillment && (
                   <MuiLink
                     color="inherit"
                     variant="body2"
@@ -965,10 +972,10 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                   >
                     {t('nearby-stores')}
                   </MuiLink>
-                )}
+                )} */}
               </Box>
             )}
-            {!isB2B && (
+            {/* {!isB2B && (
               <Box paddingY={1} display="flex" flexDirection={'column'} gap={2}>
                 <LoadingButton
                   variant="contained"
@@ -1004,7 +1011,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                   </Button>
                 </Box>
               </Box>
-            )}
+            )} */}
           </Grid>
         </Box>
         {/* <ImageGallery images={productGallery as ProductImage[]} title={'HI Image'} /> */}

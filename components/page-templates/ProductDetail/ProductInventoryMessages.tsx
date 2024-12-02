@@ -530,7 +530,7 @@ const ProductInventoryMessages = ({
   const MessageBox = ({ message }: { message: string }) => (
     <StyledBox>
       <span
-        className="material-symbols-outlined"
+        className="material-symbols-outlined responsiveShippingSpanIcon"
         style={{ fontSize: '28px', fontWeight: 500, lineHeight: '20px' }}
       >
         local_shipping
@@ -539,9 +539,9 @@ const ProductInventoryMessages = ({
         variant="body1"
         sx={{
           margin: '0 35px 0 10px',
-          fontSize: 16,
           lineHeight: '25px',
           color: '#000000',
+          '@media (max-width: 910px)': { fontSize: '0.875rem', lineHeight: '1.375rem' },
         }}
       >
         {message}

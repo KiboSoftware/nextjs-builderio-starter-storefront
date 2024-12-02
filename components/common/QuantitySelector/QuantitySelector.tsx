@@ -66,9 +66,11 @@ const QuantityTextField = ({ quantity, handleCustomQuantity }: QuantityInputProp
           fontStyle: 'normal',
           fontWeight: '300',
           lineHeight: '25px',
+          border: '1px solid #000',
+          borderRadius: '3px',
         },
       }}
-      sx={{ width: '35px', height: '24px', borderRadius: '3px', border: '1px solid gray.900' }}
+      sx={{ width: '35px', height: '24px', borderRadius: '3px' }}
     />
   )
 }
@@ -90,7 +92,7 @@ const QuantitySelector = (props: QuantitySelectorProps) => {
         <Typography
           variant="body2"
           component="span"
-          sx={{ pr: '0.5rem', color: 'gray.900' }}
+          sx={{ pr: '0.5rem', color: '#000', fontSize: '16px' }}
           data-testid="label"
         >
           {label}:
@@ -100,7 +102,17 @@ const QuantitySelector = (props: QuantitySelectorProps) => {
       <IconButton
         onClick={onDecrease}
         disabled={quantity === 1 ? true : false}
-        sx={{ ...styles.iconButton }}
+        sx={{
+          ...styles.iconButton,
+          ...(quantity === 1 && {
+            borderColor: 'grey.600',
+            color: 'grey.600',
+            cursor: 'not-allowed',
+          }),
+          '&:hover': {
+            bgcolor: 'unset',
+          },
+        }}
         aria-label={t('decrease')}
         component="span"
       >
@@ -116,7 +128,12 @@ const QuantitySelector = (props: QuantitySelectorProps) => {
       <IconButton
         onClick={onIncrease}
         disabled={maxQuantity === quantity ? true : false}
-        sx={{ ...styles.iconButton }}
+        sx={{
+          ...styles.iconButton,
+          '&:hover': {
+            bgcolor: 'unset',
+          },
+        }}
         aria-label={t('increase')}
         component="span"
       >
