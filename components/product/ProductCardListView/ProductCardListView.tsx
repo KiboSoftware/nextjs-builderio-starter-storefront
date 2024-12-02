@@ -78,6 +78,7 @@ export interface ProductCardListViewProps {
   showQuickViewButton?: boolean
   badge?: string
   brand?: string
+  catalogNumber?: string
   productProperties?: ProductProperties[]
   sliceValue?: string
   reactivity?: string
@@ -131,6 +132,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     sliceValue,
     variantProductName,
     variationProductCode,
+    catalogNumber,
     fulfillmentTypesSupported,
     onAddOrRemoveWishlistItem,
     onClickQuickViewModal,
@@ -142,6 +144,13 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
   )
   const brandLabel = (
     brandProperties?.values as { value: string; stringValue: string }[] | undefined
+  )?.[0]?.stringValue
+
+  const catalogNumberProperties = productProperties?.find(
+    (prop) => prop.attributeFQN?.toLowerCase() === 'tenant~plp-catalog-number'
+  )
+  const ProductCatalogNumber = (
+    catalogNumberProperties?.values as { value: string; stringValue: string }[] | undefined
   )?.[0]?.stringValue
 
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
@@ -254,7 +263,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                     fontWeight={500}
                     sx={ProductCardStyles.productTitle}
                   >
-                    {variationProductCode ? variantProductName : title}
+                    {sliceValue ? variantProductName : title}
                   </Typography>
                   {brandImages[brand.toLowerCase()] && (
                     <Box sx={ProductCardStyles.brandLogoContainer}>
@@ -269,14 +278,14 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   )}
                 </Box>
                 <Box sx={ProductCardStyles.brandStyle}>
-                  <Typography
-                    variant="body1"
-                    gutterBottom
-                    color="text.primary"
-                    sx={ProductCardStyles.brandLable}
-                  >
+                  <Typography gutterBottom color="text.primary" sx={ProductCardStyles.brandLable}>
                     {brandLabel}
                   </Typography>
+                  {(sliceValue ? variationProductCode : ProductCatalogNumber) && (
+                    <Typography color="text.primary" sx={ProductCardStyles.catalogNum}>
+                      {`Catalog # ${sliceValue ? variationProductCode : ProductCatalogNumber}`}
+                    </Typography>
+                  )}
                 </Box>
                 {/* <Rating
                   name="read-only"
