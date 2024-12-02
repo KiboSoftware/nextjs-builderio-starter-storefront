@@ -20,6 +20,7 @@ export const ProductCardStyles = {
     cursor: 'pointer',
     borderRadius: '0px 0px 25px 0px',
     border: '1px solid #E3E2FF',
+    boxSizing: 'border-box',
     // '&:hover .quick-actions': {
     //   opacity: 1,
     // },
