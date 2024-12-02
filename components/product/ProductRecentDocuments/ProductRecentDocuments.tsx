@@ -23,7 +23,7 @@ const tableCellStyles = {
   fontFamily: 'Poppins',
   fontSize: '16px',
   fontWeight: 300,
-  lineHeight: '42px',
+  lineHeight: '25px',
   padding: 0,
   paddingLeft: '20px',
   paddingTop: '10px',
@@ -99,7 +99,7 @@ const ProductRecentDocuments = (props: any) => {
       >
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ height: '40px' }}>
               {['Document', 'Lot', ''].map((header, index) => (
                 <TableCell
                   key={index}
@@ -118,7 +118,7 @@ const ProductRecentDocuments = (props: any) => {
           </TableHead>
           <TableBody>
             {filteredDocuments.map((document: any) => (
-              <TableRow key={document.id}>
+              <TableRow key={document.id} sx={{ height: '45px' }}>
                 <TableCell sx={{ ...tableCellStyles, width: '60%' }}>
                   <Link
                     href={`${hostUrl}${'/cms/files/'}${document.properties.salsifyname}`}
