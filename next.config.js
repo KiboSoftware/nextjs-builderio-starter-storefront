@@ -203,6 +203,7 @@ module.exports = {
         cartBottomSection: 'cart-bottom-content-section',
         cartTopSection: 'cart-top-content-section',
         categoryTopSection: 'category-section',
+        cartEmptySection: 'cart-empty-content-section',
       },
     },
     inventorySettings: {

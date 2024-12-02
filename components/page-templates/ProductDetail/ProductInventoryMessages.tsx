@@ -541,6 +541,7 @@ const ProductInventoryMessages = ({
           margin: '0 35px 0 10px',
           lineHeight: '25px',
           color: '#000000',
+          fontSize: '16px',
           '@media (max-width: 910px)': { fontSize: '0.875rem', lineHeight: '1.375rem' },
         }}
       >
