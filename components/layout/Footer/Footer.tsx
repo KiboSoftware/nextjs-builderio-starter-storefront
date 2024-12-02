@@ -7,9 +7,8 @@ import CheckoutFooter from '@/components/checkout/CheckoutFooter/CheckoutFooter'
 
 const FooterSection = () => {
   const [footerContent, setFooterContent] = useState(null)
-  const [isCheckout, setIsCheckout] = useState(false)
   const router = useRouter()
-
+  const isCheckout = router.pathname === '/checkout/[checkoutId]' ? true : false
   useEffect(() => {
     async function fetchFooterContent() {
       const content = await builder.get('footer').toPromise()
@@ -17,7 +16,6 @@ const FooterSection = () => {
     }
 
     fetchFooterContent()
-    setIsCheckout(router.pathname === '/checkout/[checkoutId]' ? true : false)
   }, [])
 
   return (
