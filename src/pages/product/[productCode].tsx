@@ -29,6 +29,7 @@ const { serverRuntimeConfig } = getConfig()
 interface ProductPageType extends PageWithMetaData {
   categoriesTree?: PrCategory[]
   product?: Product
+  relatedProducts: any
   productVariations?: Product[]
   section?: any
 }
@@ -67,6 +68,32 @@ export async function getStaticProps(
   const { locale, params } = context
   const { productCode } = params as any
   const product = await getProduct(productCode)
+  const relatedProducts = []
+  const relatedProductData = product?.properties?.find(
+    (item: any) => item.attributeFQN === 'tenant~related-products'
+  )?.values[0]?.stringValue
+  if (relatedProductData) {
+    const relatedProductCodes = relatedProductData?.split('|')
+    for (const data of relatedProductCodes) {
+      const product = await getProduct(data)
+      if (product) {
+        const productData = {
+          productCode: product?.productCode,
+          categoryCode: product?.categories[0]?.categoryCode,
+          seoFriendlyUrl: product?.content?.seoFriendlyUrl,
+          title: product?.content?.productName,
+          productImages: product?.content?.productImages,
+          brand: (product?.properties?.find(
+            (item: any) => item?.attributeFQN === publicRuntimeConfig.brandAttrName
+          )).values[0],
+        }
+        relatedProducts.push(productData)
+      } else {
+        console.warn(`No product found for code: ${data}`)
+      }
+    }
+  }
+
   const productVariations = await getProductSearchVariations(productCode)
   const categoriesTree = await getCategoryTree()
   if (!product) {
@@ -86,6 +113,7 @@ export async function getStaticProps(
       productVariations,
       categoriesTree,
       section: section || null,
+      relatedProducts,
       metaData: getMetaData(product),
       ...(await serverSideTranslations(locale as string, ['common'])),
     },
@@ -105,7 +133,7 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 }
 
 const ProductDetailPage: NextPage<ProductPageType> = (props) => {
-  const { product, productVariations } = props
+  const { product, productVariations, relatedProducts } = props
   const router = useRouter()
 
   const { isFallback, query } = router
@@ -129,6 +157,7 @@ const ProductDetailPage: NextPage<ProductPageType> = (props) => {
         <ProductDetailTemplate
           product={{ ...product, ...productResponseData }}
           productVariations={productVariations}
+          relatedProducts={relatedProducts}
           breadcrumbs={breadcrumbs}
           sliceValue={sliceValue}
         >

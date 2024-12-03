@@ -18,6 +18,7 @@ interface ProductQuickViewDialogProps {
   quoteDetails?: any
   listData?: any
   shouldFetchShippingMethods?: boolean
+  relatedProducts: any
   onUpdateListData: (param: CrWishlist, addToCartPayload: any) => void
 }
 
@@ -128,6 +129,7 @@ const ProductQuickViewDialog = (props: ProductQuickViewDialogProps) => {
     dialogProps,
     quoteDetails,
     listData,
+    relatedProducts,
     shouldFetchShippingMethods = false,
     onUpdateListData,
   } = props
@@ -196,6 +198,7 @@ const ProductQuickViewDialog = (props: ProductQuickViewDialogProps) => {
           quoteDetails={quoteDetails}
           title={title}
           cancel={cancel}
+          relatedProducts={relatedProducts}
           getCurrentProduct={handleCurrentProduct}
           shouldFetchShippingMethods={shouldFetchShippingMethods}
         />
