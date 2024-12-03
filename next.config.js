@@ -62,6 +62,7 @@ module.exports = {
     badgeAttributeFQN: 'Tenant~badge',
     variantProductAttributeName: 'tenant~variant-product-name',
     brandAttrName: 'tenant~brand',
+    catalogNumberAttr: 'tenant~plp-catalog-number',
     newProductAttrName: 'tenant~new-product',
     resourceTypeName: 'tenant~resourcetype',
     occasionAttributeFQN: 'Tenant~occasion',
