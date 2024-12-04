@@ -177,9 +177,6 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
         fedExShippings,
         (fedExShip) => fedExShip?.shippingMethodCode === selectedShippingMethodCode
       )
-      if (fedExShipMethod) {
-        setFedExAccountShippingMethod(fedExShipMethod)
-      }
       return fedExShipMethod?.shippingMethodCode ? shippingType : ''
     }
     return shippingType
@@ -337,7 +334,7 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
             selected={
               isFedExMethodSelected
                 ? isFedExShippingSelected('fedExAccount')
-                : (isFedExShippingSelected('') as string)
+                : isFedExShippingSelected('')
             }
             align="flex-start"
             onChange={() => {
