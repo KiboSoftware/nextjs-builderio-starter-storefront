@@ -221,6 +221,8 @@
   "country-code": "Country",
   "phone-number-home": "Phone number",
   "this-field-is-required": "This field is required",
+  "this-field-is-number": "Must be only digits",
+  "this-field-is-min-max-length": "Must be exactly 9 digits",
   "enter-valid-zip-code": "Please provide valid zip code",
   "ending": "Ending:",
   "exp": "Exp:",
@@ -547,5 +549,6 @@
   "add-list-name-to-search-products": "Add list name to Search/View products in list",
   "digital-products-shipping-text": "No shipping information is required since all items will be picked up in the store or digitally fulfilled.",
   "digital-products": "Digital Products",
-  "menu": "Menu"
+  "menu": "Menu",
+  "fortis-shipping": "Fortis Shipping"
 }
