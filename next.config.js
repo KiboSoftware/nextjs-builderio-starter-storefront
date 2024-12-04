@@ -209,9 +209,9 @@ module.exports = {
     },
     inventorySettings: {
       buffer: 2,
-      USShippingCutOffTime: '12:00+05:30',
+      USShippingCutOffTime: '15:00-06:00',
       USMonday: true,
-      USTuesday: false,
+      USTuesday: true,
       USWednesday: true,
       USThursday: true,
       USFriday: false,
@@ -225,7 +225,8 @@ module.exports = {
       CAFriday: true,
       CASaturday: false,
       CASunday: false,
-      nonShippingDates: '',
+      nonShippingDates:
+        '11/27/2024, 11/28/2024, 12/23/2024, 12/24/2024, 12/25/2024, 12/30/2024, 12/31/2024, 01/01/20245, 01/20/2025, 02/17/2025, 05/26/2025, 06/19/2025, 07/03/2025, 07/04/2025, 09/01/2025, 11/27/2025, 11/28/2025, 12/24/2025, 12/25/2025',
       nonShippingDatesCanada: '',
       discontinuedProduct: 'Product has been discontinued',
     },
