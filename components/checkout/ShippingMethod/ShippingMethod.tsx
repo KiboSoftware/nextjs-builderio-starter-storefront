@@ -132,7 +132,25 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
     }
   }, [fedExAccountNumber, fedExAccountSelectedShippingMethodName])
 
+  useEffect(() => {
+    if (selectedShippingMethodCode && !isFedExMethodSelected) {
+      const fedExShippings = getFedExShippingMethods()
+      const selectedFexEdMethod = find(
+        fedExShippings,
+        (fedExShip) => fedExShip?.shippingMethodCode === selectedShippingMethodCode
+      )
+      if (fedExShippings && selectedFexEdMethod) {
+        handleShippingMethodSelectChange(
+          selectedFexEdMethod?.shippingMethodName as string,
+          selectedFexEdMethod?.shippingMethodCode as string
+        )
+        setIsFedExMethodSelected(true)
+      }
+    }
+  }, [selectedShippingMethodCode])
+
   const handleShippingMethodChange = (value: string, name?: string) => {
+    setFedExAccountShippingMethod({})
     onShippingMethodChange && onShippingMethodChange(value, name)
   }
 
@@ -162,24 +180,6 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
       }
     }) as CrShippingRate[]
     return fedExShippingMethods
-  }
-
-  const isFedExShippingSelected = (shippingType: string) => {
-    const fedExShippings = getFedExShippingMethods()
-    if (
-      isFedExMethodSelected &&
-      selectedShippingMethodCode &&
-      fedExShippings &&
-      shippingType &&
-      shippingType !== ''
-    ) {
-      const fedExShipMethod = find(
-        fedExShippings,
-        (fedExShip) => fedExShip?.shippingMethodCode === selectedShippingMethodCode
-      )
-      return fedExShipMethod?.shippingMethodCode ? shippingType : ''
-    }
-    return shippingType
   }
 
   // Save FedEx account into customer attributes
@@ -280,9 +280,9 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
             }
             align="flex-start"
             onChange={(value) => {
+              handleShippingMethodChange(value)
               setIsFedExMethodSelected(false)
               setIsFedExAccountUpdated(true)
-              handleShippingMethodChange(value)
             }}
             sx={{
               borderRadius: 1,
@@ -331,19 +331,28 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
                 ),
               },
             ]}
-            selected={
-              isFedExMethodSelected
-                ? isFedExShippingSelected('fedExAccount')
-                : isFedExShippingSelected('')
-            }
+            selected={isFedExMethodSelected ? 'fedExAccount' : ''}
             align="flex-start"
             onChange={() => {
               if (selectedShippingMethodCode || fedExAccountShippingMethod?.shippingMethodCode) {
-                handleShippingMethodSelectChange(
-                  '',
-                  (selectedShippingMethodCode ??
-                    fedExAccountShippingMethod?.shippingMethodCode) as string
-                )
+                const shippingMethod = selectedShippingMethodCode
+                  ? find(
+                      getFedExShippingMethods(),
+                      (fedExMethod) =>
+                        fedExMethod?.shippingMethodCode === selectedShippingMethodCode
+                    )
+                  : undefined
+                if (shippingMethod) {
+                  handleShippingMethodSelectChange(
+                    shippingMethod?.shippingMethodName as string,
+                    shippingMethod?.shippingMethodCode as string
+                  )
+                } else if (fedExAccountShippingMethod) {
+                  handleShippingMethodSelectChange(
+                    fedExAccountShippingMethod?.shippingMethodName as string,
+                    fedExAccountShippingMethod?.shippingMethodCode as string
+                  )
+                }
               } else {
                 handleShippingMethodChange('')
               }
