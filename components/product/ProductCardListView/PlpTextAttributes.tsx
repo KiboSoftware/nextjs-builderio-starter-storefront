@@ -6,7 +6,6 @@ const { publicRuntimeConfig } = getConfig()
 const PlpTextAttributes = (props: any) => {
   const { productProperties, sliceValue } = props
 
-  // Ordered list of attribute FQNs
   const attributeList = [
     'tenant~verified-reactivity',
     sliceValue ? 'tenant~applications-variant' : 'tenant~applications',
@@ -31,7 +30,6 @@ const PlpTextAttributes = (props: any) => {
     return null
   }
 
-  // Extract the first four properties with values
   const visibleProperties = attributeList
     .map((fqn) => getPropertyDetails(fqn))
     .filter((prop) => prop !== null)
