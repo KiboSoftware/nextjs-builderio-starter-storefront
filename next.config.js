@@ -62,6 +62,7 @@ module.exports = {
     badgeAttributeFQN: 'Tenant~badge',
     variantProductAttributeName: 'tenant~variant-product-name',
     brandAttrName: 'tenant~brand',
+    catalogNumberAttr: 'tenant~plp-catalog-number',
     newProductAttrName: 'tenant~new-product',
     resourceTypeName: 'tenant~resourcetype',
     occasionAttributeFQN: 'Tenant~occasion',
@@ -257,7 +258,30 @@ module.exports = {
         cartBottomSection: 'cart-bottom-content-section',
         cartTopSection: 'cart-top-content-section',
         categoryTopSection: 'category-section',
+        cartEmptySection: 'cart-empty-content-section',
       },
+    },
+    inventorySettings: {
+      buffer: 2,
+      USShippingCutOffTime: '12:00+05:30',
+      USMonday: true,
+      USTuesday: false,
+      USWednesday: true,
+      USThursday: true,
+      USFriday: false,
+      USSaturday: false,
+      USSunday: false,
+      CAShippingCutOffTime: '19:50+06:00',
+      CAMonday: true,
+      CATuesday: false,
+      CAWednesday: true,
+      CAThursday: true,
+      CAFriday: true,
+      CASaturday: false,
+      CASunday: false,
+      nonShippingDates: '',
+      nonShippingDatesCanada: '',
+      discontinuedProduct: 'Product has been discontinued',
     },
   },
   serverRuntimeConfig: {
@@ -294,10 +318,6 @@ module.exports = {
       {
         source: '/products/:categoryCode/:productSlug/:productCode', // Match product URLs under categories
         destination: '/product/:productCode', // Destination for the product page
-      },
-      {
-        source: '/products/:categoryCode', // Match category URLs of categories
-        destination: '/category/:categoryCode', // Destination of category handler
       },
       {
         source: '/p/:productCode', // Match product URLs under categories

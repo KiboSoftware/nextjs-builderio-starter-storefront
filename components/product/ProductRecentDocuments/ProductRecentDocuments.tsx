@@ -23,7 +23,7 @@ const tableCellStyles = {
   fontFamily: 'Poppins',
   fontSize: '16px',
   fontWeight: 300,
-  lineHeight: '42px',
+  lineHeight: '25px',
   padding: 0,
   paddingLeft: '20px',
   paddingTop: '10px',
@@ -38,6 +38,7 @@ const tableCellLinkStyle = {
 
 const ProductRecentDocuments = (props: any) => {
   const { code, properties, documents } = props
+  const hostUrl = `https://${process.env.NEXT_PUBLIC_KIBO_HOST}`
 
   const [filteredDocuments, setFilteredDocuments] = useState([])
   const [showAllChecked, setShowAllChecked] = useState(false)
@@ -64,8 +65,7 @@ const ProductRecentDocuments = (props: any) => {
         (document: any) =>
           document.properties.assettype &&
           document.properties.assettype !== 'ProductImage' &&
-          document.properties.displayonpdp &&
-          document.name.toLowerCase() === code.toLowerCase()
+          document.properties.displayonpdp
       )
     }
   }
@@ -99,7 +99,7 @@ const ProductRecentDocuments = (props: any) => {
       >
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ height: '40px' }}>
               {['Document', 'Lot', ''].map((header, index) => (
                 <TableCell
                   key={index}
@@ -118,10 +118,10 @@ const ProductRecentDocuments = (props: any) => {
           </TableHead>
           <TableBody>
             {filteredDocuments.map((document: any) => (
-              <TableRow key={document.id}>
+              <TableRow key={document.id} sx={{ height: '45px' }}>
                 <TableCell sx={{ ...tableCellStyles, width: '60%' }}>
                   <Link
-                    href={document.properties.sourceurl}
+                    href={`${hostUrl}${'/cms/files/'}${document.properties.salsifyname}`}
                     target="_blank"
                     style={{
                       ...tableCellLinkStyle,
@@ -150,7 +150,7 @@ const ProductRecentDocuments = (props: any) => {
                 </TableCell>
                 <TableCell sx={{ ...tableCellStyles, textAlign: 'left', width: '15%' }}>
                   <Link
-                    href={document.properties.sourceurl}
+                    href={`${hostUrl}${'/cms/files/'}${document.properties.salsifyname}`}
                     target="_blank"
                     style={{
                       ...tableCellLinkStyle,

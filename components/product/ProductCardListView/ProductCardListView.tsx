@@ -60,6 +60,7 @@ export interface ProductCardListViewProps {
   productCode?: string
   properties?: ProductProperties[]
   resourceTypeName?: string
+  resourceType: any
   productType?: string
   variationProductCode?: string
   rating?: number
@@ -77,6 +78,7 @@ export interface ProductCardListViewProps {
   showQuickViewButton?: boolean
   badge?: string
   brand?: string
+  catalogNumber?: string
   productProperties?: ProductProperties[]
   sliceValue?: string
   reactivity?: string
@@ -110,6 +112,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     reactivity,
     properties,
     resourceTypeName,
+    resourceType,
     categoryCode,
     parentCategoryName,
     link,
@@ -117,7 +120,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     placeholderImageUrl = DefaultImage,
     rating = 4,
     productDescription = '',
-    imageHeight = 140,
+    imageHeight = 180,
     imageAltText = 'product-image-alt',
     isLoading = false,
     isInWishlist = false,
@@ -129,6 +132,7 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
     sliceValue,
     variantProductName,
     variationProductCode,
+    catalogNumber,
     fulfillmentTypesSupported,
     onAddOrRemoveWishlistItem,
     onClickQuickViewModal,
@@ -140,6 +144,13 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
   )
   const brandLabel = (
     brandProperties?.values as { value: string; stringValue: string }[] | undefined
+  )?.[0]?.stringValue
+
+  const catalogNumberProperties = productProperties?.find(
+    (prop) => prop.attributeFQN?.toLowerCase() === 'tenant~plp-catalog-number'
+  )
+  const ProductCatalogNumber = (
+    catalogNumberProperties?.values as { value: string; stringValue: string }[] | undefined
   )?.[0]?.stringValue
 
   const productPriceRange = usePriceRangeFormatter(priceRange as ProductPriceRange)
@@ -230,47 +241,51 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                   ...ProductCardStyles.cardMedia,
                   height: {
                     xs: imageHeight,
-                    sm: 'auto',
+                    // sm: 'auto',
                   },
                 }}
               >
                 <KiboImage
                   src={imageUrl || brandImages[brand.toLowerCase()] || placeholderImageUrl}
                   alt={imageUrl ? imageAltText : 'no-image-alt'}
-                  style={{ objectFit: 'contain' }}
-                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 220px, 220px"
+                  objectFit={
+                    imageUrl ? 'contain' : brandImages[brand.toLowerCase()] ? 'none' : 'contain'
+                  }
                   data-testid="product-image"
                 />
               </CardMedia>
               <Box flexDirection="column" m={1} width="75%" className="product-info">
-                <Box display="flex" alignItems="center" width="100%">
+                <Box display="flex" alignItems="start" width="100%">
                   <Typography
                     variant="body2"
                     gutterBottom
                     fontWeight={500}
                     sx={ProductCardStyles.productTitle}
                   >
-                    {variationProductCode ? variantProductName : title}
+                    {sliceValue ? variantProductName : title}
                   </Typography>
                   {brandImages[brand.toLowerCase()] && (
-                    <Box
-                      component="img"
-                      src={brandImages[brand.toLowerCase()]}
-                      alt={`${brand}-logo`}
-                      sx={ProductCardStyles.brandLogoImage}
-                      data-testid="brand-logo"
-                    />
+                    <Box sx={ProductCardStyles.brandLogoContainer}>
+                      <Box
+                        component="img"
+                        src={brandImages[brand.toLowerCase()]}
+                        alt={`${brand}-logo`}
+                        sx={ProductCardStyles.brandLogoImage}
+                        data-testid="brand-logo"
+                      />
+                    </Box>
                   )}
                 </Box>
                 <Box sx={ProductCardStyles.brandStyle}>
-                  <Typography
-                    variant="body1"
-                    gutterBottom
-                    color="text.primary"
-                    sx={ProductCardStyles.brandLable}
-                  >
+                  <Typography gutterBottom color="text.primary" sx={ProductCardStyles.brandLable}>
                     {brandLabel}
                   </Typography>
+                  {(sliceValue ? variationProductCode : ProductCatalogNumber) && (
+                    <Typography color="text.primary" sx={ProductCardStyles.catalogNum}>
+                      {`Catalog # ${sliceValue ? variationProductCode : ProductCatalogNumber}`}
+                    </Typography>
+                  )}
                 </Box>
                 {/* <Rating
                   name="read-only"

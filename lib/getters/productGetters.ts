@@ -176,6 +176,14 @@ export const getBrandName = (properties: ProductProperties[]): string => {
   }
   return 'attribute not found'
 }
+export const getCatalogNumber = (properties: ProductProperties[]): string => {
+  const catalogNumberAttr = publicRuntimeConfig?.catalogNumberAttr?.toLowerCase()
+  if (Array.isArray(properties)) {
+    return properties.find((prop) => prop.attributeFQN?.toLowerCase() === catalogNumberAttr)
+      ?.value as string
+  }
+  return 'attribute not found'
+}
 export const getResourceTypeName = (properties: ProductProperties[]): string => {
   const resourceType = publicRuntimeConfig?.resourceTypeName?.toLowerCase()
   if (Array.isArray(properties)) {
@@ -426,6 +434,7 @@ export const productGetters = {
   getSeoFriendlyUrl,
   getDescription,
   getBrandName,
+  getCatalogNumber,
   getNewProductAttrName,
   getVariantProductAttributeName,
 }
