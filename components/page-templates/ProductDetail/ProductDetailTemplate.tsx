@@ -162,6 +162,17 @@ const getDocumentListDocuments = async (documentListName: string, filter: string
     throw error
   }
 }
+const variantProperties = [
+  'tenant~applications-variant',
+  'tenant~conjugate-type-variant',
+  'tenant~purity-variant',
+  'tenant~stock-concentration',
+  'tenant~storage-variant',
+  'tenant~shelf-life-variant',
+  'tenant~buffer',
+  'tenant~prodprocedures-1',
+  'tenant~contents-variant',
+]
 
 const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { getProductLink } = uiHelpers()
@@ -553,15 +564,18 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
       // Create a map of currentProduct properties by attributeFQN for quick lookup
       const currentProductMap = new Map(
-        currentProduct.properties?.map((item: any) => [item.attributeFQN, item])
+        currentProduct?.properties?.map((item: any) => [item.attributeFQN, item])
       )
 
       // Merge properties from product and currentProduct
-      const mergedProperties = product.properties
-        ?.filter(
-          (item: any) => !currentProductMap.has(item.attributeFQN) // Remove duplicates from product
-        )
-        ?.concat(currentProduct.properties || []) // Add currentProduct values
+      let mergedProperties = product?.properties?.filter(
+        (item: any) => !currentProductMap?.has(item.attributeFQN) // Remove duplicates from product
+      )
+      // Add currentProduct values
+
+      mergedProperties = mergedProperties
+        ?.filter((property: any) => !variantProperties.includes(property.attributeFQN))
+        ?.concat(currentProduct?.properties || [])
 
       // Update the product properties immutably
       setUpdatedProduct({ ...product, properties: mergedProperties })
