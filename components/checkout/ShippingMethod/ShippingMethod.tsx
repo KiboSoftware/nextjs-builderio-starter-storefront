@@ -8,12 +8,19 @@ import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
 import { KiboRadio, KiboSelect, KiboTextBox, Price, ProductItemList } from '@/components/common'
-import { useGetCurrentCustomer, useGetStoreLocations, useUpdateCustomerProfile } from '@/hooks'
+import {
+  useCreateOrderAttribute,
+  useGetCurrentCustomer,
+  useGetStoreLocations,
+  useUpdateCustomerProfile,
+  useUpdateOrderAttributes,
+} from '@/hooks'
 import { orderGetters, storeLocationGetters } from '@/lib/getters'
 
-import type { Maybe, CrOrderItem, CrShippingRate, CustomerAccount } from '@/lib/gql/types'
+import type { Maybe, CrOrderItem, CrShippingRate, CustomerAccount, CrOrder } from '@/lib/gql/types'
 
 export type ShippingMethodProps = {
+  checkout?: CrOrder
   shipItems?: Maybe<CrOrderItem>[]
   pickupItems?: Maybe<CrOrderItem>[]
   handlingAmount?: number
@@ -24,6 +31,7 @@ export type ShippingMethodProps = {
   onStoreLocatorClick?: () => void
 }
 export type ShipItemListProps = {
+  checkout?: CrOrder
   shipItems: Maybe<CrOrderItem>[]
   handlingAmount?: number
   orderShipmentMethods?: Maybe<CrShippingRate>[]
@@ -57,7 +65,8 @@ export const useFedExSchema = () => {
 }
 
 const ShipItemList = (shipProps: ShipItemListProps) => {
-  const { orderShipmentMethods, selectedShippingMethodCode, onShippingMethodChange } = shipProps
+  const { checkout, orderShipmentMethods, selectedShippingMethodCode, onShippingMethodChange } =
+    shipProps
   const { t } = useTranslation('common')
 
   const [isFedExMethodSelected, setIsFedExMethodSelected] = useState<boolean>(false)
@@ -184,12 +193,15 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
 
   // Save FedEx account into customer attributes
   const { updateUserData } = useUpdateCustomerProfile()
+  const { createOrderAttributes } = useCreateOrderAttribute()
+  const { updateOrderAttributes } = useUpdateOrderAttributes()
   const handleFexExAccountShipping = async (
     customerAccount: CustomerAccount,
     fedExAccountNumber: string,
     fedExShippingMethodName: string
   ) => {
     try {
+      // Update customer attributes
       const updatedCustomerAccountAttributes = customerAccount?.attributes?.length
         ? customerAccount?.attributes?.map((attribute) => {
             if (attribute?.fullyQualifiedName === 'tenant~customer-fedex-account-number') {
@@ -239,6 +251,61 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
           attributes: updatedCustomerAccountAttributes,
         },
       })
+
+      // Update order attributes
+      const fedExAccountNumberAttr = find(
+        checkout?.attributes,
+        (attr) => attr?.fullyQualifiedName === 'tenant~customerFedexAccountNumber'
+      )
+      const b2bAccountNameAttr = find(
+        checkout?.attributes,
+        (attr) => attr?.fullyQualifiedName === 'tenant~b2bAccountName'
+      )
+      if (fedExAccountNumberAttr || b2bAccountNameAttr) {
+        // Updating FedEx Account Number
+        await updateOrderAttributes.mutateAsync({
+          orderId: checkout?.id as string,
+          orderAttributeInput: [
+            {
+              fullyQualifiedName: 'tenant~customerFedexAccountNumber',
+              values: [fedExAccountNumber],
+            },
+          ],
+        })
+
+        // Updating B2B Account Name
+        await updateOrderAttributes.mutateAsync({
+          orderId: checkout?.id as string,
+          orderAttributeInput: [
+            {
+              fullyQualifiedName: 'tenant~b2bAccountName',
+              values: [customerAccount?.companyOrOrganization],
+            },
+          ],
+        })
+      } else {
+        // Adding FedEx Account Number
+        await createOrderAttributes.mutateAsync({
+          orderId: checkout?.id as string,
+          orderAttributeInput: [
+            {
+              fullyQualifiedName: 'tenant~customerFedexAccountNumber',
+              values: [fedExAccountNumber],
+            },
+          ],
+        })
+
+        // Adding B2B Account Name
+        await createOrderAttributes.mutateAsync({
+          orderId: checkout?.id as string,
+          orderAttributeInput: [
+            {
+              fullyQualifiedName: 'tenant~b2bAccountName',
+              values: [customerAccount?.companyOrOrganization],
+            },
+          ],
+        })
+      }
     } catch (error) {
       console.error(error)
     }
@@ -463,6 +530,7 @@ const PickupItemList = (pickupProps: PickupItemListProps) => {
 }
 const ShippingMethod = (props: ShippingMethodProps) => {
   const {
+    checkout,
     shipItems,
     pickupItems,
     orderShipmentMethods,
@@ -497,6 +565,7 @@ const ShippingMethod = (props: ShippingMethodProps) => {
           {...(orderShipmentMethods && { orderShipmentMethods })}
           selectedShippingMethodCode={selectedShippingMethodCode}
           shipItems={shipItems}
+          checkout={checkout}
         />
       ) : null}
       {pickupItems?.length ? (

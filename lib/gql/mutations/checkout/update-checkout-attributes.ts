@@ -1,11 +1,11 @@
-const updateCheckoutAttributes = /* GraphQL */ `
-  mutation updateCheckoutAttributes(
-    $checkoutId: String!
+const updateOrderAttributes = /* GraphQL */ `
+  mutation updateOrderAttributes(
+    $orderId: String!
     $removeMissing: Boolean
     $orderAttributeInput: [CrOrderAttributeInput]
   ) {
-    updateCheckoutAttributes(
-      checkoutId: $checkoutId
+    updateOrderAttributes(
+      orderId: $orderId
       removeMissing: $removeMissing
       orderAttributeInput: $orderAttributeInput
     ) {
@@ -16,4 +16,4 @@ const updateCheckoutAttributes = /* GraphQL */ `
   }
 `
 
-export default updateCheckoutAttributes
+export default updateOrderAttributes
