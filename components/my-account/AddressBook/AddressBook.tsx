@@ -57,10 +57,24 @@ interface AccountAddressProps {
 
 const styles = {
   addNewAddressButtonStyle: {
-    maxWidth: '26.313rem',
-    '& > *:first-of-type': {
-      fontSize: 'inherit',
+    width: 'auto',
+    maxWidth: '300px',
+    backgroundColor: 'primary.main',
+    color: 'secondary.light',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontSize: '16px',
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: '24px',
+    borderRadius: '0px 26px',
+    border: '1px solid primary.main',
+    padding: '12px 30px',
+    '&:hover': {
+      backgroundColor: 'primary.light',
+      border: '1px solid primary.light',
     },
+    marginLeft: '20px',
   },
 }
 const buildAddressProps = (customerContact: CustomerContact) => {
