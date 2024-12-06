@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { MouseEvent, useState } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
+import { LoadingButton } from '@mui/lab'
 import {
   Typography,
   Box,
@@ -13,7 +14,12 @@ import {
   FormControlLabel,
   FormControl,
   SxProps,
+  Grid,
+  TextField,
+  Link,
 } from '@mui/material'
+import { grey } from '@mui/material/colors'
+import { styled } from '@mui/material/styles'
 import { useTranslation } from 'next-i18next'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
@@ -24,10 +30,12 @@ import {
   ProductItemList,
   PasswordValidation,
   KiboTextBox,
+  CheckoutProductItem,
+  KiboImage,
 } from '@/components/common'
 import type { OrderPriceProps } from '@/components/common/OrderPrice/OrderPrice'
 import { useCheckoutStepContext, useAuthContext } from '@/context'
-import { useUpdateUserOrder } from '@/hooks'
+import { useUpdateOrder, useUpdateUserOrder } from '@/hooks'
 import { addressGetters, checkoutGetters, orderGetters, productGetters } from '@/lib/getters'
 import { isPasswordValid } from '@/lib/helpers/validations/validations'
 
@@ -67,14 +75,56 @@ const styles = {
   confirmAndPayButtonStyle: {
     ...buttonStyle,
     marginBottom: '0.75rem',
+    borderRadius: '0px 26px',
+    padding: '24px 44px',
+    fontSize: '16px',
+    fontWeight: 500,
     '&:disabled': {
-      backgroundColor: '#C0E3DF',
+      color: '#020027 !important',
+      backgroundColor: '#EDEDED !important',
     },
   },
   goBackButtonStyle: {
     ...buttonStyle,
   },
+  shippingInfoContainerStyle: {
+    maxWidth: '100%',
+    padding: '1.25rem 1.25rem',
+    marginBottom: {
+      xs: 0,
+      sm: 0,
+      md: 0,
+    },
+    border: {
+      xs: `2px solid ${grey[300]}`,
+      md: `2px solid ${grey[300]}`,
+    },
+    boxShadow: 'none',
+  },
+  billingInfoContainerStyle: {
+    maxWidth: '100%',
+    padding: '1.25rem 1.25rem',
+    marginBottom: {
+      xs: 0,
+      sm: 0,
+      md: 0,
+    },
+    border: {
+      xs: `2px solid ${grey[300]}`,
+      md: `2px solid ${grey[300]}`,
+    },
+    boxShadow: 'none',
+  },
 }
+
+const StyledActions = styled(Link)(({ theme }: { theme: Theme }) => ({
+  textAlign: 'right',
+  flex: '25%',
+  textDecoration: 'underline',
+  '&:hover': {
+    textDecoration: 'none',
+  },
+}))
 
 const useDetailsSchema = () => {
   const { t } = useTranslation('common')
@@ -113,11 +163,31 @@ const ReviewStep = (props: ReviewStepProps) => {
   const theme = useTheme()
   const { isAuthenticated, createAccount } = useAuthContext()
   const { updateUserOrder } = useUpdateUserOrder()
-  const [isAgreeWithTermsAndConditions, setAgreeWithTermsAndConditions] =
-    useState<boolean>(isAuthenticated)
+  const { updateOrder } = useUpdateOrder()
+  const [isAgreeWithTermsAndConditions, setAgreeWithTermsAndConditions] = useState<boolean>(false)
 
-  const { setStepNext, setStepBack, setStepStatusComplete } = useCheckoutStepContext()
-  const { subTotal, shippingTotal, taxTotal, total, discountedSubtotal } = orderSummaryProps
+  const { setStepNext, setStepBack, setStepStatusComplete, steps, setActiveStep } =
+    useCheckoutStepContext()
+  const {
+    shippingDetails,
+    billingDetails,
+    paymentMethods,
+    shippingMethod,
+    purchaseOrderPaymentMethods,
+  } = orderSummaryProps
+
+  const { shippingPhoneHome, shippingAddress, companyOrOrganization } = shippingDetails
+  const { billingAddress, billingCompanyOrOrganization } = billingDetails
+
+  const shippingPersonalDetails = {
+    firstName: shippingDetails?.firstName,
+    lastNameOrSurname: shippingDetails?.lastNameOrSurname,
+  }
+
+  const billingPersonalDetails = {
+    firstName: billingDetails?.firstName,
+    lastNameOrSurname: billingDetails?.lastNameOrSurname,
+  }
 
   const {
     formState: { errors, isValid },
@@ -137,6 +207,12 @@ const ReviewStep = (props: ReviewStepProps) => {
 
   const showAccountFields: boolean = watch(['showAccountFields']).join('') === 'true'
   const userEnteredPassword: string = watch(['password']).join('')
+
+  const [instructionsValue, setInstructionsValue] = useState('')
+
+  const handleInstChange = (event: any) => {
+    setInstructionsValue(event.target.value)
+  }
 
   const isEnabled = () => {
     if (showAccountFields && !isAuthenticated) {
@@ -169,6 +245,11 @@ const ReviewStep = (props: ReviewStepProps) => {
         }
       }
 
+      if (instructionsValue) {
+        checkout.shopperNotes = checkout.shopperNotes || {}
+        checkout.shopperNotes.comments = instructionsValue
+        await updateOrder.mutateAsync(checkout as CrOrder)
+      }
       await onCreateOrder(checkout)
 
       setStepStatusComplete()
@@ -183,6 +264,13 @@ const ReviewStep = (props: ReviewStepProps) => {
   }
   const handleComplete = () => handleSubmit(onValid, onInvalidForm)()
 
+  const handleEditAction = (event: MouseEvent<HTMLElement>) => {
+    const redirectStepIndex = steps.findIndex(
+      (step: string) => step === event.currentTarget.getAttribute('data-step')
+    )
+    setActiveStep(redirectStepIndex)
+  }
+
   const orderPriceProps = {
     subTotalLabel: t('subtotal'),
     shippingTotalLabel: t('shipping'),
@@ -193,11 +281,16 @@ const ReviewStep = (props: ReviewStepProps) => {
 
   return (
     <Box data-testid={'review-step-component'}>
-      <Typography variant="h2" component="h2" sx={{ fontWeight: 'bold' }} color="text.primary">
-        {t('order-details')}
+      <Typography
+        variant="h2"
+        component="h2"
+        gutterBottom
+        sx={{ color: 'primary.main', marginBottom: '20px' }}
+      >
+        {t('Review Order')}
       </Typography>
 
-      <Divider color={theme.palette.primary.main} sx={{ mt: '1.688rem', mb: '1.438rem' }} />
+      {/*<Divider color={theme.palette.primary.main} sx={{ mt: '1.688rem', mb: '1.438rem' }} />*/}
 
       {/* MultiShip Checkout */}
       {isMultiShipEnabled && shipItems && shipItems.length > 0 && (
@@ -276,13 +369,24 @@ const ReviewStep = (props: ReviewStepProps) => {
 
       {/* Standard Checkout */}
       {!isMultiShipEnabled && shipItems && shipItems.length > 0 && (
-        <Stack gap={4}>
-          <Typography variant="h3" component="h3" sx={{ fontWeight: 'bold' }} color="text.primary">
-            {t('shipping-to-home')}
-          </Typography>
-          <ProductItemList items={shipItems} testId={'review-ship-items'} />
-          <Divider sx={{ mb: '1.438rem' }} />
-        </Stack>
+        <Box sx={{ mb: '30px' }}>
+          {shipItems.map((item: Maybe<CrOrderItem>) => {
+            const product = item?.product as CrProduct
+            return (
+              <Box key={item?.id}>
+                <CheckoutProductItem
+                  id={'1'}
+                  productCode={productGetters.getProductId(product)}
+                  name={productGetters.getName(product)}
+                  options={productGetters.getOptions(product)}
+                  price={productGetters.getPrice(product).regular?.toString()}
+                  salePrice={productGetters.getPrice(product).special?.toString()}
+                  qty={orderGetters.getProductQuantity(item as CrOrderItem)}
+                />
+              </Box>
+            )
+          })}
+        </Box>
       )}
 
       {/* Standard and MultiShip Checkout */}
@@ -306,7 +410,198 @@ const ReviewStep = (props: ReviewStepProps) => {
         </Stack>
       )}
 
-      <OrderPrice {...orderPriceProps} />
+      {/*<OrderPrice {...orderPriceProps} />*/}
+
+      {/* Shipping Information */}
+      <Box sx={{ marginBottom: '30px' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: {
+              xs: 'start',
+              sm: 'center',
+              md: 'center',
+            },
+            justifyContent: 'space-between',
+          }}
+        >
+          <Typography
+            variant="h3"
+            component="h3"
+            sx={{ color: 'primary.main', marginBottom: '10px' }}
+          >
+            {t('Shipping Information')}
+          </Typography>
+          <StyledActions data-step={'Shipping'} onClick={handleEditAction}>
+            <Typography
+              sx={{ cursor: 'pointer', fontSize: '16px', color: '#30299A', fontWeight: '500' }}
+              component="span"
+              variant="caption"
+            >
+              {t('Change')}
+            </Typography>
+          </StyledActions>
+        </Box>
+        <Box sx={{ ...styles.shippingInfoContainerStyle }}>
+          <Grid container>
+            <Grid
+              item
+              sm={6}
+              sx={{
+                marginBottom: {
+                  xs: '16px',
+                },
+              }}
+            >
+              <Typography variant="body2" data-testid="shippingMethod" sx={{ fontWeight: 500 }}>
+                {t('Shipping Method')}
+              </Typography>
+              <Typography variant="body2">{t(shippingMethod)}</Typography>
+            </Grid>
+            <Grid item sm={6}>
+              <Typography variant="body2" data-testid="shippingAddress" sx={{ fontWeight: 500 }}>
+                {t('Shipping Address')}
+              </Typography>
+              <Typography variant="body2">
+                {t(
+                  `${shippingPersonalDetails.firstName} ${shippingPersonalDetails.lastNameOrSurname}`
+                )}
+              </Typography>
+              {companyOrOrganization && (
+                <Typography variant="body2">{t(companyOrOrganization)}</Typography>
+              )}
+              {shippingAddress.address1 && (
+                <Typography variant="body2">{t(shippingAddress.address1)}</Typography>
+              )}
+              {shippingAddress.address2 && (
+                <Typography variant="body2">{t(shippingAddress.address2)}</Typography>
+              )}
+              {shippingAddress.cityOrTown &&
+                shippingAddress.stateOrProvince &&
+                shippingAddress.postalOrZipCode && (
+                  <Typography variant="body2">
+                    {t(shippingAddress.cityOrTown)}, {t(shippingAddress.stateOrProvince)}{' '}
+                    {t(shippingAddress.postalOrZipCode)}
+                  </Typography>
+                )}
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+
+      {/* Billing Information */}
+      <Box sx={{ marginBottom: '30px' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: {
+              xs: 'start',
+              sm: 'center',
+              md: 'center',
+            },
+            justifyContent: 'space-between',
+          }}
+        >
+          <Typography
+            variant="h3"
+            component="h3"
+            sx={{ color: 'primary.main', marginBottom: '10px' }}
+          >
+            {t('Billing Information')}
+          </Typography>
+          <StyledActions data-step={'Payment'} onClick={handleEditAction}>
+            <Typography
+              sx={{ cursor: 'pointer', fontSize: '16px', color: '#30299A', fontWeight: '500' }}
+              component="span"
+              variant="caption"
+            >
+              {t('Change')}
+            </Typography>
+          </StyledActions>
+        </Box>
+        <Box sx={{ ...styles.billingInfoContainerStyle }}>
+          <Grid container>
+            <Grid
+              item
+              sm={6}
+              sx={{
+                marginBottom: {
+                  xs: '16px',
+                },
+              }}
+            >
+              <Typography variant="body2" data-testid="shippingMethod" sx={{ fontWeight: 500 }}>
+                {t('Payment Method')}
+              </Typography>
+              {paymentMethods?.map((method: any, index: number) => (
+                <Box display={'flex'} key={index}>
+                  <Typography variant="body2">
+                    {method?.cardType} ending {method?.cardNumberPartOrMask.slice(-4)} ({'expires'}{' '}
+                    {method?.expiry})
+                  </Typography>
+                </Box>
+              ))}
+              {purchaseOrderPaymentMethods?.map((method: any, index: number) => (
+                <Box display={'flex'} key={index}>
+                  <Typography variant="body2">PO Number: {method.purchaseOrderNumber}</Typography>
+                </Box>
+              ))}
+            </Grid>
+            <Grid item sm={6}>
+              <Typography variant="body2" data-testid="shippingAddress" sx={{ fontWeight: 500 }}>
+                {t('Billing Address')}
+              </Typography>
+              <Typography variant="body2">
+                {t(
+                  `${billingPersonalDetails.firstName} ${billingPersonalDetails.lastNameOrSurname}`
+                )}
+              </Typography>
+              {billingCompanyOrOrganization && (
+                <Typography variant="body2">{t(billingCompanyOrOrganization)}</Typography>
+              )}
+              {billingAddress.address1 && (
+                <Typography variant="body2">{t(billingAddress.address1)}</Typography>
+              )}
+              {billingAddress.address2 && (
+                <Typography variant="body2">{t(billingAddress.address2)}</Typography>
+              )}
+              {billingAddress.cityOrTown &&
+                billingAddress.stateOrProvince &&
+                billingAddress.postalOrZipCode && (
+                  <Typography variant="body2">
+                    {t(billingAddress.cityOrTown)}, {t(billingAddress.stateOrProvince)}{' '}
+                    {t(billingAddress.postalOrZipCode)}
+                  </Typography>
+                )}
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+
+      <Box sx={{ marginBottom: '10px' }}>
+        <Typography variant="body2" sx={{ marginBottom: '10px' }}>
+          {t('Special Instructions')}
+        </Typography>
+        <Box>
+          <TextField
+            id="mui-textarea"
+            label=""
+            multiline
+            rows={1}
+            variant="outlined"
+            fullWidth
+            value={instructionsValue}
+            onChange={handleInstChange}
+          />
+        </Box>
+      </Box>
+
+      <Box>
+        <Typography variant="body2">
+          If you have received a Quote, please include the Quote Reference # in the Special
+          Instructions section above. Quoted pricing will be reflected in your final invoice.
+        </Typography>
+      </Box>
 
       <Box sx={{ mt: '31px', mb: '35px' }}>
         <FormControlLabel
@@ -320,102 +615,120 @@ const ReviewStep = (props: ReviewStepProps) => {
               color="primary"
               checked={isAgreeWithTermsAndConditions}
               onChange={handleAgreeTermsConditions}
+              sx={{
+                '& .MuiSvgIcon-root': {
+                  fontSize: 32,
+                },
+              }}
             />
           }
-          label={`${t('terms-conditions')}`}
+          label={
+            <>
+              {t('I agree to Fortis')}{' '}
+              <Link
+                href={'/sales-terms'}
+                target="_blank"
+                style={{ textDecoration: 'underline', color: '#30299A', fontWeight: 500 }}
+              >
+                {t('Sales Terms & Conditions.')}
+              </Link>
+            </>
+          }
         />
 
-        <Box>
-          <FormControl>
-            <Controller
-              name="showAccountFields"
-              control={control}
-              defaultValue={personalDetails?.showAccountFields}
-              render={({ field }) => (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      inputProps={{
-                        'aria-label': 'showAccountFields',
-                      }}
-                      data-testid="showAccountFields"
-                      size="medium"
-                      color="primary"
-                      disabled={isAuthenticated}
-                      value={field.value}
-                      onChange={(_name, value) => field.onChange(value)}
-                    />
-                  }
-                  label={t('i-want-to-create-an-account').toString()}
-                />
-              )}
-            />
-          </FormControl>
-        </Box>
+        {/*
+                  <Box>
+                    <FormControl>
+                      <Controller
+                        name="showAccountFields"
+                        control={control}
+                        defaultValue={personalDetails?.showAccountFields}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                inputProps={{
+                                  'aria-label': 'showAccountFields',
+                                }}
+                                data-testid="showAccountFields"
+                                size="medium"
+                                color="primary"
+                                disabled={isAuthenticated}
+                                value={field.value}
+                                onChange={(_name, value) => field.onChange(value)}
+                              />
+                            }
+                            label={t('i-want-to-create-an-account').toString()}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Box>
 
-        {getValues()?.showAccountFields && (
-          <FormControl>
-            <Controller
-              name="firstName"
-              control={control}
-              defaultValue={personalDetails?.firstName || ''}
-              render={({ field }) => (
-                <KiboTextBox
-                  value={field.value}
-                  label={t('first-name')}
-                  required
-                  sx={{ ...commonStyle }}
-                  onBlur={field.onBlur}
-                  onChange={(_name, value) => field.onChange(value)}
-                  error={!!errors?.firstName}
-                  helperText={errors?.firstName?.message as string}
-                />
-              )}
-            />
-            <Controller
-              name="lastNameOrSurname"
-              control={control}
-              defaultValue={personalDetails?.lastNameOrSurname || ''}
-              render={({ field }) => (
-                <KiboTextBox
-                  value={field.value}
-                  label={t('last-name-or-sur-name')}
-                  required
-                  sx={{ ...commonStyle }}
-                  onBlur={field.onBlur}
-                  onChange={(_name, value) => field.onChange(value)}
-                  error={!!errors?.lastNameOrSurname}
-                  helperText={errors?.lastNameOrSurname?.message as string}
-                />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              defaultValue={personalDetails?.password || ''}
-              render={({ field }) => (
-                <KiboTextBox
-                  value={field.value}
-                  label={t('password')}
-                  required
-                  sx={{ ...commonStyle }}
-                  onBlur={field.onBlur}
-                  onChange={(_name, value) => field.onChange(value)}
-                  error={!!errors?.password}
-                  helperText={errors?.password?.message as string}
-                  type="password"
-                  placeholder="password"
-                />
-              )}
-            />
+                  {getValues()?.showAccountFields && (
+                    <FormControl>
+                      <Controller
+                        name="firstName"
+                        control={control}
+                        defaultValue={personalDetails?.firstName || ''}
+                        render={({ field }) => (
+                          <KiboTextBox
+                            value={field.value}
+                            label={t('first-name')}
+                            required
+                            sx={{ ...commonStyle }}
+                            onBlur={field.onBlur}
+                            onChange={(_name, value) => field.onChange(value)}
+                            error={!!errors?.firstName}
+                            helperText={errors?.firstName?.message as string}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="lastNameOrSurname"
+                        control={control}
+                        defaultValue={personalDetails?.lastNameOrSurname || ''}
+                        render={({ field }) => (
+                          <KiboTextBox
+                            value={field.value}
+                            label={t('last-name-or-sur-name')}
+                            required
+                            sx={{ ...commonStyle }}
+                            onBlur={field.onBlur}
+                            onChange={(_name, value) => field.onChange(value)}
+                            error={!!errors?.lastNameOrSurname}
+                            helperText={errors?.lastNameOrSurname?.message as string}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="password"
+                        control={control}
+                        defaultValue={personalDetails?.password || ''}
+                        render={({ field }) => (
+                          <KiboTextBox
+                            value={field.value}
+                            label={t('password')}
+                            required
+                            sx={{ ...commonStyle }}
+                            onBlur={field.onBlur}
+                            onChange={(_name, value) => field.onChange(value)}
+                            error={!!errors?.password}
+                            helperText={errors?.password?.message as string}
+                            type="password"
+                            placeholder="password"
+                          />
+                        )}
+                      />
 
-            <PasswordValidation password={userEnteredPassword} />
-          </FormControl>
-        )}
+                      <PasswordValidation password={userEnteredPassword} />
+                    </FormControl>
+                  )}
+                  */}
       </Box>
 
-      <Stack alignItems="left">
-        <Button
+      <Stack direction="row" justifyContent="flex-end" alignItems="center">
+        <LoadingButton
           variant="contained"
           color="primary"
           sx={{
@@ -424,18 +737,18 @@ const ReviewStep = (props: ReviewStepProps) => {
           disabled={!isEnabled()}
           onClick={handleComplete}
         >
-          {t('confirm-and-pay')}
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          sx={{
-            ...styles.goBackButtonStyle,
-          }}
-          onClick={() => setStepBack()}
-        >
-          {t('go-back')}
-        </Button>
+          {t('Place Order')}
+        </LoadingButton>
+        {/*<Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{
+                      ...styles.goBackButtonStyle,
+                    }}
+                    onClick={() => setStepBack()}
+                  >
+                    {t('go-back')}
+                  </Button>*/}
       </Stack>
     </Box>
   )
