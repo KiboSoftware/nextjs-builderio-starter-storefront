@@ -240,8 +240,18 @@ const AddressBook = (props: AddressBookProps) => {
       contact: {
         ...address.contact,
         email: user.emailAddress as string,
+        phoneNumbers: {
+          ...address.contact.phoneNumbers,
+          work: address.contact.phoneNumbers.home, // Set work phone number to home phone number
+        },
+        companyOrOrganization: address.contact.companyOrOrganization || 'New Company Name', // Update company name if needed
+        address: {
+          ...address.contact.address,
+          addressType: 'commercial', // Change address type to Commercial
+        },
       },
     }
+
     const params = buildAddressParams({
       accountId: user?.id,
       address,
