@@ -159,6 +159,8 @@
   "old-password": "Old Password",
   "new-password": "New Password",
   "external-password": "Reenter new password",
+  "spaces-are-not-allowed": "Spaces are not allowed",
+  "please-enter-a-valid-account-number": "Please enter a valid account number",
 
   "shop-now": "Shop Now",
   "edit-customer-name": "Edit Customer Name",
@@ -218,6 +220,8 @@
   "go-back": "Go Back",
   "company-or-organization": "Company Institution or Organization",
   "address1": "Street address",
+  "wallet": "Wallet",
+  "shipping-preferences": "Shipping Preferences",
   "address2": "Suite, Lab, Room, Floor, Building, etc.",
   "city-or-town": "City",
   "state-or-province": "State",
