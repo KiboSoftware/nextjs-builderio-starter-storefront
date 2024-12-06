@@ -447,6 +447,7 @@ const StandardShippingStep = (props: ShippingProps) => {
               selectedShippingMethodCode={checkoutShippingMethodCode}
               onShippingMethodChange={handleSaveShippingMethod}
               onStoreLocatorClick={handleStoreLocatorClick}
+              checkout={checkout}
             />
           )}
         </>
