@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 
-import { Box, Stack, Button, SxProps } from '@mui/material'
+import { Box, Stack, Button, SxProps, Typography } from '@mui/material'
 import { Theme } from '@mui/material/styles'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
@@ -86,6 +86,9 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       gap={2}
     >
       <Stack sx={{ width: '100%', maxWidth: '872px' }} gap={1}>
+        <Typography variant="h1" sx={{ color: 'primary.main' }}>
+          {t('checkout')}
+        </Typography>
         <KiboStepper isSticky={true}>{children}</KiboStepper>
       </Stack>
       <Box
