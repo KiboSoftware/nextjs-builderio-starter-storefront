@@ -49,7 +49,7 @@ const PlpIconAttributes = (props: any) => {
   }
 
   return (
-    <Grid container spacing={2} mb={2}>
+    <Grid container spacing={2} sx={{ marginBottom: '10px' }}>
       {properties?.map((data: any) => {
         return data?.attributeFQN === 'tenant~validation-text' ? (
           <Grid
