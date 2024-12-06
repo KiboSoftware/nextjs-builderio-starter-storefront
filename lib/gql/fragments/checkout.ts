@@ -224,6 +224,7 @@ export const fullfillmentInfoFragment = /* GraphQL */ `
       middleNameOrInitial
       phoneNumbers {
         home
+        work
       }
     }
   }
