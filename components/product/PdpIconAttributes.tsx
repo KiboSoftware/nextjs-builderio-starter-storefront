@@ -54,7 +54,7 @@ const PdpIconAttributes = (props: any) => {
       sx={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)', // 4 equal columns
-        gap: '10px', // Spacing between items
+        // gap: '10px', // Spacing between items
         marginTop: '10px',
         marginLeft: '10px',
         '@media (max-width: 1200px)': {
@@ -84,7 +84,9 @@ const PdpIconAttributes = (props: any) => {
         sx={{ ...styles.iconCss, cursor: 'pointer' }}
         onClick={() => handleScroll('document-section')}
       >
-        <span className="material-symbols-outlined">draft</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+          draft
+        </span>
         <Box sx={styles.iconText}>Documents</Box>
       </Box>
 
@@ -94,11 +96,15 @@ const PdpIconAttributes = (props: any) => {
           data?.values[0]?.value > 0 ? (
             <Box
               sx={{ ...styles.iconCss, cursor: 'pointer' }}
-              onClick={() => handleScroll('document-section')}
+              onClick={() => handleScroll('citation-document-section')}
               key="citations"
             >
-              <span className="material-symbols-outlined">note_stack</span>
-              <Box sx={styles.iconText}>Citations({data?.values[0]?.value})</Box>
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                note_stack
+              </span>
+              <Box sx={{ ...styles.iconText, marginLeft: '4px' }}>
+                Citations ({data?.values[0]?.value})
+              </Box>
             </Box>
           ) : null
         ) : null
@@ -110,7 +116,9 @@ const PdpIconAttributes = (props: any) => {
           data?.values[0]?.value === 'ISO13485' ? (
             <Box sx={{ ...styles.iconCss, color: '#348345' }} key="iso-certification">
               <span className="material-symbols-outlined">task_alt</span>
-              <Box sx={{ ...styles.iconText, color: '#348345' }}>{data?.values[0]?.value}</Box>
+              <Box sx={{ ...styles.iconText, color: '#348345', textDecoration: 'none' }}>
+                {data?.values[0]?.stringValue}
+              </Box>
             </Box>
           ) : null
         ) : null
@@ -122,7 +130,9 @@ const PdpIconAttributes = (props: any) => {
           data?.values[0]?.value === 'gmp_ready' ? (
             <Box sx={{ ...styles.iconCss, color: '#1468C8' }} key="gmp-ready">
               <span className="material-symbols-outlined">manufacturing</span>
-              <Box sx={{ ...styles.iconText, color: '#1468C8' }}>cGMP</Box>
+              <Box sx={{ ...styles.iconText, color: '#1468C8', textDecoration: 'none' }}>
+                {data?.values[0]?.stringValue}
+              </Box>
             </Box>
           ) : null
         ) : null
@@ -131,10 +141,14 @@ const PdpIconAttributes = (props: any) => {
       {/* Manufacturing Availability (Lyo-Ready) */}
       {properties?.map((data: any) =>
         data?.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
-          data?.values[0]?.value === 'Lyo-Ready' ? (
+          data?.values[0]?.value === 'lyo_ready' ? (
             <Box sx={{ ...styles.iconCss, color: '#CD461D' }} key="lyo-ready">
-              <span className="material-symbols-outlined">grain</span>
-              <Box sx={{ ...styles.iconText, color: '#CD461D' }}>LYO-Ready</Box>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                grain
+              </span>
+              <Box sx={{ ...styles.iconText, color: '#CD461D', textDecoration: 'none' }}>
+                {data?.values[0]?.stringValue}
+              </Box>
             </Box>
           ) : null
         ) : null
