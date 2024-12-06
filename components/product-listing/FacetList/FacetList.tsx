@@ -64,7 +64,7 @@ const FacetList = (props: FacetListProps) => {
           variant="h4"
           color="grey.900"
           sx={{
-            fontSize: '20px',
+            fontSize: '20.6px',
             fontFamily: 'Roboto',
             fontWeight: '700',
             lineHeight: '24px',
