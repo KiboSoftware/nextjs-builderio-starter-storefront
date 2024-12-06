@@ -884,7 +884,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 }
               })}
             </Box>
-            <PdpIconAttributes product={product} />
+            <PdpIconAttributes product={updatedProduct} />
             {countryCode && countryCode === 'US' && (
               <Box
                 display="flex"
