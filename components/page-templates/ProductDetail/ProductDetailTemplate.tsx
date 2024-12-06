@@ -48,6 +48,7 @@ import {
 import AdditionalProductInfo from '@/components/product/AdditionalProductInfo'
 import PdpIconAttributes from '@/components/product/PdpIconAttributes'
 import ProductApplications from '@/components/product/ProductApplication/ProductApplications'
+import RelatedProductsCarousel from '@/components/product/RelatedProductsCarousel'
 import { useModalContext } from '@/context'
 import {
   useProductDetailTemplate,
@@ -107,6 +108,7 @@ interface ProductDetailTemplateProps {
   title?: string
   cancel?: string
   quoteDetails?: any
+  relatedProducts: any
   shouldFetchShippingMethods?: boolean
   getCurrentProduct?: (
     addToCartPayload: any,
@@ -177,6 +179,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     cancel,
     quoteDetails,
     shouldFetchShippingMethods,
+    relatedProducts,
     getCurrentProduct,
   } = props
   const [updatedProduct, setUpdatedProduct] = useState(product)
@@ -194,6 +197,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const [showPrices, setShowPrices] = useState<boolean | null>()
   const [customCTALabel, setcustomCTALabel] = useState<string | null>('')
   const [customCTATarget, setcustomTarget] = useState<string | null>('')
+  const [stockBehaviour, setStockBehaviourArr] = useState<string | null>('')
+  const [minimumStock, setMinimumStock] = useState<number>(0)
   // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
@@ -351,7 +356,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     } else if (isDigitalFulfillment) {
       return isValidForOneTime
     }
-    return isValidForOneTime && !(quantityLeft < 1)
+    return true
   }
 
   const isProductInWishlist = checkProductInWishlist({
@@ -591,6 +596,15 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
         (data: any) => data?.attributeFQN === 'tenant~custom-cta-target'
       )?.values?.[0]?.stringValue || null
 
+    const stockBehaviourAttr =
+      updatedProduct?.properties?.find(
+        (data: any) => data?.attributeFQN === 'tenant~stock-behavior-option'
+      )?.values?.[0]?.stringValue || null
+
+    const minimumStockArr =
+      updatedProduct?.properties?.find((data: any) => data?.attributeFQN === 'tenant~minimum-stock')
+        ?.values?.[0]?.value || null
+
     setSkuStatusText(
       skuStatusTextProperty ? String(skuStatusTextProperty?.values?.[0]?.value) : null
     )
@@ -598,6 +612,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     setShowPrices(showPricesProperty ? Boolean(showPricesProperty?.values?.[0]?.value) : null)
     setcustomCTALabel(customCTALabelAttr ? String(customCTALabelAttr) : null)
     setcustomTarget(customCTATargetAttr ? String(customCTATargetAttr) : null)
+    setStockBehaviourArr(stockBehaviourAttr ? String(stockBehaviourAttr) : null)
+    setMinimumStock(minimumStockArr ? Number(minimumStockArr) : 0)
   }, [updatedProduct])
 
   const availabilityMessageArr =
@@ -609,6 +625,12 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     router.push(targetPath)
   }
 
+  const maxQuantity =
+    skuStatusText?.toLowerCase() === 'active' &&
+    stockBehaviour?.toLowerCase() === 'denybackorder' &&
+    stockAvailable >= minimumStock
+      ? stockAvailable - minimumStock
+      : undefined
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -876,13 +898,16 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                     {customCTALabel}
                   </LoadingButton>
                 )}
-                {skuStatusText && skuStatusText !== 'CustomCTA' && (
+                {skuStatusText && skuStatusText === 'Active' && (
                   <Box display="flex" flexDirection="column" justifyContent="flex-start">
                     {/* Align items in a column */}
-                    <Box sx={{ width: '100%' }}>
+                    <Box
+                      sx={{ width: '100%', '@media (max-width: 1023px)': { marginTop: '20px' } }}
+                    >
                       <QuantitySelector
                         label="Quantity"
                         quantity={quantity}
+                        {...(maxQuantity !== undefined ? { maxQuantity } : {})}
                         onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
                         onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
                       />
@@ -894,12 +919,19 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                       className="add-to-cart-button"
                       onClick={() => handleAddToCart()}
                       loading={addToCart.isPending}
-                      {...(!isValidForAddToCart() && { disabled: true })}
                       sx={{
                         marginTop: '20px',
                         bgcolor: theme?.palette.primary.main,
                         fontSize: '16px !important',
-                      }} // Add margin top for spacing between QuantitySelector and LoadingButton
+                        transition: 'none',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          bgcolor: theme?.palette.primary.light,
+                        },
+                        '@media (max-width: 1023px)': {
+                          width: '52%',
+                        },
+                      }}
                     >
                       {t('add-to-cart')}
                     </LoadingButton>
@@ -907,16 +939,16 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 )}
               </Box>
             )}
-            <Box paddingY={1}>
+            {/* <Box paddingY={1}>
               <QuantitySelector
                 label="Qty"
                 quantity={quantity}
                 onIncrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) + 1)}
                 onDecrease={() => setQuantity((prevQuantity: number) => Number(prevQuantity) - 1)}
               />
-            </Box>
+            </Box> */}
             {isSubscriptionModeAvailable && (
-              <Box paddingY={1}>
+              <Box paddingY={1} sx={{ display: 'none' }}>
                 <KiboRadio
                   radioOptions={purchaseTypeRadioOptions}
                   selected={purchaseType}
@@ -924,7 +956,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 />
               </Box>
             )}
-            <Box paddingY={1}>
+            <Box paddingY={1} sx={{ display: 'none' }}>
               {purchaseType === PurchaseTypes.SUBSCRIPTION && (
                 <KiboSelect
                   name={t('subscription-frequency')}
@@ -957,7 +989,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 )}
             </Box>
             {!addItemToList && (
-              <Box pt={2} display="flex" sx={{ justifyContent: 'space-between' }}>
+              <Box pt={2} display="flex" sx={{ justifyContent: 'space-between', display: 'none' }}>
                 <Typography fontWeight="600" variant="body2">
                   {selectedFulfillmentOption?.method && `${quantityLeft} ${t('item-left')}`}
                 </Typography>
@@ -973,7 +1005,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 )}
               </Box>
             )}
-            {!isB2B && (
+            {/* {!isB2B && (
               <Box paddingY={1} display="flex" flexDirection={'column'} gap={2}>
                 <LoadingButton
                   variant="contained"
@@ -1009,7 +1041,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                   </Button>
                 </Box>
               </Box>
-            )}
+            )} */}
           </Grid>
         </Box>
         {/* <ImageGallery images={productGallery as ProductImage[]} title={'HI Image'} /> */}
@@ -1048,6 +1080,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       ) : null}
       {!isQuickViewModal && children}
       <AdditionalProductInfo product={product} />
+      <RelatedProductsCarousel product={relatedProducts} />
     </Grid>
   )
 }

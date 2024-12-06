@@ -41,8 +41,8 @@ export const useProductDetailTemplate = (props: UseProductDetailTemplateProps) =
   const [selectedFulfillmentOption, setSelectedFulfillmentOption] = useState<
     SelectedFulfillmentOption<Location>
   >({
-    method: '',
-    location: {},
+    method: 'Ship', // Default fulfillment method to 'Ship'
+    location: { code: 'Bethyl', name: 'Bethyl' }, // Default location to 'Bethyl'
   })
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const useProductDetailTemplate = (props: UseProductDetailTemplateProps) =
   useEffect(() => {
     if (purchaseLocation?.name || selectedFulfillmentOption?.location?.name) {
       setSelectedFulfillmentOption({
-        method: selectedFulfillmentOption?.method || '',
+        method: selectedFulfillmentOption?.method || 'Ship',
         location: selectedFulfillmentOption.location?.code
           ? selectedFulfillmentOption?.location
           : purchaseLocation,
