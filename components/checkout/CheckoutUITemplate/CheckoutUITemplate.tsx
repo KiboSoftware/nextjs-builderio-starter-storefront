@@ -80,7 +80,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
     <Stack
       sx={{ paddingTop: '20px', paddingBottom: { md: '40px' } }}
       direction={{ xs: 'column', md: 'row' }}
-      gap={2}
+      gap={0}
     >
       <Stack sx={{ width: '100%', maxWidth: '872px' }} gap={1}>
         <KiboStepper isSticky={true}>{children}</KiboStepper>

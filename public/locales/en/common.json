@@ -244,6 +244,7 @@
   "invalid-expiry-date-format": "Provide Expiration Date as MM/YYYY",
   "security-code": "Security code",
   "security-code-placeholder": "XXX",
+  "cvv-code": "CVV Code",
   "cvv-is-required": "CVV is required",
   "invalid-cvv": "Invalid: CVV must be 3 or 4 digits",
   "billing-address-same-as-shipping": "Billing address same as shipping",
@@ -553,5 +554,7 @@
   "add-list-name-to-search-products": "Add list name to Search/View products in list",
   "digital-products-shipping-text": "No shipping information is required since all items will be picked up in the store or digitally fulfilled.",
   "digital-products": "Digital Products",
-  "menu": "Menu"
+  "menu": "Menu",
+  "credit-card": "Credit Card",
+  "purchase-order": "Purchase Order"
 }
