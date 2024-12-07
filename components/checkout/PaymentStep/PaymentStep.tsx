@@ -1077,10 +1077,25 @@ const PaymentStep = (props: PaymentStepProps) => {
                         <Button
                           variant="contained"
                           color="inherit"
-                          sx={{ width: { xs: '100%', sm: '50%' } }}
+                          sx={{
+                            width: 'auto',
+                            background: 'transparent',
+                            color: 'primary.main',
+                            border: '1px solid primary.main',
+                            borderTopRightRadius: 26,
+                            borderBottomLeftRadius: 26,
+                            fontSize: '1rem',
+                            padding: '12px 16px',
+                            lineHeight: 1.4,
+                            '&:hover': {
+                              background: '#E3E2FF',
+                              color: '#4C47C4',
+                              border: '1px solid #E3E2FF',
+                            },
+                          }}
                           onClick={handleAddPaymentMethod}
                         >
-                          {t('add-payment-method')}
+                          {t('add-new-card')}
                         </Button>
                       </Box>
                     ) : null}
