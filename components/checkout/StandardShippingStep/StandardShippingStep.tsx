@@ -151,7 +151,7 @@ const StandardShippingStep = (props: ShippingProps) => {
       }
       contact.address = {
         ...contact.address,
-        addressType: 'commercial', // Add addressType with value commercial
+        addressType: 'Commercial', // Add addressType with value commercial
       }
       if (!allowInvalidAddresses && contact?.address?.countryCode === CountryCode.US) {
         await validateCustomerAddress.mutateAsync({
@@ -398,11 +398,12 @@ const StandardShippingStep = (props: ShippingProps) => {
 
             {previouslySavedShippingAddress?.length > 0 && (
               <>
-                <Typography variant="subtitle2" fontWeight={'bold'}>
-                  {t('previously-saved-shipping-addresses')}
-                </Typography>
                 <KiboRadio
                   radioOptions={previouslySavedShippingAddress?.map((address, index) => {
+                    console.log(
+                      'This is previously saved addressed ---> ',
+                      previouslySavedShippingAddress
+                    )
                     return {
                       value: String(address.id),
                       name: String(address.id),
@@ -416,26 +417,30 @@ const StandardShippingStep = (props: ShippingProps) => {
                           cityOrTown={address?.address?.cityOrTown as string}
                           stateOrProvince={address?.address?.stateOrProvince as string}
                           postalOrZipCode={address?.address?.postalOrZipCode as string}
+                          variant="body2"
                         />
                       ),
                     }
                   })}
                   selected={selectedShippingAddressId?.toString()}
                   align="flex-start"
+                  addressCheckout={true}
                   onChange={handleAddressSelect}
                 />
               </>
             )}
             <NoSsr>
               {hasPermission(actions.CREATE_CONTACTS) && (
-                <Button
-                  variant="contained"
-                  color="inherit"
-                  sx={{ width: { xs: '100%', sm: '50%' } }}
-                  onClick={handleAddNewAddress}
-                >
-                  {t('add-new-address')}
-                </Button>
+                <Box>
+                  <Button
+                    sx={{ padding: '12px 19px', ...StandardShippingStepStyle.secondaryButton }}
+                    onClick={handleAddNewAddress}
+                  >
+                    <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '400' }}>
+                      {t('add-new-address')}
+                    </Typography>
+                  </Button>
+                </Box>
               )}
             </NoSsr>
           </Stack>
@@ -490,10 +495,10 @@ const StandardShippingStep = (props: ShippingProps) => {
                 sx={{ justifyContent: 'space-between' }}
               >
                 <Button
-                  sx={{ ...StandardShippingStepStyle.secondaryButton }}
+                  sx={{ padding: '12px 38px', ...StandardShippingStepStyle.secondaryButton }}
                   onClick={() => setShouldShowAddAddressButton(true)}
                 >
-                  <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '300' }}>
+                  <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '400' }}>
                     {t('cancel')}
                   </Typography>
                 </Button>
@@ -510,7 +515,7 @@ const StandardShippingStep = (props: ShippingProps) => {
                   onClick={handleAddressValidationAndSave}
                   {...(!isAddressFormValid && { disabled: true })}
                 >
-                  <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '300' }}>
+                  <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '400' }}>
                     {t('save-shipping-address')}
                   </Typography>
                 </Button>
