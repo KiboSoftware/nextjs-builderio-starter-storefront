@@ -8,6 +8,7 @@ export { default as FullWidthDivider } from './FullWidthDivider/FullWidthDivider
 export { default as HeaderAction } from './HeaderAction/HeaderAction'
 export { default as KiboDialog } from './KiboDialog/KiboDialog'
 export { default as CustomDialog } from './CustomDialog/CustomDialog'
+export { default as ImageGalleryDialog } from './ImageGalleryDialog/ImageGalleryDialog'
 export { default as KiboImage } from './KiboImage/KiboImage'
 export { default as KiboLogo } from './KiboLogo/KiboLogo'
 export { default as KiboRadio } from './KiboRadio/KiboRadio'

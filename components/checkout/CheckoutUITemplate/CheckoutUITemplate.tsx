@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 
-import { Box, Stack, Button, SxProps } from '@mui/material'
+import { Box, Stack, Button, SxProps, Typography } from '@mui/material'
 import { Theme } from '@mui/material/styles'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
@@ -40,9 +40,12 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
   const { activeStep, stepStatus, steps, setStepStatusSubmit, setStepBack } =
     useCheckoutStepContext()
   const buttonLabels = [t('go-to-payment'), t('review-order')] //t('go-to-shipping'),
-  // const detailsStepIndex = steps.findIndex(
-  //   (step: string) => step.toLowerCase() === t('details').toLowerCase()
-  // )
+  const shippingStepIndex = steps.findIndex(
+    (step: string) => step.toLowerCase() === t('shipping').toLowerCase()
+  )
+  const paymentStepIndex = steps.findIndex(
+    (step: string) => step.toLowerCase() === t('payment').toLowerCase()
+  )
   const reviewStepIndex = steps.findIndex(
     (step: string) => step.toLowerCase() === t('review').toLowerCase()
   )
@@ -83,6 +86,9 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       gap={2}
     >
       <Stack sx={{ width: '100%', maxWidth: '872px' }} gap={1}>
+        <Typography variant="h1" sx={{ color: 'primary.main' }}>
+          {t('checkout')}
+        </Typography>
         <KiboStepper isSticky={true}>{children}</KiboStepper>
       </Stack>
       <Box
@@ -107,18 +113,21 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
                   onClick={handleSubmit}
                   disabled={stepStatus !== STEP_STATUS.VALID || activeStep === steps.length - 1}
                 >
-                  {buttonLabels[activeStep]}
+                  {t('continue')}
+                  {/*buttonLabels[activeStep]*/}
                 </Button>
-                {/* <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={{ ...buttonStyle }}
-                  fullWidth
-                  onClick={handleBack}
-                  disabled={activeStep === detailsStepIndex}
-                >
-                  {t('go-back')}
-                </Button> */}
+                {activeStep === paymentStepIndex && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{ ...buttonStyle }}
+                    fullWidth
+                    onClick={handleBack}
+                    disabled={activeStep === shippingStepIndex}
+                  >
+                    {t('go-back')}
+                  </Button>
+                )}
               </Stack>
             )}
           </OrderSummary>

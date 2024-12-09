@@ -162,6 +162,17 @@ const getDocumentListDocuments = async (documentListName: string, filter: string
     throw error
   }
 }
+const variantProperties = [
+  'tenant~applications-variant',
+  'tenant~conjugate-type-variant',
+  'tenant~purity-variant',
+  'tenant~stock-concentration',
+  'tenant~storage-variant',
+  'tenant~shelf-life-variant',
+  'tenant~buffer',
+  'tenant~prodprocedures-1',
+  'tenant~contents-variant',
+]
 
 const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const { getProductLink } = uiHelpers()
@@ -265,7 +276,13 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const brandValue = product?.properties?.find((data: any) => data?.attributeFQN === 'tenant~brand')
   const brand = (brandValue?.values?.[0]?.value as string) ?? null
   const variantProductName = productGetters.getVariantProductAttributeName(properties)
-
+  const ousShowDistributorBtn =
+    (product?.properties?.find(
+      (data: any) => data?.attributeFQN === 'tenant~ous-show-distributors-button'
+    )?.values?.[0]?.value as boolean) || false
+  const ousShowPrices =
+    (product?.properties?.find((data: any) => data?.attributeFQN === 'tenant~ous-show-prices')
+      ?.values?.[0]?.value as boolean) || false
   const { data: locationInventory } = useGetProductInventory(
     (variationProductCode || productCode) as string,
     selectedFulfillmentOption?.location?.code as string
@@ -555,15 +572,18 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
       // Create a map of currentProduct properties by attributeFQN for quick lookup
       const currentProductMap = new Map(
-        currentProduct.properties?.map((item: any) => [item.attributeFQN, item])
+        currentProduct?.properties?.map((item: any) => [item.attributeFQN, item])
       )
 
       // Merge properties from product and currentProduct
-      const mergedProperties = product.properties
-        ?.filter(
-          (item: any) => !currentProductMap.has(item.attributeFQN) // Remove duplicates from product
-        )
-        ?.concat(currentProduct.properties || []) // Add currentProduct values
+      let mergedProperties = product?.properties?.filter(
+        (item: any) => !currentProductMap?.has(item.attributeFQN) // Remove duplicates from product
+      )
+      // Add currentProduct values
+
+      mergedProperties = mergedProperties
+        ?.filter((property: any) => !variantProperties.includes(property.attributeFQN))
+        ?.concat(currentProduct?.properties || [])
 
       // Update the product properties immutably
       setUpdatedProduct({ ...product, properties: mergedProperties })
@@ -625,12 +645,20 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     router.push(targetPath)
   }
 
+
+  const handleLinkTarget = () => {
+    const targetPath = ousShowDistributorBtn ? '/distributors' : '/'
+    router.push(targetPath)
+  }
+
   const maxQuantity =
     skuStatusText?.toLowerCase() === 'active' &&
     stockBehaviour?.toLowerCase() === 'denybackorder' &&
     stockAvailable >= minimumStock
       ? stockAvailable - minimumStock
+
       : null
+
   return (
     <Grid container>
       {!isQuickViewModal && (
@@ -800,6 +828,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                       radioOptions={radioOptions}
                       skuStatusText={skuStatusText}
                       showPrices={showPrices}
+                      ousShowPrices={ousShowPrices}
                       onChange={async (selectedValue) => {
                         await selectProductOption(
                           option?.attributeFQN as string,
@@ -856,7 +885,7 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                 }
               })}
             </Box>
-            <PdpIconAttributes product={product} />
+            <PdpIconAttributes product={updatedProduct} />
             {countryCode && countryCode === 'US' && (
               <Box
                 display="flex"
@@ -941,6 +970,69 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                       </LoadingButton>
                     </Box>
                   )}
+              </Box>
+            )}
+            {countryCode && countryCode !== 'US' && (
+              <Box
+                display="flex"
+                sx={{
+                  padding: '20px',
+                  bgcolor: theme?.palette.secondary.main,
+                  margin: '30px 0',
+                  flexDirection: { xs: 'column', lg: 'row' },
+                }}
+              >
+                {/* Column for Messages */}
+                <Box
+                  flex={1}
+                  sx={{ minWidth: '0', [theme.breakpoints.up('lg')]: { minWidth: '333px' } }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'start' }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        margin: '0 35px 0 10px',
+                        lineHeight: '25px',
+                        color: '#000000',
+                        fontSize: '16px',
+                        '@media (max-width: 910px)': {
+                          fontSize: '0.875rem',
+                          lineHeight: '1.375rem',
+                        },
+                      }}
+                    >
+                      {ousShowDistributorBtn ? t('distributorMessage') : t('nonDistributorMessage')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Column for OUS Button */}
+                {!(skuStatusText !== 'CustomCTA' && !ousShowDistributorBtn) && (
+                  <LoadingButton
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    className="add-to-cart-button"
+                    onClick={() =>
+                      ousShowDistributorBtn ? handleLinkTarget() : handleCustomCTATarget()
+                    }
+                    sx={{
+                      bgcolor: theme?.palette.primary.main,
+                      fontSize: '16px !important',
+                      transition: 'none',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        bgcolor: theme?.palette.primary.light,
+                      },
+                      '@media (max-width: 1023px)': {
+                        width: '52%',
+                      },
+                    }}
+                  >
+                    {ousShowDistributorBtn && t('distributors')}
+                    {!ousShowDistributorBtn && skuStatusText === 'CustomCTA' && customCTALabel}
+                  </LoadingButton>
+                )}
               </Box>
             )}
             {/* <Box paddingY={1}>
