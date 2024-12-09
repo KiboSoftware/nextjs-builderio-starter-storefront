@@ -400,10 +400,6 @@ const StandardShippingStep = (props: ShippingProps) => {
               <>
                 <KiboRadio
                   radioOptions={previouslySavedShippingAddress?.map((address, index) => {
-                    console.log(
-                      'This is previously saved addressed ---> ',
-                      previouslySavedShippingAddress
-                    )
                     return {
                       value: String(address.id),
                       name: String(address.id),
