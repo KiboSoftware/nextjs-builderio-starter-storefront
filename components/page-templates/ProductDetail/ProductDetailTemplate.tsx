@@ -257,7 +257,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     },
     productPriceResponse?.price as ProductPrice
   )
-  const [variantProductTitle, setVariantProductTitle] = useState(productName)
+  const [variantProductTitle, setVariantProductTitle] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const newProductData = product?.properties?.find(
     (data: any) => data?.attributeFQN === 'tenant~new-product'
   )
@@ -567,13 +568,19 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
 
       // Update the product properties immutably
       setUpdatedProduct({ ...product, properties: mergedProperties })
-      const variantTitle =
-        currentProduct?.properties?.find(
-          (data: any) => data?.attributeFQN === 'tenant~variant-product-name'
-        )?.values?.[0]?.stringValue || null
+    }
+    const variantTitlePropertyLength = currentProduct?.properties?.find(
+      (data: any) => data?.attributeFQN === 'tenant~variant-product-name'
+    )?.values?.length
+
+    const variantTitle =
+      currentProduct?.properties?.find(
+        (data: any) => data?.attributeFQN === 'tenant~variant-product-name'
+      )?.values?.[0]?.stringValue || null
+    if (variantTitlePropertyLength === 1) {
+      setIsLoading(false)
       setVariantProductTitle(variantTitle as string)
     }
-
     mergeProductProperties()
   }, [product, currentProduct])
 
@@ -675,9 +682,11 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
               )}
             </Box>
             <Box>
-              <Typography variant="h1" sx={{ color: 'primary.main' }}>
-                {variantProductTitle}
-              </Typography>
+              {!isLoading && (
+                <Typography variant="h1" sx={{ color: 'primary.main' }}>
+                  {variantProductTitle}
+                </Typography>
+              )}
             </Box>
           </Box>
           <Box
