@@ -98,7 +98,7 @@ const Content = (props: ContentProps) => {
                 <KiboTextBox
                   name="email"
                   value={field.value}
-                  label={t('email')}
+                  label={t('email-address')}
                   required
                   autoFocus={setAutoFocus}
                   sx={{ ...styles.formInput }}

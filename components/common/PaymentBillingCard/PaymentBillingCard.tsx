@@ -2,11 +2,13 @@ import { Box } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 
 import { AddressCard, KeyValueDisplay, PaymentCard } from '@/components/common'
-import { PaymentType } from '@/lib/constants'
+import { PageType, PaymentType } from '@/lib/constants'
 
 import { CrPurchaseOrderPaymentTerm } from '@/lib/gql/types'
 
 interface PaymentBillingCardProps {
+  showAddress?: boolean
+  pageType?: string
   cardNumberPart?: string
   expireMonth?: number
   expireYear?: number
@@ -25,6 +27,8 @@ interface PaymentBillingCardProps {
 
 const PaymentBillingCard = (props: PaymentBillingCardProps) => {
   const {
+    showAddress,
+    pageType,
     cardNumberPart,
     expireMonth,
     expireYear,
@@ -48,18 +52,36 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
       maxWidth={873}
       display="flex"
       sx={{
-        flexDirection: 'column',
+        flexDirection: 'row',
         gap: 1,
       }}
     >
       {paymentType === PaymentType.CREDITCARD && (
-        <PaymentCard
-          cardNumberPart={cardNumberPart as string}
-          expireMonth={expireMonth as number}
-          expireYear={expireYear as number}
-          cardType={cardType}
-          // onPaymentCardSelection={() => null}
-        />
+        <>
+          <PaymentCard
+            pageType={pageType}
+            cardNumberPart={cardNumberPart as string}
+            expireMonth={expireMonth as number}
+            expireYear={expireYear as number}
+            cardType={cardType}
+            // onPaymentCardSelection={() => null}
+          />
+          {showAddress && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', pt: 1, ml: 5 }}>
+              <AddressCard
+                title={t('billing-address')}
+                variant={'body2'}
+                firstName={firstName}
+                lastNameOrSurname={lastNameOrSurname}
+                address1={address1}
+                address2={address2}
+                cityOrTown={cityOrTown}
+                stateOrProvince={postalOrZipCode}
+                postalOrZipCode={stateOrProvince}
+              />
+            </Box>
+          )}
+        </>
       )}
 
       {paymentType === PaymentType.PURCHASEORDER && (
@@ -78,18 +100,20 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
             }}
             variant="body1"
           />
+
+          <AddressCard
+            title={t('billing-address')}
+            variant={'body2'}
+            firstName={firstName}
+            lastNameOrSurname={lastNameOrSurname}
+            address1={address1}
+            address2={address2}
+            cityOrTown={cityOrTown}
+            stateOrProvince={postalOrZipCode}
+            postalOrZipCode={stateOrProvince}
+          />
         </Box>
       )}
-
-      <AddressCard
-        firstName={firstName}
-        lastNameOrSurname={lastNameOrSurname}
-        address1={address1}
-        address2={address2}
-        cityOrTown={cityOrTown}
-        stateOrProvince={postalOrZipCode}
-        postalOrZipCode={stateOrProvince}
-      />
     </Box>
   )
 }

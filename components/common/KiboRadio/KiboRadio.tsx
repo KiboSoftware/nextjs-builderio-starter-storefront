@@ -28,6 +28,7 @@ interface KiboRadioProps {
     optionIndicator?: string // use this to assign a specific property to an option. e.g: isPrimary
   }[]
   sx?: SxProps<Theme>
+  boxSx?: SxProps<Theme>
   onChange: (value: string) => void
 }
 
@@ -38,6 +39,7 @@ export const KiboRadio = (props: KiboRadioProps) => {
     radioOptions,
     selected = '',
     sx,
+    boxSx,
     align = 'center',
     row = false,
     onChange,
@@ -59,8 +61,9 @@ export const KiboRadio = (props: KiboRadioProps) => {
           width: '100%',
           p: 2,
           borderRadius: '5px',
-          backgroundColor: isSelected ? 'secondary.main' : 'transparent',
+          backgroundColor: isSelected ? 'secondary.main' : 'inherit',
           transition: 'background-color 0.3s',
+           ...boxSx
         }}
       >
         {radio.optionIndicator && (
@@ -93,12 +96,14 @@ export const KiboRadio = (props: KiboRadioProps) => {
 
   return (
     <FormControl>
-      <FormLabel
-        id="kibo-radio-buttons-group-label"
-        sx={{ fontSize: 'body2', color: 'text.primary', pb: 1 }}
-      >
-        {title}
-      </FormLabel>
+      {title && (
+        <FormLabel
+          id="kibo-radio-buttons-group-label"
+          sx={{ fontSize: 'body2', color: 'text.primary', pb: 1 }}
+        >
+          {title}
+        </FormLabel>
+      )}
       <RadioGroup
         aria-label={name ?? 'kibo-radio'}
         name="radio-buttons-group"
