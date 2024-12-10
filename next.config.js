@@ -342,11 +342,11 @@ module.exports = {
     debounceTimeout: '1000',
     productListing: {
       sortOptions: [
-        { value: 'Best Match', id: '' },
+        { value: 'Relevance', id: '' },
         { value: 'Price: Low to High', id: 'price asc' },
         { value: 'Price: High to Low', id: 'price desc' },
-        { value: 'Latest', id: 'createDate desc' },
-        { value: 'Oldest', id: 'createDate asc' },
+        { value: 'Date Added: Most Recent First', id: 'createDate desc' },
+        { value: 'Date Added: Most Recent Last', id: 'createDate asc' },
       ],
       // For Infinite Scroll use this.
       pageSize: 15,
