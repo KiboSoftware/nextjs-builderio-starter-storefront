@@ -26,6 +26,7 @@ interface KiboRadioProps {
     optionIndicator?: string // use this to assign a specific property to an option. e.g: isPrimary
   }[]
   sx?: SxProps<Theme>
+  boxSx?: SxProps<Theme>
   onChange: (value: string) => void
 }
 
@@ -36,6 +37,7 @@ export const KiboRadio = (props: KiboRadioProps) => {
     radioOptions,
     selected = '',
     sx,
+    boxSx,
     align = 'center',
     row = false,
     onChange,
@@ -64,7 +66,10 @@ export const KiboRadio = (props: KiboRadioProps) => {
       >
         {radioOptions?.map((radio, index) => {
           return (
-            <Box key={radio.value + index}>
+            <Box
+              key={radio.value + index}
+              sx={{ background: selected === radio?.value ? '#E3E2FF' : 'inherit', ...boxSx }}
+            >
               {radio.optionIndicator && (
                 <Typography
                   sx={{ fontSize: 'subtitle2', color: 'text.primary', fontWeight: 700, pl: 4 }}
