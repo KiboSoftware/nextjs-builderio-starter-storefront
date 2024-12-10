@@ -108,7 +108,7 @@ interface ProductDetailTemplateProps {
   title?: string
   cancel?: string
   quoteDetails?: any
-  relatedProducts: any
+  relatedProducts?: []
   shouldFetchShippingMethods?: boolean
   getCurrentProduct?: (
     addToCartPayload: any,
@@ -1185,7 +1185,9 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       ) : null}
       {!isQuickViewModal && children}
       <AdditionalProductInfo product={product} />
-      <RelatedProductsCarousel product={relatedProducts} />
+      {relatedProducts && relatedProducts.length > 0 ? (
+        <RelatedProductsCarousel relatedProducts={relatedProducts} />
+      ) : null}
     </Grid>
   )
 }
