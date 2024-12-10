@@ -52,7 +52,9 @@ const App = (props: KiboAppProps) => {
   const { siteTitle, defaultTitle, defaultDescription } = publicRuntimeConfig?.metaData || {}
   const getLayout =
     Component.getLayout ?? ((page) => <DefaultLayout pageProps={pageProps}>{page}</DefaultLayout>)
-  const pageTitle = `${siteTitle} | ${pageProps?.metaData?.title || defaultTitle}`
+  // const pageTitle = `${siteTitle} | ${pageProps?.metaData?.title || defaultTitle}`
+  const pagePropsPageData = pageProps?.page?.data
+  const pageTitle = `${pageProps?.metaData?.title || pagePropsPageData?.title || defaultTitle}`
 
   const [googleReCaptcha, setGoogleReCaptcha] = useState()
   const [gtmId, setGtmId] = useState()
@@ -78,12 +80,27 @@ const App = (props: KiboAppProps) => {
     (googleReCaptcha as any)?.accountCreationSiteKey
   }`
 
+  console.log('This is pageprops', pageProps)
+
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="title" content={pageProps?.metaData?.title || defaultTitle} />
-        <meta name="description" content={pageProps?.metaData?.description || defaultDescription} />
+        <meta
+          name="title"
+          content={pageProps?.metaData?.title || pagePropsPageData?.title || defaultTitle}
+        />
+        <meta
+          name="description"
+          content={
+            pageProps?.metaData?.description || pagePropsPageData?.description || defaultDescription
+          }
+        />
+        <meta
+          name="image"
+          property="og:image"
+          content={pageProps?.metaData?.image || pagePropsPageData?.image}
+        />
         <meta name="keywords" content={pageProps?.metaData?.keywords} />
         {pageProps?.metaData?.robots && (
           <meta name="robots" content={pageProps?.metaData?.robots} />
