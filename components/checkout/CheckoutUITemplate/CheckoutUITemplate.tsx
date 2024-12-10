@@ -53,18 +53,17 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
   const handleSubmit = useCallback(() => setStepStatusSubmit(), [])
 
   const orderSummaryArgs = {
-    nameLabel: t('order-summary'),
-    subTotalLabel: `Cart Subtotal of (${checkout?.items?.length} items)`,
-    shippingTotalLabel: t('standard-shipping'),
-    taxLabel: t('tax'),
-    totalLabel: t('order-total'),
-    handlingLabel: t('additional-handling'),
+    nameLabel: t('Order Summary'),
+    subTotalLabel: `Subtotal`,
+    shippingTotalLabel: t('Shipping'),
+    taxLabel: t('Estimated Tax'),
+    totalLabel: t('Total'),
+    handlingLabel: t('Handling'),
     orderDetails: checkout,
-
     checkoutLabel: t('go-to-checkout'),
     shippingLabel: t('go-to-shipping'),
     backLabel: t('go-back'),
-    promoComponent: (
+    /*promoComponent: (
       <PromoCodeBadge
         onApplyCouponCode={handleApplyCouponCode}
         onRemoveCouponCode={handleRemoveCouponCode}
@@ -72,7 +71,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
         promoError={!!promoError}
         helpText={promoError}
       />
-    ),
+    ),*/
   }
   const showCheckoutSteps = activeStep !== steps.length
 
@@ -85,53 +84,61 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       direction={{ xs: 'column', md: 'row' }}
       gap={0}
     >
-      <Stack sx={{ width: '100%', maxWidth: '872px' }} gap={1}>
+
+      <Stack sx={{ width: '100%', maxWidth: '920' }} gap={1}>
         <Typography variant="h1" sx={{ color: 'primary.main' }}>
           {t('checkout')}
         </Typography>
+
         <KiboStepper isSticky={true}>{children}</KiboStepper>
       </Stack>
       <Box
         sx={{
           width: '100%',
-          maxWidth: 428,
+          maxWidth: {
+            xm: '100%',
+            sm: '100%',
+            md: '380px',
+            lg: '380px',
+          },
           height: 'fit-content',
           marginLeft: { lg: '1rem' },
           position: { md: 'sticky' },
           top: '80px',
         }}
       >
-        {activeStep != reviewStepIndex && (
-          <OrderSummary {...orderSummaryArgs}>
-            {activeStep < buttonLabels.length && (
-              <Stack direction="column" gap={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ ...buttonStyle }}
-                  fullWidth
-                  onClick={handleSubmit}
-                  disabled={stepStatus !== STEP_STATUS.VALID || activeStep === steps.length - 1}
-                >
-                  {t('continue')}
-                  {/*buttonLabels[activeStep]*/}
-                </Button>
-                {activeStep === paymentStepIndex && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{ ...buttonStyle }}
-                    fullWidth
-                    onClick={handleBack}
-                    disabled={activeStep === shippingStepIndex}
-                  >
-                    {t('go-back')}
-                  </Button>
-                )}
-              </Stack>
-            )}
-          </OrderSummary>
-        )}
+
+        <OrderSummary {...orderSummaryArgs}>
+          {/*
+          {activeStep < buttonLabels.length && (
+            <Stack direction="column" gap={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ ...buttonStyle }}
+                fullWidth
+                onClick={handleSubmit}
+                disabled={stepStatus !== STEP_STATUS.VALID || activeStep === steps.length - 1}
+              >
+                {buttonLabels[activeStep]}
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ ...buttonStyle }}
+                fullWidth
+                onClick={handleBack}
+                disabled={activeStep === detailsStepIndex}
+              >
+                {t('go-back')}
+              </Button>
+            </Stack>
+          )}
+          */}
+        </OrderSummary>
+
+        {/*
+
         {activeStep === reviewStepIndex && (
           <OrderReview
             checkout={checkout as CrOrder}
@@ -141,6 +148,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
             promoError={promoError}
           />
         )}
+        */}
       </Box>
     </Stack>
   ) : null

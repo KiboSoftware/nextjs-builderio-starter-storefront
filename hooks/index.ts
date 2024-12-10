@@ -137,6 +137,7 @@ export * from './mutations/standardCheckout/useUpdateOrderBillingInfo/useUpdateO
 export * from './mutations/standardCheckout/useVoidOrderPayment/useVoidOrderPayment'
 export * from './mutations/standardCheckout/useAddOrderPaymentInfo/useAddOrderPaymentInfo'
 export * from './mutations/standardCheckout/useCreateOrder/useCreateOrder'
+export * from './mutations/standardCheckout/useUpdateOrder/useUpdateOrder'
 export * from './mutations/standardCheckout/useInitiateOrder/useInitiateOrder'
 export * from './mutations/standardCheckout/useUpdateOrderCoupon/useUpdateOrderCoupon'
 export * from './mutations/standardCheckout/useDeleteOrderCoupon/useDeleteOrderCoupon'
