@@ -20,6 +20,7 @@ interface PaymentBillingCardProps {
   stateOrProvince?: string
   firstName?: string
   lastNameOrSurname?: string
+  companyOrOrganization?: string
   purchaseOrderNumber?: string
   paymentTerm?: CrPurchaseOrderPaymentTerm
   paymentType?: string
@@ -40,6 +41,7 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
     stateOrProvince,
     firstName,
     lastNameOrSurname,
+    companyOrOrganization,
     purchaseOrderNumber,
     paymentTerm,
     paymentType,
@@ -73,6 +75,7 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
                 variant={'body2'}
                 firstName={firstName}
                 lastNameOrSurname={lastNameOrSurname}
+                companyOrOrganization={companyOrOrganization}
                 address1={address1}
                 address2={address2}
                 cityOrTown={cityOrTown}
