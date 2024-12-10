@@ -28,7 +28,7 @@ interface AddressFormProps {
   onDefaultPaymentChange?: (value: boolean) => void
 }
 
-interface Countries {
+interface Country {
   name: string
   code: string
 }
@@ -106,7 +106,7 @@ const AddressForm = (props: AddressFormProps) => {
   const { t } = useTranslation('common')
 
   const generateSelectOptions = () => {
-    return countries?.map((country: Countries) => {
+    return countries?.map((country: Country) => {
       return (
         <MenuItem key={country?.name} value={country?.code}>
           {country?.name}
@@ -115,7 +115,7 @@ const AddressForm = (props: AddressFormProps) => {
     })
   }
 
-  const generateProvincesOptions = (provinces: Province[]) =>
+  const generateProvincesOptions = () =>
     provinces?.map((province: Province) => {
       return (
         <MenuItem key={province.name} value={province.code}>
@@ -136,7 +136,7 @@ const AddressForm = (props: AddressFormProps) => {
   useEffect(() => {
     reset(contact)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contact?.firstName])
+  }, [contact])
 
   return (
     <Box
@@ -341,7 +341,7 @@ const AddressForm = (props: AddressFormProps) => {
                   onBlur={field.onBlur}
                   required={true}
                 >
-                  {generateProvincesOptions(provinces)}
+                  {generateProvincesOptions()}
                 </KiboSelect>
               </Box>
             )}

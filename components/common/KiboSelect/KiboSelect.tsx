@@ -52,7 +52,7 @@ const KiboSelect = (props: KiboSelectProps) => {
       required={required}
     >
       {label && (
-        <InputLabel shrink htmlFor={name} sx={{ top: -18, left: -13, ...sx }}>
+        <InputLabel shrink htmlFor={name} sx={{ top: -18, left: -13, color: 'black', ...sx }}>
           {label}
         </InputLabel>
       )}
