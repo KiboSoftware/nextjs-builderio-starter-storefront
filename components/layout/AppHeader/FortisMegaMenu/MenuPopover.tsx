@@ -101,7 +101,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     <Link href={category.categoryLink} passHref>
                       <Typography
                         variant="body2"
-                        sx={{ paddingLeft: '16px', color: 'primary.main' }}
+                        sx={{ paddingLeft: '16px', color: 'primary.main', whiteSpace: 'normal' }}
                         onClick={handleLinkClick}
                       >
                         {category.categoryName}
@@ -127,7 +127,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <>
                         <Typography
                           variant="body2"
-                          sx={{ paddingLeft: '10px', color: 'primary.main' }}
+                          sx={{ paddingLeft: '10px', color: 'primary.main', whiteSpace: 'normal' }}
                         >
                           {category.categoryName}
                         </Typography>
@@ -139,7 +139,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <>
                         <Typography
                           variant="body2"
-                          sx={{ paddingLeft: '15px', color: 'primary.main' }}
+                          sx={{ paddingLeft: '15px', color: 'primary.main', whiteSpace: 'normal' }}
                         >
                           {category.categoryName}
                         </Typography>
@@ -158,7 +158,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                   <Link href={submenu.categoryLink} passHref>
                     <Typography
                       variant="body2"
-                      sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                      sx={{ paddingLeft: '28px', color: 'primary.main', whiteSpace: 'normal' }}
                       onClick={handleLinkClick}
                     >
                       {submenu.categoryName}
@@ -170,7 +170,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                 <Link href={activeCategory.categoryLink} passHref>
                   <Typography
                     variant="body2"
-                    sx={{ paddingLeft: '28px', color: 'primary.main' }}
+                    sx={{ paddingLeft: '28px', color: 'primary.main', whiteSpace: 'normal' }}
                     onClick={handleLinkClick}
                   >
                     View All {activeCategory.categoryName}

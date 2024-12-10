@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 
-import { Box, Stack, Button, SxProps } from '@mui/material'
+import { Box, Stack, Button, SxProps, Typography } from '@mui/material'
 import { Theme } from '@mui/material/styles'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
@@ -40,9 +40,12 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
   const { activeStep, stepStatus, steps, setStepStatusSubmit, setStepBack } =
     useCheckoutStepContext()
   const buttonLabels = [t('go-to-payment'), t('review-order')] //t('go-to-shipping'),
-  // const detailsStepIndex = steps.findIndex(
-  //   (step: string) => step.toLowerCase() === t('details').toLowerCase()
-  // )
+  const shippingStepIndex = steps.findIndex(
+    (step: string) => step.toLowerCase() === t('shipping').toLowerCase()
+  )
+  const paymentStepIndex = steps.findIndex(
+    (step: string) => step.toLowerCase() === t('payment').toLowerCase()
+  )
   const reviewStepIndex = steps.findIndex(
     (step: string) => step.toLowerCase() === t('review').toLowerCase()
   )
@@ -81,7 +84,12 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       direction={{ xs: 'column', md: 'row' }}
       gap={2}
     >
+
       <Stack sx={{ width: '100%', maxWidth: '920' }} gap={1}>
+        <Typography variant="h1" sx={{ color: 'primary.main' }}>
+          {t('checkout')}
+        </Typography>
+
         <KiboStepper isSticky={true}>{children}</KiboStepper>
       </Stack>
       <Box
@@ -99,6 +107,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
           top: '80px',
         }}
       >
+
         <OrderSummary {...orderSummaryArgs}>
           {/*
           {activeStep < buttonLabels.length && (
@@ -129,6 +138,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
         </OrderSummary>
 
         {/*
+
         {activeStep === reviewStepIndex && (
           <OrderReview
             checkout={checkout as CrOrder}

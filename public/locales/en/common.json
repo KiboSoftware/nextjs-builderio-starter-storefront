@@ -159,6 +159,8 @@
   "old-password": "Old Password",
   "new-password": "New Password",
   "external-password": "Reenter new password",
+  "spaces-are-not-allowed": "Spaces are not allowed",
+  "please-enter-a-valid-account-number": "Please enter a valid account number",
 
   "shop-now": "Shop Now",
   "edit-customer-name": "Edit Customer Name",
@@ -218,6 +220,8 @@
   "go-back": "Go Back",
   "company-or-organization": "Company Institution or Organization",
   "address1": "Street address",
+  "wallet": "Wallet",
+  "shipping-preferences": "Shipping Preferences",
   "address2": "Suite, Lab, Room, Floor, Building, etc.",
   "city-or-town": "City",
   "state-or-province": "State",
@@ -225,6 +229,8 @@
   "country-code": "Country",
   "phone-number-home": "Phone number",
   "this-field-is-required": "This field is required",
+  "this-field-is-number": "Must be only digits",
+  "this-field-is-min-max-length": "Must be exactly 9 digits",
   "enter-valid-zip-code": "Please provide valid zip code",
   "ending": "Ending:",
   "exp": "Exp:",
@@ -554,5 +560,10 @@
   "add-list-name-to-search-products": "Add list name to Search/View products in list",
   "digital-products-shipping-text": "No shipping information is required since all items will be picked up in the store or digitally fulfilled.",
   "digital-products": "Digital Products",
-  "menu": "Menu"
+  "menu": "Menu",
+
+  "distributors": "Distributors",
+  "distributorMessage": "For ordering information, see our International Distributors",
+  "nonDistributorMessage": "Helpful information about catalog orders to appear here.",
+  "fortis-shipping": "Fortis Shipping"
 }
