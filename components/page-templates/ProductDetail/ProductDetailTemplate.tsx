@@ -656,7 +656,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     stockBehaviour?.toLowerCase() === 'denybackorder' &&
     stockAvailable >= minimumStock
       ? stockAvailable - minimumStock
-      : undefined
+
+      : null
 
   return (
     <Grid container>
@@ -926,45 +927,49 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
                     {customCTALabel}
                   </LoadingButton>
                 )}
-                {skuStatusText && skuStatusText === 'Active' && (
-                  <Box display="flex" flexDirection="column" justifyContent="flex-start">
-                    {/* Align items in a column */}
-                    <Box
-                      sx={{ width: '100%', '@media (max-width: 1023px)': { marginTop: '20px' } }}
-                    >
-                      <QuantitySelector
-                        label="Quantity"
-                        quantity={quantity}
-                        {...(maxQuantity !== undefined ? { maxQuantity } : {})}
-                        onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
-                        onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
-                      />
+                {skuStatusText &&
+                  skuStatusText === 'Active' &&
+                  stockBehaviour &&
+                  (stockBehaviour !== 'DenyBackorder' ||
+                    (stockBehaviour === 'DenyBackorder' && stockAvailable >= minimumStock)) && (
+                    <Box display="flex" flexDirection="column" justifyContent="flex-start">
+                      {/* Align items in a column */}
+                      <Box
+                        sx={{ width: '100%', '@media (max-width: 1023px)': { marginTop: '20px' } }}
+                      >
+                        <QuantitySelector
+                          label="Quantity"
+                          quantity={quantity}
+                          {...(maxQuantity ? { maxQuantity } : {})}
+                          onIncrease={() => setQuantity((prevQuantity) => Number(prevQuantity) + 1)}
+                          onDecrease={() => setQuantity((prevQuantity) => Number(prevQuantity) - 1)}
+                        />
+                      </Box>
+                      <LoadingButton
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        className="add-to-cart-button"
+                        onClick={() => handleAddToCart()}
+                        loading={addToCart.isPending}
+                        sx={{
+                          marginTop: '20px',
+                          bgcolor: theme?.palette.primary.main,
+                          fontSize: '16px !important',
+                          transition: 'none',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            bgcolor: theme?.palette.primary.light,
+                          },
+                          '@media (max-width: 1023px)': {
+                            width: '52%',
+                          },
+                        }}
+                      >
+                        {t('add-to-cart')}
+                      </LoadingButton>
                     </Box>
-                    <LoadingButton
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      className="add-to-cart-button"
-                      onClick={() => handleAddToCart()}
-                      loading={addToCart.isPending}
-                      sx={{
-                        marginTop: '20px',
-                        bgcolor: theme?.palette.primary.main,
-                        fontSize: '16px !important',
-                        transition: 'none',
-                        boxShadow: 'none',
-                        '&:hover': {
-                          bgcolor: theme?.palette.primary.light,
-                        },
-                        '@media (max-width: 1023px)': {
-                          width: '52%',
-                        },
-                      }}
-                    >
-                      {t('add-to-cart')}
-                    </LoadingButton>
-                  </Box>
-                )}
+                  )}
               </Box>
             )}
             {countryCode && countryCode !== 'US' && (
