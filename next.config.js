@@ -9,14 +9,14 @@ module.exports = {
   reactStrictMode: false,
   // This config ensures that when you import an SVG file, it will be treated as a React component.
   // Commented the below code, it was causing issues to display the svg on checkout page.
-  // webpack(config) {
-  //   config.module.rules.push({
-  //     test: /\.svg$/,
-  //     use: ['@svgr/webpack'],
-  //   })
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    })
 
-  //   return config
-  // },
+    return config
+  },
   compiler: {
     // see https://styled-components.com/docs/tooling#babel-plugin for more info on the options.
     styledComponents: true,
