@@ -17,7 +17,6 @@ import type { Address, ContactForm } from '@/lib/types'
 interface AddressFormProps {
   contact?: ContactForm
   countries?: string[]
-  states?: any
   isUserLoggedIn: boolean
   saveAddressLabel?: string
   isAddressFormInDialog?: boolean
@@ -27,6 +26,16 @@ interface AddressFormProps {
   onSaveAddress: (data: Address) => void
   onFormStatusChange?: (status: boolean) => void
   onDefaultPaymentChange?: (value: boolean) => void
+}
+
+interface Country {
+  name: string
+  code: string
+}
+
+interface Province {
+  name: string
+  code: string
 }
 
 export const useFormSchema = () => {
@@ -39,9 +48,11 @@ export const useFormSchema = () => {
       address1: yup.string().required(t('this-field-is-required')),
       address2: yup.string().nullable(true).notRequired(),
       cityOrTown: yup.string().required(t('this-field-is-required')),
-      stateOrProvince: yup.string().when('countryCode', {
-        is: CountryCode.US || CountryCode.CA,
-        then: yup.string().required(t('this-field-is-required')),
+      stateOrProvince: yup.string().when('countryCode', ([countryCode], schema) => {
+        if (countryCode == CountryCode.US) {
+          return schema.required(t('this-field-is-required'))
+        }
+        return schema
       }),
       postalOrZipCode: yup.string().when('countryCode', {
         is: CountryCode.US || CountryCode.CA,
@@ -58,11 +69,10 @@ export const useFormSchema = () => {
 // Component
 const AddressForm = (props: AddressFormProps) => {
   const { publicRuntimeConfig } = getConfig()
-  console.log(publicRuntimeConfig)
+
   const {
     contact,
     countries = publicRuntimeConfig.countries,
-    states = publicRuntimeConfig.states,
     isUserLoggedIn = false,
     saveAddressLabel,
     isAddressFormInDialog = false,
@@ -73,6 +83,8 @@ const AddressForm = (props: AddressFormProps) => {
     onFormStatusChange,
     onDefaultPaymentChange,
   } = props
+
+  const provinces = publicRuntimeConfig.provinces
 
   const addressSchema = useFormSchema()
   // Define Variables and States
@@ -93,24 +105,24 @@ const AddressForm = (props: AddressFormProps) => {
 
   const { t } = useTranslation('common')
 
-  const generateSelectOptions = () =>
-    countries?.map((country: string) => {
+  const generateSelectOptions = () => {
+    return countries?.map((country: Country) => {
       return (
-        <MenuItem key={country} value={country}>
-          {country}
-        </MenuItem>
-      )
-    })
-
-  const generateSelectStateOptions = () => {
-    return states?.map((state: any) => {
-      return (
-        <MenuItem key={state.id} value={state.name}>
-          {state.name}
+        <MenuItem key={country?.name} value={country?.code}>
+          {country?.name}
         </MenuItem>
       )
     })
   }
+
+  const generateProvincesOptions = () =>
+    provinces?.map((province: Province) => {
+      return (
+        <MenuItem key={province.name} value={province.code}>
+          {province.name}
+        </MenuItem>
+      )
+    })
 
   const onValid = async (formData: ContactForm) =>
     onSaveAddress({ contact: formData, isDataUpdated: true })
@@ -130,15 +142,15 @@ const AddressForm = (props: AddressFormProps) => {
     <Box
       component="form"
       sx={{
-        m: 1,
+        my: 1,
+        mx: 0,
         maxWidth: '872px',
       }}
       noValidate
       autoComplete="off"
       data-testid="address-form"
-      onSubmit={handleSubmit(onValid)}
     >
-      <Grid container rowSpacing={1} columnSpacing={{ md: 4 }}>
+      <Grid container rowSpacing={0} columnGap={2.5}>
         <Grid item xs={12} md={isAddressFormInDialog ? 12 : 6}>
           <Controller
             name="firstName"
@@ -228,24 +240,23 @@ const AddressForm = (props: AddressFormProps) => {
           <Controller
             name="address.countryCode"
             control={control}
-            defaultValue={
-              contact?.address?.countryCode || countries.length === 1 ? countries[0] : ''
-            }
+            defaultValue={contact?.address?.countryCode || countries[0]?.code}
             render={({ field }) => (
-              <div>
+              <Box>
                 <KiboSelect
+                  sx={{ color: '#020027', '> fieldSet': { borderColor: '#020027' } }}
                   name="country-code"
                   label={t('country-code')}
                   value={field.value}
                   error={!!errors?.address?.countryCode}
                   helperText={errors?.address?.countryCode?.message}
-                  onChange={(_name, value) => field.onChange(value)}
+                  onChange={(_name: string, value: string) => field.onChange(value)}
                   onBlur={field.onBlur}
                   required={true}
                 >
                   {generateSelectOptions()}
                 </KiboSelect>
-              </div>
+              </Box>
             )}
           />
         </Grid>
@@ -318,20 +329,9 @@ const AddressForm = (props: AddressFormProps) => {
             control={control}
             defaultValue={contact?.address?.stateOrProvince}
             render={({ field }) => (
-              // <>
-              // <KiboTextBox
-              //   {...field}
-              //   value={field.value || ''}
-              //   label={t('state-or-province')}
-              //   ref={null}
-              //   error={!!errors?.address?.stateOrProvince}
-              //   helperText={errors?.address?.stateOrProvince?.message}
-              //   onChange={(_name: string, value: string) => field.onChange(value)}
-              //   onBlur={field.onBlur}
-              //   required={true}
-              // />
-              <div>
+              <Box>
                 <KiboSelect
+                  sx={{ color: '#020027', '> fieldSet': { borderColor: '#020027' } }}
                   name="state-or-province"
                   label={t('state-or-province')}
                   value={field.value}
@@ -341,10 +341,9 @@ const AddressForm = (props: AddressFormProps) => {
                   onBlur={field.onBlur}
                   required={true}
                 >
-                  {generateSelectStateOptions()}
+                  {generateProvincesOptions()}
                 </KiboSelect>
-              </div>
-              // </>
+              </Box>
             )}
           />
         </Grid>

@@ -84,7 +84,6 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       direction={{ xs: 'column', md: 'row' }}
       gap={0}
     >
-
       <Stack sx={{ width: '100%', maxWidth: '920' }} gap={1}>
         <Typography variant="h1" sx={{ color: 'primary.main' }}>
           {t('checkout')}
@@ -107,7 +106,6 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
           top: '80px',
         }}
       >
-
         <OrderSummary {...orderSummaryArgs}>
           {/*
           {activeStep < buttonLabels.length && (

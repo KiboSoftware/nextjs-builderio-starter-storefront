@@ -652,7 +652,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     router.push(targetPath)
   }
 
-
   const handleLinkTarget = () => {
     const targetPath = ousShowDistributorBtn ? '/distributors' : '/'
     router.push(targetPath)
@@ -663,7 +662,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     stockBehaviour?.toLowerCase() === 'denybackorder' &&
     stockAvailable >= minimumStock
       ? stockAvailable - minimumStock
-
       : null
 
   return (

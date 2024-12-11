@@ -63,7 +63,7 @@ export const KiboRadio = (props: KiboRadioProps) => {
           borderRadius: '5px',
           backgroundColor: isSelected ? 'secondary.main' : 'inherit',
           transition: 'background-color 0.3s',
-           ...boxSx
+          ...boxSx,
         }}
       >
         {radio.optionIndicator && (
