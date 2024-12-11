@@ -15,6 +15,7 @@ const plpIconStyles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   spaceBetween: {
     display: 'flex',
@@ -25,9 +26,11 @@ const plpIconStyles = {
     display: 'flex',
     alignItems: 'center',
     marginRight: '10px',
+    justifyContent: 'center',
   },
   plpIconText: {
     display: 'inline-block',
+    textAlign: 'center',
     color: 'primary.main',
     fontFamily: 'Poppins',
     fontSize: '12px',
@@ -208,7 +211,7 @@ const PlpIconAttributes = (props: any) => {
 
       {properties?.map((data: any) => {
         return data?.attributeFQN === publicRuntimeConfig?.mfgAvailabilityAttrFQN ? (
-          data?.values[0]?.value === 'Lyo-Ready' ? (
+          data?.values[0]?.value === 'lyo_ready' ? (
             <Grid item md={3} sm={3}>
               <Box sx={plpIconStyles.flexDirectionRow}>
                 <Box sx={plpIconStyles.flexDirectionRow}>
