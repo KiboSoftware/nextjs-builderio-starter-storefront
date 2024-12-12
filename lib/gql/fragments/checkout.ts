@@ -254,6 +254,11 @@ export const checkoutPaymentFragment = /* GraphQL */ `
           description
           code
         }
+        customFields {
+          code
+          label
+          value
+        }
       }
       card {
         paymentServiceCardId

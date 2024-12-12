@@ -142,7 +142,13 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                   value={field.value || ''}
                   label={t('expires-mm-yyyy')}
                   required={true}
-                  onChange={(_name, value) => field.onChange(value)}
+                  onChange={(_name, value) => {
+                    if (value?.length > 1 && value?.length < 3) {
+                      field.onChange(`${value}/`)
+                    } else {
+                      field.onChange(value)
+                    }
+                  }}
                   onBlur={field.onBlur}
                   error={!!errors?.expiryDate}
                   helperText={errors?.expiryDate?.message as unknown as string}

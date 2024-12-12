@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Box, Grid, FormControlLabel, Checkbox } from '@mui/material'
+import { Box, Grid, FormControlLabel, Checkbox, Typography } from '@mui/material'
 import MenuItem from '@mui/material/MenuItem'
 import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
@@ -48,11 +48,9 @@ export const useFormSchema = () => {
       address1: yup.string().required(t('this-field-is-required')),
       address2: yup.string().nullable(true).notRequired(),
       cityOrTown: yup.string().required(t('this-field-is-required')),
-      stateOrProvince: yup.string().when('countryCode', ([countryCode], schema) => {
-        if (countryCode == CountryCode.US) {
-          return schema.required(t('this-field-is-required'))
-        }
-        return schema
+      stateOrProvince: yup.string().when('countryCode', {
+        is: CountryCode.US || CountryCode.CA,
+        then: yup.string().required(t('this-field-is-required')),
       }),
       postalOrZipCode: yup.string().when('countryCode', {
         is: CountryCode.US || CountryCode.CA,
@@ -151,7 +149,7 @@ const AddressForm = (props: AddressFormProps) => {
       data-testid="address-form"
     >
       <Grid container rowSpacing={0} columnGap={2.5}>
-        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 5.82}>
           <Controller
             name="firstName"
             control={control}
@@ -173,7 +171,7 @@ const AddressForm = (props: AddressFormProps) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 5.82}>
           <Controller
             name="lastNameOrSurname"
             control={control}
@@ -215,7 +213,7 @@ const AddressForm = (props: AddressFormProps) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 5.82}>
           <Controller
             name="phoneNumbers.home"
             control={control}
@@ -236,7 +234,7 @@ const AddressForm = (props: AddressFormProps) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 12 : 5.82}>
           <Controller
             name="address.countryCode"
             control={control}
@@ -244,7 +242,11 @@ const AddressForm = (props: AddressFormProps) => {
             render={({ field }) => (
               <Box>
                 <KiboSelect
-                  sx={{ color: '#020027', '> fieldSet': { borderColor: '#020027' } }}
+                  sx={{
+                    color: '#020027',
+                    fontSize: '1rem',
+                    '> fieldSet': { borderColor: '#020027' },
+                  }}
                   name="country-code"
                   label={t('country-code')}
                   value={field.value}
@@ -323,7 +325,7 @@ const AddressForm = (props: AddressFormProps) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={isAddressFormInDialog ? 8 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 8 : 5.82}>
           <Controller
             name="address.stateOrProvince"
             control={control}
@@ -331,7 +333,11 @@ const AddressForm = (props: AddressFormProps) => {
             render={({ field }) => (
               <Box>
                 <KiboSelect
-                  sx={{ color: '#020027', '> fieldSet': { borderColor: '#020027' } }}
+                  sx={{
+                    color: '#020027',
+                    fontSize: '1rem',
+                    '> fieldSet': { borderColor: '#020027' },
+                  }}
                   name="state-or-province"
                   label={t('state-or-province')}
                   value={field.value}
@@ -348,7 +354,7 @@ const AddressForm = (props: AddressFormProps) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={isAddressFormInDialog ? 4 : 6}>
+        <Grid item xs={12} md={isAddressFormInDialog ? 3 : 5.82}>
           <Controller
             name="address.postalOrZipCode"
             control={control}
@@ -373,7 +379,7 @@ const AddressForm = (props: AddressFormProps) => {
           <Grid item md={12}>
             <FormControlLabel
               control={<Checkbox onChange={() => setSaveAddress((prevState) => !prevState)} />}
-              label={saveAddressLabel}
+              label={<Typography variant="body2">{saveAddressLabel}</Typography>}
             />
           </Grid>
         )}

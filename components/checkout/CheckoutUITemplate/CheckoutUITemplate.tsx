@@ -107,7 +107,6 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
         }}
       >
         <OrderSummary {...orderSummaryArgs}>
-          {/*
           {activeStep < buttonLabels.length && (
             <Stack direction="column" gap={2}>
               <Button
@@ -126,16 +125,13 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
                 sx={{ ...buttonStyle }}
                 fullWidth
                 onClick={handleBack}
-                disabled={activeStep === detailsStepIndex}
+                disabled={activeStep === shippingStepIndex}
               >
                 {t('go-back')}
               </Button>
             </Stack>
           )}
-          */}
         </OrderSummary>
-
-        {/*
 
         {activeStep === reviewStepIndex && (
           <OrderReview
@@ -146,7 +142,6 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
             promoError={promoError}
           />
         )}
-        */}
       </Box>
     </Stack>
   ) : null

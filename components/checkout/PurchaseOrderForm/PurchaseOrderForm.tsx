@@ -1,23 +1,18 @@
 import React, { useEffect } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  Box,
-  Grid,
-  InputLabel,
-  Typography,
-  useMediaQuery,
-  Theme,
-  Stack,
-  MenuItem,
-} from '@mui/material'
+import { Box, Grid, Typography, useMediaQuery, Theme, MenuItem } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
 
-import { KiboSelect, KiboTextBox } from '@/components/common'
+import { KiboTextBox } from '@/components/common'
 
-import { CrPurchaseOrderPayment, CustomerPurchaseOrderPaymentTerm } from '@/lib/gql/types'
+import {
+  CrPurchaseOrderCustomField,
+  CrPurchaseOrderPayment,
+  CustomerPurchaseOrderPaymentTerm,
+} from '@/lib/gql/types'
 
 const schema = yup.object().shape({
   purchaseOrderNumber: yup.string().required('This field is required'),
@@ -27,6 +22,15 @@ const schema = yup.object().shape({
     then: yup.string().required('This field is required when more data is present.'),
     otherwise: yup.string().nullable(),
   }),
+  authorizerName: yup.string().required('This field is required'),
+  authorizerPhone: yup
+    .string()
+    .matches(
+      /^\d{3}-\d{3}-\d{4}$/,
+      'Phone number format is invalid. It must fit the xxx-xxx-xxxx format.'
+    )
+    .required('This field is required'),
+  referenceNumber: yup.string().nullable().notRequired(),
 })
 
 interface PurchaseOrderFormProps {
@@ -60,6 +64,7 @@ const PurchaseOrderForm = (props: PurchaseOrderFormProps) => {
     shouldFocusError: true,
     context: { purchaseOrderPaymentTerms },
   })
+
   const singlePurchaseOrderPaymentTerms =
     purchaseOrderPaymentTerms?.length === 1 ? purchaseOrderPaymentTerms?.[0] : null
 
@@ -79,6 +84,23 @@ const PurchaseOrderForm = (props: PurchaseOrderFormProps) => {
       paymentTerm: singlePurchaseOrderPaymentTerms
         ? singlePurchaseOrderPaymentTerms
         : purchaseOrderPaymentTerms.find((term: any) => term.description === formData.paymentTerm),
+      customFields: [
+        {
+          code: 'authorizer-name',
+          label: 'Authorizer Name',
+          value: formData?.authorizerName,
+        },
+        {
+          code: 'authorizer-phone',
+          label: 'Authorizer Phone',
+          value: formData?.authorizerPhone,
+        },
+        {
+          code: 'reference-number',
+          label: 'Reference Number',
+          value: formData?.referenceNumber,
+        },
+      ] as CrPurchaseOrderCustomField[],
     }
     onSavePurchaseData(purchaseOrderFormData)
   }
@@ -101,8 +123,83 @@ const PurchaseOrderForm = (props: PurchaseOrderFormProps) => {
       autoComplete="off"
       data-testid="purchase-order-form"
     >
-      <Grid container rowSpacing={1} columnSpacing={{ md: 4 }}>
-        {!mdScreen && (
+      <Typography variant="h3" component="h3" sx={{ color: 'primary.main', mt: 3, mb: 2, p: 0 }}>
+        {t('payment-information')}
+      </Typography>
+      <Grid container rowSpacing={0} columnGap={2.5}>
+        <Grid item xs={12} md={5.82}>
+          <Controller
+            name="purchaseOrderNumber"
+            control={control}
+            defaultValue={''}
+            render={({ field }) => (
+              <KiboTextBox
+                {...field}
+                value={field.value || ''}
+                label={t('po-number')}
+                ref={null}
+                onChange={(_name: string, value: string) => field.onChange(value)}
+                onBlur={field.onBlur}
+                required
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={5.82}>
+          <Controller
+            name="authorizerName"
+            control={control}
+            defaultValue={''}
+            render={({ field }) => (
+              <KiboTextBox
+                {...field}
+                value={field.value || ''}
+                label={t('authorizer-name')}
+                ref={null}
+                onChange={(_name: string, value: string) => field.onChange(value)}
+                onBlur={field.onBlur}
+                required
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={5.82}>
+          <Controller
+            name="referenceNumber"
+            control={control}
+            defaultValue={''}
+            render={({ field }) => (
+              <KiboTextBox
+                {...field}
+                value={field.value || ''}
+                label={t('reference-number')}
+                ref={null}
+                onChange={(_name: string, value: string) => field.onChange(value)}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={5.82}>
+          <Controller
+            name="authorizerPhone"
+            control={control}
+            defaultValue={''}
+            render={({ field }) => (
+              <KiboTextBox
+                {...field}
+                value={field.value || ''}
+                label={t('authorizer-phone')}
+                ref={null}
+                onChange={(_name: string, value: string) => field.onChange(value)}
+                onBlur={field.onBlur}
+                required
+              />
+            )}
+          />
+        </Grid>
+
+        {/* {!mdScreen && (
           <Grid item xs={6} md={6}>
             <InputLabel shrink={true} sx={{ position: 'relative', left: '-13px' }}>
               {t('credit-limit')}
@@ -118,23 +215,7 @@ const PurchaseOrderForm = (props: PurchaseOrderFormProps) => {
             <Typography>{t('currency', { val: availableBalance })}</Typography>
           </Grid>
         )}
-        <Grid item xs={12} md={6}>
-          <Controller
-            name="purchaseOrderNumber"
-            control={control}
-            // defaultValue={contact?.address?.address1}
-            render={({ field }) => (
-              <KiboTextBox
-                {...field}
-                value={field.value || ''}
-                label={t('po-number')}
-                ref={null}
-                onChange={(_name: string, value: string) => field.onChange(value)}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </Grid>
+        
         {mdScreen && (
           <Grid item xs={12} md={6}>
             <Stack direction="row" mt={'1rem'} mb={'1rem'}>
@@ -184,28 +265,7 @@ const PurchaseOrderForm = (props: PurchaseOrderFormProps) => {
               )}
             />
           </Grid>
-        )}
-
-        {/* <Grid item xs={12} md={6}>
-          <Controller
-            name="po-external-id"
-            control={control}
-            // defaultValue={contact?.address?.address2}
-            render={({ field }) => (
-              <KiboTextBox
-                {...field}
-                value={field.value || ''}
-                label={t('po-external-id')}
-                ref={null}
-                placeholder="XXX"
-                // error={!!errors?.address?.address2}
-                // helperText={errors?.address?.address2?.message}
-                onChange={(_name: string, value: string) => field.onChange(value)}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </Grid> */}
+        )} */}
       </Grid>
     </Box>
   )

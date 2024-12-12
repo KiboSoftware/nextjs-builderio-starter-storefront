@@ -111,6 +111,9 @@ const getTotalCollected = (order: CrOrder): number => order.totalCollected || 0
 const getShippingContact = (order: CrOrder): CrContact =>
   order?.fulfillmentInfo?.fulfillmentContact as CrContact
 
+const getBillingContact = (order: CrOrder): CrContact =>
+  order?.billingInfo?.billingContact as CrContact
+
 const getShippingFirstName = (order: CrOrder): string =>
   addressGetters.getFirstName(order.fulfillmentInfo?.fulfillmentContact as CrContact)
 const getShippingLastNameOrSurname = (order: CrOrder): string =>
@@ -126,6 +129,8 @@ const getShippingPhoneWork = (order: CrOrder): string =>
   addressGetters.getPhoneNumbers(order?.fulfillmentInfo?.fulfillmentContact as CrContact).work
 const getShippingAddress = (order: CrOrder) =>
   addressGetters.getAddress(order?.fulfillmentInfo?.fulfillmentContact?.address as CrAddress)
+const getBillingAddress = (order: CrOrder) =>
+  addressGetters.getAddress(order?.billingInfo?.billingContact?.address as CrAddress)
 
 const getFulfillmentLocationCodes = (cartItems: (CrCartItem | CrOrderItem)[]): string => {
   const locationCodes = Array.from(
@@ -382,6 +387,7 @@ export const orderGetters = {
   getNewOrderPayments,
   getShippedTo,
   getShippingAddress,
+  getBillingAddress,
   getOrderHistoryDetails,
   getOrderPaymentCardDetails,
   getOrderNumber,
@@ -402,6 +408,7 @@ export const orderGetters = {
   getFulfillmentLocationCodes,
   getCheckoutDetails,
   getShippingContact,
+  getBillingContact,
   getSelectedPaymentType,
   getShippingMethodCode,
   getLocationCode,

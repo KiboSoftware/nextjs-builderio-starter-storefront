@@ -739,16 +739,16 @@ const ReviewStep = (props: ReviewStepProps) => {
         >
           {t('Place Order')}
         </LoadingButton>
-        {/*<Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{
-                      ...styles.goBackButtonStyle,
-                    }}
-                    onClick={() => setStepBack()}
-                  >
-                    {t('go-back')}
-                  </Button>*/}
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={{
+            ...styles.goBackButtonStyle,
+          }}
+          onClick={() => setStepBack()}
+        >
+          {t('go-back')}
+        </Button>
       </Stack>
     </Box>
   )
