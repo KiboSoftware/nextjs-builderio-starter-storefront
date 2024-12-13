@@ -41,7 +41,9 @@ const PdpIconAttributes = (props: any) => {
   const handleScroll = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      const yOffset = -125
+      const yPosition = element.getBoundingClientRect().top + window.scrollY + yOffset
+      window.scrollTo({ top: yPosition, behavior: 'smooth' })
     }
   }
 
