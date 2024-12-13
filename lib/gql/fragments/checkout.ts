@@ -175,6 +175,10 @@ export const baseCheckoutFragment = /* GraphQL */ `
         }
       }
     }
+    attributes {
+      fullyQualifiedName
+      values
+    }
   }
 `
 export const billingContactFragment = /* GraphQL */ `

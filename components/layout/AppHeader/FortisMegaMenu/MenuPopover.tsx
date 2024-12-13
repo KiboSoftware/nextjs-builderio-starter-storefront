@@ -102,7 +102,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                     <Link href={category.categoryLink} passHref style={{ paddingLeft: '16px' }}>
                       <Typography
                         variant="body2"
-                        sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal' }}
+                        sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal', whiteSpace: 'normal' }}
                         onClick={handleLinkClick}
                       >
                         {category.categoryName}
@@ -128,7 +128,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <>
                         <Typography
                           variant="body2"
-                          sx={{ paddingLeft: '10px', color: 'primary.main', fontStyle: 'normal' }}
+                          sx={{ paddingLeft: '10px', color: 'primary.main', fontStyle: 'normal', whiteSpace: 'normal' }}
                         >
                           {category.categoryName}
                         </Typography>
@@ -140,7 +140,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                       <>
                         <Typography
                           variant="body2"
-                          sx={{ paddingLeft: '15px', color: 'primary.main', fontStyle: 'normal' }}
+                          sx={{ paddingLeft: '15px', color: 'primary.main', fontStyle: 'normal', whiteSpace: 'normal' }}
                         >
                           {category.categoryName}
                         </Typography>
@@ -159,7 +159,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                   <Link href={submenu.categoryLink} passHref style={{ paddingLeft: '28px' }}>
                     <Typography
                       variant="body2"
-                      sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal' }}
+                      sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal', whiteSpace: 'normal' }}
                       onClick={handleLinkClick}
                     >
                       {submenu.categoryName}
@@ -171,7 +171,7 @@ const MenuPopover: React.FC<CustomDropdownProps> = ({
                 <Link href={activeCategory.categoryLink} passHref style={{ paddingLeft: '28px' }}>
                   <Typography
                     variant="body2"
-                    sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal' }}
+                    sx={{ ...animatedUnderline, color: 'primary.main', fontStyle: 'normal', whiteSpace: 'normal' }}
                     onClick={handleLinkClick}
                   >
                     View All {activeCategory.categoryName}
