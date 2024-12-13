@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
+import CreditCardIcon from '@mui/icons-material/CreditCard'
 import Help from '@mui/icons-material/Help'
+import RequestQuoteOutlinedIcon from '@mui/icons-material/RequestQuoteOutlined'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   Stack,
   Checkbox,
@@ -14,7 +17,10 @@ import {
   Button,
   Box,
   Tooltip,
+  Tab,
+  Divider,
 } from '@mui/material'
+import { find } from 'lodash'
 import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
 import { useReCaptcha } from 'next-recaptcha-v3'
@@ -25,7 +31,7 @@ import { CardDetailsForm, PurchaseOrderForm } from '@/components/checkout'
 import { AddressForm, KiboTextBox, KiboRadio, PaymentBillingCard } from '@/components/common'
 import { useCheckoutStepContext, STEP_STATUS, useAuthContext, useSnackbarContext } from '@/context'
 import { usePaymentTypes, useValidateCustomerAddress } from '@/hooks'
-import { CountryCode, CurrencyCode, PaymentType, PaymentWorkflow } from '@/lib/constants'
+import { CountryCode, CurrencyCode, PageType, PaymentType, PaymentWorkflow } from '@/lib/constants'
 import { addressGetters, cardGetters, orderGetters, userGetters } from '@/lib/getters'
 import {
   actions,
@@ -127,7 +133,7 @@ const initialBillingAddressData: Address = {
       cityOrTown: '',
       stateOrProvince: '',
       postalOrZipCode: '',
-      countryCode: '',
+      countryCode: 'US',
     },
     phoneNumbers: {
       home: '',
@@ -191,8 +197,9 @@ const PaymentStep = (props: PaymentStepProps) => {
   const checkoutPayment = orderGetters.getSelectedPaymentType(checkout)
   const checkoutPaymentType = checkoutPayment?.paymentType?.toString() ?? ''
 
-  const [selectedPaymentTypeRadio, setSelectedPaymentTypeRadio] =
-    useState<string>(checkoutPaymentType)
+  const [selectedPaymentTypeRadio, setSelectedPaymentTypeRadio] = useState<string>(
+    checkoutPaymentType ? checkoutPaymentType : PaymentType.CREDITCARD
+  )
 
   const [isAddingNewPayment, setIsAddingNewPayment] = useState<boolean>(false)
 
@@ -773,48 +780,99 @@ const PaymentStep = (props: PaymentStepProps) => {
 
   return (
     <Stack data-testid="checkout-payment">
-      <Typography variant="h2" sx={{ paddingBottom: '1.625rem' }}>
+      <Typography
+        variant="h2"
+        component="h2"
+        sx={{ fontWeight: '500', pb: 3, color: 'primary.main' }}
+      >
         {t('payment-method')}
       </Typography>
 
       <FormControl>
-        <RadioGroup
-          aria-labelledby="payment-types-radio"
-          aria-label="payment-types"
-          value={selectedPaymentTypeRadio}
-          onChange={(_, value: string) => handlePaymentTypeRadioChange(value)}
-          data-testid="payment-types"
-        >
+        <TabContext value={selectedPaymentTypeRadio}>
+          <TabList
+            onChange={(_, value: string) => handlePaymentTypeRadioChange(value)}
+            aria-labelledby="payment-types-tab"
+            aria-label="payment-types"
+            data-testid="payment-types"
+            TabIndicatorProps={{
+              sx: {
+                borderRadius: 2,
+                bottom: 0,
+                top: 0,
+                left: 0,
+                height: 'auto',
+                background: 'transparent',
+                border: '3px solid #30299A',
+                borderBottom: 'none',
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
+                transition: 'all 0ms linear',
+              },
+            }}
+          >
+            <Tab
+              label={t('credit-card')}
+              value={PaymentType.CREDITCARD}
+              icon={<CreditCardIcon />}
+              iconPosition="start"
+              color={'primary.main'}
+              sx={{
+                width: '50%',
+                color: '#30299A',
+                borderBottom:
+                  selectedPaymentTypeRadio !== PaymentType.CREDITCARD
+                    ? '3px solid #30299A'
+                    : '3px solid #ffffff',
+              }}
+            />
+            <Tab
+              label={
+                find(
+                  newPaymentTypes,
+                  (paymentType: PaymentsType) => paymentType?.id === PaymentType.PURCHASEORDER
+                )?.name
+              }
+              value={PaymentType.PURCHASEORDER}
+              icon={<RequestQuoteOutlinedIcon />}
+              iconPosition="start"
+              color={'primary.main'}
+              sx={{
+                width: '50%',
+                color: '#30299A',
+                borderBottom:
+                  selectedPaymentTypeRadio !== PaymentType.PURCHASEORDER
+                    ? '3px solid #30299A'
+                    : '3px solid #ffffff',
+              }}
+            />
+          </TabList>
+
           {newPaymentTypes.map((paymentType: PaymentsType) => {
             return (
               <Box key={paymentType.id}>
-                <FormControlLabel
-                  sx={{ ...formControlLabelStyle }}
-                  value={paymentType.id}
-                  control={<Radio sx={{ ...radioStyle }} />}
-                  label={paymentType.name}
-                />
                 {paymentType.id === selectedPaymentTypeRadio ? (
-                  <Box sx={{ maxWidth: '100%', mb: 1, pl: 4 }}>
+                  <Box sx={{ maxWidth: '100%', mb: 1, pl: 0 }}>
                     {shouldShowPreviouslySavedCards ? (
                       <Stack gap={2} width="100%" data-testid="saved-payment-methods">
                         {cardOptions?.length ? (
                           <>
                             <KiboRadio
+                              boxSx={{ p: 2 }}
+                              sx={{ width: '100% !important' }}
                               radioOptions={cardOptions?.map((card) => {
                                 const address = addressGetters.getAddress(
                                   card?.billingAddressInfo?.contact.address as CrAddress
                                 )
                                 return {
+                                  sx: { width: '100%' },
                                   value: cardGetters.getCardId(card?.cardInfo),
                                   name: cardGetters.getCardId(card?.cardInfo),
-                                  optionIndicator:
-                                    defaultCustomerAccountCard.cardInfo?.id === card.cardInfo?.id
-                                      ? t('primary')
-                                      : '',
                                   label: (
                                     <>
                                       <PaymentBillingCard
+                                        showAddress={selectedCardRadio === card?.cardInfo?.id}
+                                        pageType={PageType.CHECKOUT}
                                         cardNumberPart={cardGetters.getCardNumberPart(
                                           card?.cardInfo
                                         )}
@@ -824,6 +882,17 @@ const PaymentStep = (props: PaymentStepProps) => {
                                         cardType={cardGetters
                                           .getCardType(card?.cardInfo)
                                           ?.toUpperCase()}
+                                        firstName={
+                                          card?.billingAddressInfo?.contact?.firstName as string
+                                        }
+                                        lastNameOrSurname={
+                                          card?.billingAddressInfo?.contact
+                                            ?.lastNameOrSurname as string
+                                        }
+                                        companyOrOrganization={
+                                          card?.billingAddressInfo?.contact
+                                            ?.companyOrOrganization as string
+                                        }
                                         address1={addressGetters.getAddress1(address)}
                                         address2={addressGetters.getAddress2(address)}
                                         cityOrTown={addressGetters.getCityOrTown(address)}
@@ -833,7 +902,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                                       {selectedCardRadio === card?.cardInfo?.id &&
                                         !isCVVAddedForNewPayment && (
                                           <Box pt={2} width={'50%'}>
-                                            <FormControl sx={{ width: '100%' }}>
+                                            <FormControl sx={{ width: '50%' }}>
                                               <Controller
                                                 name="cvv"
                                                 control={control}
@@ -841,9 +910,10 @@ const PaymentStep = (props: PaymentStepProps) => {
                                                 render={({ field }) => {
                                                   return (
                                                     <KiboTextBox
+                                                      sx={{ background: '#ffffff' }}
                                                       type="password"
                                                       value={field.value || ''}
-                                                      label={t('security-code')}
+                                                      label={t('cvv-code')}
                                                       placeholder={t('security-code-placeholder')}
                                                       required={true}
                                                       onChange={(_, value) => {
@@ -858,7 +928,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                                                       icon={
                                                         <Box
                                                           pr={1}
-                                                          pt={0.5}
+                                                          pt={1}
                                                           sx={{ cursor: 'pointer' }}
                                                         >
                                                           <Tooltip
@@ -937,27 +1007,41 @@ const PaymentStep = (props: PaymentStepProps) => {
                     ) : null}
                     {shouldShowCardForm ? (
                       <>
-                        <CardDetailsForm
-                          validateForm={validateForm}
-                          onSaveCardData={handleCardFormData}
-                          onFormStatusChange={handleCardFormValidDetails}
-                        />
-
-                        {isAuthenticated ? (
-                          <FormControlLabel
-                            sx={{
-                              width: '100%',
-                              paddingLeft: '0.5rem',
-                            }}
-                            control={
-                              <Checkbox
-                                onChange={handleSavePaymentMethodCheckbox}
-                                data-testid="save-payment"
-                              />
-                            }
-                            label={`${t('save-payment-method-checkbox')}`}
+                        <StyledHeadings
+                          variant="h3"
+                          sx={{ fontWeight: '500', pb: 1.5, pt: 2, pl: 0, color: 'primary.main' }}
+                        >
+                          {t('add-new-credit-card')}
+                        </StyledHeadings>
+                        <Box sx={{ maxWidth: '24rem', pl: 0 }}>
+                          <CardDetailsForm
+                            validateForm={validateForm}
+                            onSaveCardData={handleCardFormData}
+                            onFormStatusChange={handleCardFormValidDetails}
                           />
-                        ) : null}
+
+                          {isAuthenticated ? (
+                            <FormControlLabel
+                              sx={{
+                                width: '100%',
+                                paddingLeft: 0,
+                                marginLeft: 0,
+                              }}
+                              control={
+                                <Checkbox
+                                  sx={{ pl: 0, ml: 0 }}
+                                  onChange={handleSavePaymentMethodCheckbox}
+                                  data-testid="save-payment"
+                                />
+                              }
+                              label={
+                                <Typography variant="body2">{`${t(
+                                  'save-payment-method-checkbox'
+                                )}`}</Typography>
+                              }
+                            />
+                          ) : null}
+                        </Box>
                       </>
                     ) : null}
                     {shouldShowPurchaseOrderForm ? (
@@ -972,17 +1056,30 @@ const PaymentStep = (props: PaymentStepProps) => {
                     ) : null}
                     {shouldShowBillingAddressForm ? (
                       <>
-                        <StyledHeadings variant="h2" sx={{ paddingTop: '3.125rem' }}>
+                        <StyledHeadings
+                          variant="h3"
+                          sx={{ fontWeight: '500', pb: 1.5, pt: 2, pl: 0, color: 'primary.main' }}
+                        >
                           {t('billing-address')}
                         </StyledHeadings>
                         {showBillingSameAsShippingAddressCheckbox() && (
                           <FormControlLabel
                             sx={{
                               width: '100%',
-                              paddingLeft: '0.5rem',
+                              paddingLeft: 0,
+                              marginLeft: 0,
                             }}
-                            control={<Checkbox name={`${t('billing-address-same-as-shipping')}`} />}
-                            label={`${t('billing-address-same-as-shipping')}`}
+                            control={
+                              <Checkbox
+                                sx={{ pl: 0, ml: 0 }}
+                                name={`${t('billing-address-same-as-shipping')}`}
+                              />
+                            }
+                            label={
+                              <Typography variant="body2">{`${t(
+                                'billing-address-same-as-shipping'
+                              )}`}</Typography>
+                            }
                             onChange={(_, value) => handleSameAsShippingAddressCheckbox(value)}
                           />
                         )}
@@ -995,11 +1092,38 @@ const PaymentStep = (props: PaymentStepProps) => {
                           validateForm={validateForm}
                           onFormStatusChange={handleBillingFormValidDetails}
                         />
-                        <Stack pl={1} gap={2} sx={{ width: { xs: '100%', md: '50%' } }}>
+                        <Divider orientation="horizontal" flexItem />
+                        <Stack
+                          pl={0}
+                          gap={2}
+                          mt={2}
+                          sx={{
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Button
                             variant="contained"
                             color="secondary"
                             onClick={cancelAddingNewPaymentMethod}
+                            sx={{
+                              width: '180px',
+                              background: 'transparent',
+                              color: 'primary.main',
+                              border: '1px solid primary.main',
+                              borderTopRightRadius: 26,
+                              borderBottomLeftRadius: 26,
+                              fontSize: '1rem',
+                              padding: '12px 18px',
+                              lineHeight: 1.4,
+                              '&:hover': {
+                                background: '#E3E2FF',
+                                color: '#4C47C4',
+                                border: '1px solid #E3E2FF',
+                              },
+                            }}
                           >
                             {t('cancel')}
                           </Button>
@@ -1008,8 +1132,24 @@ const PaymentStep = (props: PaymentStepProps) => {
                             color="primary"
                             {...(isAddPaymentMethodButtonDisabled() && { disabled: true })}
                             onClick={handleSaveNewPaymentMethod}
+                            sx={{
+                              width: 'auto',
+                              background: 'primary.main',
+                              color: '#ffffff',
+                              border: '1px solid primary.main',
+                              borderTopRightRadius: 26,
+                              borderBottomLeftRadius: 26,
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              lineHeight: 1.4,
+                              '&:hover': {
+                                background: '#4C47C4',
+                                color: '#FFFFFF',
+                                border: '1px solid #4C47C4',
+                              },
+                            }}
                           >
-                            {t('save-payment-method')}
+                            {t('save-credit-card')}
                           </Button>
                         </Stack>
                       </>
@@ -1019,10 +1159,25 @@ const PaymentStep = (props: PaymentStepProps) => {
                         <Button
                           variant="contained"
                           color="inherit"
-                          sx={{ width: { xs: '100%', sm: '50%' } }}
+                          sx={{
+                            width: 'auto',
+                            background: 'transparent',
+                            color: 'primary.main',
+                            border: '1px solid primary.main',
+                            borderTopRightRadius: 26,
+                            borderBottomLeftRadius: 26,
+                            fontSize: '1rem',
+                            padding: '12px 16px',
+                            lineHeight: 1.4,
+                            '&:hover': {
+                              background: '#E3E2FF',
+                              color: '#4C47C4',
+                              border: '1px solid #E3E2FF',
+                            },
+                          }}
                           onClick={handleAddPaymentMethod}
                         >
-                          {t('add-payment-method')}
+                          {t('add-new-card')}
                         </Button>
                       </Box>
                     ) : null}
@@ -1031,7 +1186,7 @@ const PaymentStep = (props: PaymentStepProps) => {
               </Box>
             )
           })}
-        </RadioGroup>
+        </TabContext>
       </FormControl>
     </Stack>
   )
