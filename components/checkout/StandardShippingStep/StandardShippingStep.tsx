@@ -352,7 +352,7 @@ const StandardShippingStep = (props: ShippingProps) => {
 
   return (
     <Stack data-testid="checkout-shipping" gap={2} ref={shippingAddressRef}>
-      <Typography variant="h2" component="h2" sx={{ color: 'primary.main', margin: '0px 8px' }}>
+      <Typography variant="h2" component="h2" sx={{ color: 'primary.main' }}>
         {t('shipping-address')}
       </Typography>
       {shouldShowAddAddressButton && (
@@ -477,7 +477,7 @@ const StandardShippingStep = (props: ShippingProps) => {
             />
           )} */}
 
-          <Box m={1} maxWidth={'872px'} data-testid="address-form" sx={{ marginTop: '-24px' }}>
+          <Box maxWidth={'872px'} data-testid="address-form" sx={{ marginTop: '-24px' }}>
             <Divider sx={{ marginBottom: '20px' }} />
             <Grid container>
               {/* <Grid item xs={6} gap={2} display={'flex'} direction={'column'}> */}
