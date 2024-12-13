@@ -217,7 +217,7 @@ const StandardShipCheckoutTemplate = (props: StandardShipCheckoutProps) => {
           pickupItems={pickupItems}
           digitalItems={digitalItems}
           // personalDetails={personalDetails}
-          orderSummaryProps={orderDetails?.orderSummary}
+          orderSummaryProps={orderDetails}
           onCreateOrder={handleCreateOrder}
         />
       </CheckoutUITemplate>

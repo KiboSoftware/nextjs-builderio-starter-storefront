@@ -62,7 +62,7 @@ const KiboSelect = (props: KiboSelectProps) => {
 
   return (
     <FormControl
-      sx={{ minWidth: 120, marginTop: label ? 3 : 0 }}
+      sx={{ minWidth: 120, marginTop: label ? 3 : 0, ...sx }}
       size="small"
       fullWidth
       variant="outlined"
@@ -102,9 +102,11 @@ const KiboSelect = (props: KiboSelectProps) => {
         onBlur={(event) => onBlur && onBlur(event.target.name, event.target.value)}
         {...rest}
       >
-        <MenuItem value={''} disabled sx={{ display: 'none' }}>
-          {placeholder}
-        </MenuItem>
+        {placeholder && (
+          <MenuItem value={''} disabled sx={{ display: 'none' }}>
+            {placeholder}
+          </MenuItem>
+        )}
         {children}
       </Select>
       {error && (

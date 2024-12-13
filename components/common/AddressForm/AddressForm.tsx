@@ -48,9 +48,11 @@ export const useFormSchema = () => {
       address1: yup.string().required(t('this-field-is-required')),
       address2: yup.string().nullable(true).notRequired(),
       cityOrTown: yup.string().required(t('this-field-is-required')),
-      stateOrProvince: yup.string().when('countryCode', {
-        is: CountryCode.US || CountryCode.CA,
-        then: yup.string().required(t('this-field-is-required')),
+      stateOrProvince: yup.string().when('countryCode', ([countryCode], schema) => {
+        if (countryCode == CountryCode.US) {
+          return schema.required(t('this-field-is-required'))
+        }
+        return schema
       }),
       postalOrZipCode: yup.string().when('countryCode', {
         is: CountryCode.US || CountryCode.CA,
