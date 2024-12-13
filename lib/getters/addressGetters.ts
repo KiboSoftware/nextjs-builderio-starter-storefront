@@ -52,6 +52,9 @@ const getFirstName = (contact?: GenericContact): string => contact?.firstName ||
 
 const getLastNameOrSurname = (contact?: GenericContact): string => contact?.lastNameOrSurname || ''
 
+const getCompanyOrOrganization = (contact?: GenericContact): string =>
+  contact?.companyOrOrganization || ''
+
 const getPhoneNumbers = (contact?: GenericContact) => getContactNumbers(contact?.phoneNumbers)
 
 const getEmail = (contact?: GenericContact): string => contact?.email || ''
@@ -89,6 +92,7 @@ export const addressGetters = {
   getCountryCode,
   getFirstName,
   getLastNameOrSurname,
+  getCompanyOrOrganization,
   getIsBillingShippingAddressSame,
   getStorePickupAddress,
   getPhoneNumbers,
