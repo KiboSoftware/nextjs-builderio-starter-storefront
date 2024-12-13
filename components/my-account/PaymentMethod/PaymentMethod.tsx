@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import Delete from '@mui/icons-material/Delete'
 import { Box, Button, Checkbox, FormControlLabel, NoSsr, Stack, Typography } from '@mui/material'
 import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
@@ -369,6 +370,9 @@ const PaymentMethod = (props: PaymentMethodProps) => {
                       {...addressGetters.getAddress(
                         each?.billingAddressInfo?.contact?.address as CrAddress
                       )}
+                      companyOrOrganization={
+                        each?.billingAddressInfo?.contact?.companyOrOrganization as string
+                      }
                     />
                     <Stack gap={1}>
                       {hasPermission(actions.EDIT_PAYMENTS) && (
@@ -382,13 +386,12 @@ const PaymentMethod = (props: PaymentMethodProps) => {
                         </Typography>
                       )}
                       {hasPermission(actions.DELETE_PAYMENTS) && (
-                        <Typography
-                          variant="body2"
-                          sx={{ cursor: 'pointer' }}
+                        <Delete
+                          sx={{ cursor: 'pointer', color: 'primary.main', marginTop: '1rem' }}
                           onClick={() => openDeleteConfirmation(each.cardInfo as SavedCard)}
                         >
                           {t('delete')}
-                        </Typography>
+                        </Delete>
                       )}
                     </Stack>
                   </Box>

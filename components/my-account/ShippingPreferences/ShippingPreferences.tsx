@@ -70,9 +70,12 @@ const ShippingPreferences = (props: MyProfileProps) => {
     return yup.object().shape({
       fedexNumber: yup
         .string()
-        .required(t('this-field-is-required'))
-        .matches(/^\S*$/, t('spaces-are-not-allowed'))
-        .length(9, t('please-enter-a-valid-account-number')), // Disallow spaces
+        .test(
+          'empty-or-length-9',
+          t('please-enter-a-valid-account-number'),
+          (value) => !value || value.length === 9 // Allow empty or length 9
+        )
+        .matches(/^\S*$/, t('spaces-are-not-allowed')), // Disallow spaces
     })
   }
 
@@ -116,7 +119,11 @@ const ShippingPreferences = (props: MyProfileProps) => {
     })
 
     const attributeDetails = await attributeData.json()
-    setFedexNumber(attributeDetails?.data?.values[0])
+    if (attributeDetails?.data?.values[0]) {
+      setFedexNumber(attributeDetails?.data?.values[0])
+    } else {
+      setFedexNumber('')
+    }
     setEditForm(false)
   }
 
@@ -154,12 +161,16 @@ const ShippingPreferences = (props: MyProfileProps) => {
                 <span className="material-symbols-outlined">edit</span>
               </Button>
             </Typography>
-            <Typography variant="body2" sx={{ color: 'gray.900' }}>
-              Customer Fedex Account Number
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'gray.900' }}>
-              {fedexNumber}
-            </Typography>
+            {fedexNumber && (
+              <>
+                <Typography variant="body2" sx={{ color: 'gray.900' }}>
+                  Customer Fedex Account Number
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'gray.900' }}>
+                  {fedexNumber}
+                </Typography>
+              </>
+            )}
           </Box>
         )}
 
@@ -184,11 +195,15 @@ const ShippingPreferences = (props: MyProfileProps) => {
                       name="fedexNumber"
                       value={field.value}
                       label={t('fedexNumber')}
-                      required
+                      required={false}
                       // eslint-disable-next-line jsx-a11y/no-autofocus
                       autoFocus={setAutoFocus}
                       onBlur={field.onBlur}
-                      onChange={(_name, value) => field.onChange(value)}
+                      onChange={(_name, value) => {
+                        // Remove spaces dynamically as the user types
+                        const sanitizedValue = value.replace(/\s/g, '')
+                        field.onChange(sanitizedValue)
+                      }}
                       error={!!errors?.fedexNumber}
                       helperText={errors?.fedexNumber?.message}
                       inputProps={{ maxLength: 9 }}
