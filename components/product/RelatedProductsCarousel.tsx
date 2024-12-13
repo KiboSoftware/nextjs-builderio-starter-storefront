@@ -43,7 +43,7 @@ const brandImages: Record<string, string> = {
 }
 
 const RelatedProductsCarousel = (props: any) => {
-  const { product } = props
+  const { relatedProducts } = props
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'))
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
@@ -61,9 +61,9 @@ const RelatedProductsCarousel = (props: any) => {
   const swiperRef = useRef<any>(null)
 
   const shouldShowArrows =
-    (isDesktop && product.length > 4) ||
-    (isTablet && product.length > 3) ||
-    (isMobile && product.length > 1)
+    (isDesktop && relatedProducts?.length > 4) ||
+    (isTablet && relatedProducts?.length > 3) ||
+    (isMobile && relatedProducts?.length > 1)
   const handleSwiperInit = (swiper: any) => {
     swiperRef.current = swiper
     setIsBeginning(swiper.isBeginning)
@@ -75,7 +75,7 @@ const RelatedProductsCarousel = (props: any) => {
     setIsEnd(swiper.isEnd)
   }
 
-  if (product.length > 0)
+  if (relatedProducts?.length > 0)
     return (
       <Box
         sx={{
@@ -104,7 +104,7 @@ const RelatedProductsCarousel = (props: any) => {
             onInit={handleSwiperInit}
             onSlideChange={handleSwiperSlideChange}
           >
-            {product.map((data: any, index: number) => {
+            {relatedProducts.map((data: any, index: number) => {
               const productName = data?.title
               const productCode = data?.productCode
               const brandImg = data?.brand?.value
