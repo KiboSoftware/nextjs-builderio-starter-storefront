@@ -73,7 +73,7 @@ const KiboSelect = (props: KiboSelectProps) => {
         <InputLabel
           shrink
           htmlFor={name}
-          sx={{ top: -18, left: -13, color: error ? 'error.main' : 'black' }}
+          sx={{ top: -18, left: -13, color: error ? 'error.main' : 'black', ...sx }}
         >
           {label}
         </InputLabel>
