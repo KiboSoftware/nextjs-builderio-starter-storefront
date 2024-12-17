@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import { AddressCard, KeyValueDisplay, PaymentCard } from '@/components/common'
 import { PageType, PaymentType } from '@/lib/constants'
 
-import { CrPurchaseOrderCustomField, CrPurchaseOrderPaymentTerm } from '@/lib/gql/types'
+import { CrPurchaseOrderCustomField, CrPurchaseOrderPaymentTerm, Maybe } from '@/lib/gql/types'
 
 interface PaymentBillingCardProps {
   showAddress?: boolean
@@ -24,7 +24,7 @@ interface PaymentBillingCardProps {
   purchaseOrderNumber?: string
   paymentTerm?: CrPurchaseOrderPaymentTerm
   paymentType?: string
-  poCustomFields?: CrPurchaseOrderCustomField[]
+  poCustomFields?: Maybe<CrPurchaseOrderCustomField[]>
 }
 
 const PaymentBillingCard = (props: PaymentBillingCardProps) => {

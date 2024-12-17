@@ -201,6 +201,8 @@ export const billingContactFragment = /* GraphQL */ `
     }
     phoneNumbers {
       home
+      mobile
+      work
     }
   }
 `
@@ -228,6 +230,7 @@ export const fullfillmentInfoFragment = /* GraphQL */ `
       middleNameOrInitial
       phoneNumbers {
         home
+        mobile
         work
       }
     }

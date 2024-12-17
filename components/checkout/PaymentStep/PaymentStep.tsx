@@ -89,6 +89,8 @@ import type {
   CustomerPurchaseOrderAccount,
   CheckoutGrouping,
   CustomerContact,
+  CrPurchaseOrderCustomField,
+  CrPaymentCardInput,
 } from '@/lib/gql/types'
 
 interface PaymentStepProps {
@@ -143,6 +145,7 @@ const initialPurchaseOrderFormData: any = {
   poNumber: '',
   purchaseOrderPaymentTerms: '',
   isPurchaseOrderFormValidated: false,
+  customFields: [],
 }
 
 const initialBillingAddressData: Address = {
@@ -353,19 +356,26 @@ const PaymentStep = (props: PaymentStepProps) => {
   const [validateForm, setValidateForm] = useState<boolean>(false)
 
   const checkoutBillingContact = orderGetters.getBillingContact(checkout as CrOrder)
-  const previouslySavedBillingAddress = userGetters.getUserBillingAddresses(
-    addressCollection?.items as CustomerContact[]
-  )
+
+  // getting billing address from all addresses returned from server
+  const userBillingAddress = isAuthenticated
+    ? userGetters.getUserBillingAddresses(addressCollection?.items as CustomerContact[])
+    : []
+  if (checkoutBillingContact && checkoutBillingContact.id === null) {
+    checkoutBillingContact.id = DefaultId.ADDRESSID
+  }
   const [savedBillingAddresses, setSavedBillingAddresses] = useState<CustomerContact[] | undefined>(
-    checkoutBillingContact
-      ? userGetters.getAllBillingAddresses(checkoutBillingContact, previouslySavedBillingAddress)
-      : previouslySavedBillingAddress
+    userGetters.getAllBillingAddresses(checkoutBillingContact, userBillingAddress)
   )
   const defaultBillingAddress = userGetters.getDefaultBillingAddress(
     savedBillingAddresses as CustomerContact[]
   )
+  const previouslySavedBillingAddress = userGetters.getOtherBillingAddress(
+    savedBillingAddresses as CustomerContact[],
+    defaultBillingAddress?.id as number
+  )
   const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<number>(
-    (checkoutBillingContact?.id || defaultBillingAddress?.id || DefaultId.ADDRESSID) as number
+    checkoutBillingContact?.id as number
   )
   const [isAddressFormValid, setIsAddressFormValid] = useState<boolean>(false)
 
@@ -411,8 +421,8 @@ const PaymentStep = (props: PaymentStepProps) => {
       )
       setBillingFormAddress({
         contact: (checkoutBillingContact?.id
-          ? checkoutBillingContact
-          : defaultBillingAddress) as ContactForm,
+          ? { ...checkoutBillingContact, email: checkout?.email }
+          : { ...defaultBillingAddress, email: checkout?.email }) as ContactForm,
         isSameBillingShippingAddress: value,
         isAddressValid: true,
       })
@@ -540,6 +550,7 @@ const PaymentStep = (props: PaymentStepProps) => {
       purchaseOrder: {
         purchaseOrderNumber: purchaseOrderFormData?.purchaseOrderNumber,
         paymentTerm: purchaseOrderFormData?.paymentTerm,
+        customFields: purchaseOrderFormData?.customFields,
       },
       billingAddressInfo: {
         ...billingFormAddress,
@@ -559,10 +570,13 @@ const PaymentStep = (props: PaymentStepProps) => {
         })
       }
 
-      selectedPaymentTypeRadio === PaymentType.CREDITCARD &&
+      if (selectedPaymentTypeRadio === PaymentType.CREDITCARD) {
         handleTokenization({ ...cardFormDetails })
-      selectedPaymentTypeRadio === PaymentType.PURCHASEORDER &&
+      }
+
+      if (selectedPaymentTypeRadio === PaymentType.PURCHASEORDER) {
         handlePurchaseOrderValidation({ ...purchaseOrderFormDetails })
+      }
     } catch (error) {
       setValidateForm(false)
       console.error(error)
@@ -696,6 +710,7 @@ const PaymentStep = (props: PaymentStepProps) => {
       const purchaseOrderDataWithNewStatus = {
         purchaseOrderNumber: paymentWithNewStatus?.billingInfo?.purchaseOrder?.purchaseOrderNumber,
         purchaseOrderPaymentTerms: paymentWithNewStatus?.billingInfo?.purchaseOrder?.paymentTerm,
+        customFields: paymentWithNewStatus?.billingInfo?.purchaseOrder?.customFields,
       }
 
       paymentActionToBeVoided = buildPurchaseOrderPaymentActionForCheckoutParams(
@@ -713,8 +728,18 @@ const PaymentStep = (props: PaymentStepProps) => {
       ...buildPurchaseOrderPaymentActionForCheckoutParams(
         CurrencyCode.US,
         checkout,
-        purchaseOrderData,
-        savedPaymentBillingDetailsForPurchaseOrder?.billingAddressInfo?.contact as CrContact,
+        {
+          ...purchaseOrderData,
+          customFields: purchaseOrderData?.customFields?.length
+            ? purchaseOrderData?.customFields
+            : purchaseOrderFormDetails?.customFields,
+        },
+        {
+          ...savedPaymentBillingDetailsForPurchaseOrder?.billingAddressInfo?.contact,
+          email:
+            savedPaymentBillingDetailsForPurchaseOrder?.billingAddressInfo?.contact?.email ||
+            checkout?.email,
+        } as CrContact,
         isSameAsShipping
       ),
       actionName: '',
@@ -746,7 +771,6 @@ const PaymentStep = (props: PaymentStepProps) => {
 
     const responseForAdd =
       selectedPaymentTypeRadio && (await paymentMethodSelection[selectedPaymentTypeRadio]())
-
     if (checkout?.id && responseForAdd?.paymentActionToBeAdded) {
       await onAddPayment(checkout.id, responseForAdd?.paymentActionToBeAdded)
       setStepStatusComplete()
@@ -778,13 +802,12 @@ const PaymentStep = (props: PaymentStepProps) => {
 
   const [isAddressSavedToAccount, setIsAddressSavedToAccount] = useState<boolean>(true)
   const [isNewAddressAdded, setIsNewAddressAdded] = useState<boolean>(false)
-  const [shouldShowAddAddressButton, setShouldShowAddAddressButton] = useState<boolean>(
-    Boolean(savedBillingAddresses?.length)
-  )
+  const [shouldShowAddBillingAddressButton, setShouldShowAddBillingAddressButton] =
+    useState<boolean>(Boolean(savedBillingAddresses?.length))
 
   const { createCustomerAddress } = useCreateCustomerAddress()
   const { updateOrderBillingInfo } = useUpdateOrderBillingInfo()
-  const handleSaveAddressToAccount = async (contact: CrContact) => {
+  const handleSaveBilingAddressToAccount = async (contact: CrContact) => {
     const address = {
       contact: {
         ...contact,
@@ -802,7 +825,7 @@ const PaymentStep = (props: PaymentStepProps) => {
     return createCustomerAddress.mutateAsync(params)
   }
 
-  const handleSaveAddressToCheckout = async ({ contact }: { contact: CrContact }) => {
+  const handleSaveBillingAddressToCheckout = async ({ contact }: { contact: CrContact }) => {
     try {
       // Directly modify the properties of `contact`
       contact.phoneNumbers = {
@@ -813,6 +836,7 @@ const PaymentStep = (props: PaymentStepProps) => {
         ...contact.address,
         addressType: 'Commercial', // Add addressType with value commercial
       }
+      contact.email = checkout?.email || user?.emailAddress
       if (!allowInvalidAddresses && contact?.address?.countryCode === CountryCode.US) {
         await validateCustomerAddress.mutateAsync({
           addressValidationRequestInput: { address: contact?.address as CuAddress },
@@ -820,26 +844,17 @@ const PaymentStep = (props: PaymentStepProps) => {
       }
 
       if (isAddressSavedToAccount) {
-        const customerSavedAddress = await handleSaveAddressToAccount(contact)
-        const { accountId: _, types: __, ...customerContact } = customerSavedAddress
-        await updateOrderBillingInfo.mutateAsync({
-          orderId: checkout?.id as string,
-          billingInfoInput: { billingContact: customerContact },
-        })
+        const customerSavedAddress = await handleSaveBilingAddressToAccount(contact)
         setSelectedBillingAddressId(customerSavedAddress?.id as number)
+        handleValidateBillingAddress(customerSavedAddress)
       } else {
-        await updateOrderBillingInfo.mutateAsync({
-          orderId: checkout?.id as string,
-          billingInfoInput: {
-            billingContact: contact,
-          },
-        })
         setSelectedBillingAddressId((contact?.id as number) || DefaultId.ADDRESSID)
+        handleValidateBillingAddress(contact as CuAddress)
       }
       setIsAddressSavedToAccount(false)
-      setShouldShowAddAddressButton(true)
-      setValidateForm(false)
+      setShouldShowAddBillingAddressButton(true)
       setIsNewAddressAdded(true)
+      setValidateForm(false)
       setStepStatusIncomplete()
     } catch (error: any) {
       setValidateForm(false)
@@ -847,7 +862,7 @@ const PaymentStep = (props: PaymentStepProps) => {
     }
   }
 
-  const handleAddressSelect = (addressId: string) => {
+  const handleBilingAddressSelect = (addressId: string) => {
     const selectedAddress = savedBillingAddresses?.find(
       (address) => address?.id === Number(addressId)
     )
@@ -857,7 +872,7 @@ const PaymentStep = (props: PaymentStepProps) => {
         firstName: selectedAddress?.firstName || '',
         lastNameOrSurname: selectedAddress?.lastNameOrSurname || '',
         middleNameOrInitial: selectedAddress?.middleNameOrInitial || '',
-        email: selectedAddress?.email || '',
+        email: selectedAddress?.email || checkout?.email,
         address: {
           ...(selectedAddress?.address as any),
         },
@@ -866,23 +881,23 @@ const PaymentStep = (props: PaymentStepProps) => {
         },
       }
 
-      setBillingFormAddress({
-        contact: contact as ContactForm,
-        isSameBillingShippingAddress: false,
-        isAddressValid: false,
-      })
+      handleSaveBillingAddressToCheckout({ contact: { ...contact, email: checkout?.email } })
       handleBillingFormValidDetails(true)
-      handleSaveAddressToCheckout({ contact })
+      handleBillingFormAddress({
+        contact: { ...contact, email: checkout?.email } as ContactForm,
+        isSameBillingShippingAddress: false,
+        isDataUpdated: true,
+      })
     }
   }
 
-  const handleAddNewAddress = () => {
+  const handleAddNewBillingAddress = () => {
     setValidateForm(false)
-    setShouldShowAddAddressButton(false)
+    setShouldShowAddBillingAddressButton(false)
     setIsNewAddressAdded(false)
     setSelectedBillingAddressId(0)
     setBillingFormAddress({
-      contact: initialBillingAddressData?.contact as ContactForm,
+      contact: { ...initialBillingAddressData?.contact, email: checkout?.email } as ContactForm,
       isSameBillingShippingAddress: false,
       isAddressValid: false,
     })
@@ -926,6 +941,9 @@ const PaymentStep = (props: PaymentStepProps) => {
     cardFormDetails.isDataUpdated,
     billingFormAddress.isDataUpdated,
     purchaseOrderFormDetails.isPurchaseOrderFormValidated,
+    isAddressFormValid,
+    purchaseOrderFormDetails?.customFields?.length,
+    validateForm,
   ])
 
   useEffect(() => {
@@ -1158,7 +1176,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                             <PaymentBillingCard
                               poCustomFields={
                                 savedPaymentBillingDetailsForPurchaseOrder?.purchaseOrder
-                                  ?.customFields
+                                  ?.customFields as CrPurchaseOrderCustomField[]
                               }
                               purchaseOrderNumber={
                                 savedPaymentBillingDetailsForPurchaseOrder?.purchaseOrder
@@ -1239,6 +1257,14 @@ const PaymentStep = (props: PaymentStepProps) => {
                     ) : null}
                     {shouldShowPurchaseOrderForm ? (
                       <PurchaseOrderForm
+                        customFields={
+                          savedPaymentBillingDetailsForPurchaseOrder?.purchaseOrder
+                            ?.customFields as CrPurchaseOrderCustomField[]
+                        }
+                        purchaseOrderNumber={
+                          savedPaymentBillingDetailsForPurchaseOrder?.purchaseOrder
+                            ?.purchaseOrderNumber as string
+                        }
                         creditLimit={creditLimit}
                         availableBalance={availableBalance}
                         validateForm={validateForm}
@@ -1287,66 +1313,78 @@ const PaymentStep = (props: PaymentStepProps) => {
                         {/**
                          * Show saved billing Address and add new address
                          */}
-                        {previouslySavedBillingAddress?.length && shouldShowAddAddressButton && (
-                          <>
-                            <KiboRadio
-                              radioOptions={previouslySavedBillingAddress?.map((address, index) => {
-                                return {
-                                  value: String(address.id),
-                                  name: String(address.id),
-                                  label: (
-                                    <AddressCard
-                                      key={`billing-address-${index}`}
-                                      firstName={address?.firstName as string}
-                                      middleNameOrInitial={address?.middleNameOrInitial as string}
-                                      lastNameOrSurname={address?.lastNameOrSurname as string}
-                                      companyOrOrganization={addressGetters.getCompanyOrOrganization(
-                                        address
-                                      )}
-                                      address1={address?.address?.address1 as string}
-                                      address2={address?.address?.address2 as string}
-                                      cityOrTown={address?.address?.cityOrTown as string}
-                                      stateOrProvince={address?.address?.stateOrProvince as string}
-                                      postalOrZipCode={address?.address?.postalOrZipCode as string}
-                                      variant="body2"
-                                    />
-                                  ),
-                                }
-                              })}
-                              selected={selectedBillingAddressId?.toString()}
-                              align="flex-start"
-                              addressCheckout={true}
-                              onChange={handleAddressSelect}
-                            />
-                            <NoSsr>
-                              {hasPermission(actions.CREATE_CONTACTS) &&
-                                shouldShowAddAddressButton && (
-                                  <Box>
-                                    <Button
-                                      sx={{
-                                        mt: 2,
-                                        padding: '12px 19px',
-                                        ...StandardShippingStepStyle.secondaryButton,
-                                      }}
-                                      onClick={handleAddNewAddress}
-                                    >
-                                      <Typography
+                        {previouslySavedBillingAddress?.length &&
+                          shouldShowAddBillingAddressButton && (
+                            <>
+                              <KiboRadio
+                                radioOptions={previouslySavedBillingAddress
+                                  .filter((savedAddress) => {
+                                    if (savedAddress?.id && savedAddress?.id > 0)
+                                      return savedAddress
+                                  })
+                                  ?.map((address, index) => {
+                                    return {
+                                      value: String(address.id),
+                                      name: String(address.id),
+                                      label: (
+                                        <AddressCard
+                                          key={`billing-address-${index}`}
+                                          firstName={address?.firstName as string}
+                                          middleNameOrInitial={
+                                            address?.middleNameOrInitial as string
+                                          }
+                                          lastNameOrSurname={address?.lastNameOrSurname as string}
+                                          companyOrOrganization={addressGetters.getCompanyOrOrganization(
+                                            address
+                                          )}
+                                          address1={address?.address?.address1 as string}
+                                          address2={address?.address?.address2 as string}
+                                          cityOrTown={address?.address?.cityOrTown as string}
+                                          stateOrProvince={
+                                            address?.address?.stateOrProvince as string
+                                          }
+                                          postalOrZipCode={
+                                            address?.address?.postalOrZipCode as string
+                                          }
+                                          variant="body2"
+                                        />
+                                      ),
+                                    }
+                                  })}
+                                selected={selectedBillingAddressId?.toString()}
+                                align="flex-start"
+                                addressCheckout={true}
+                                onChange={handleBilingAddressSelect}
+                              />
+                              <NoSsr>
+                                {hasPermission(actions.CREATE_CONTACTS) &&
+                                  shouldShowAddBillingAddressButton && (
+                                    <Box>
+                                      <Button
                                         sx={{
-                                          fontSize: '1rem',
-                                          lineHeight: '1.5rem',
-                                          fontWeight: '400',
+                                          mt: 2,
+                                          padding: '12px 19px',
+                                          ...StandardShippingStepStyle.secondaryButton,
                                         }}
+                                        onClick={handleAddNewBillingAddress}
                                       >
-                                        {t('add-new-address')}
-                                      </Typography>
-                                    </Button>
-                                  </Box>
-                                )}
-                            </NoSsr>
-                          </>
-                        )}
+                                        <Typography
+                                          sx={{
+                                            fontSize: '1rem',
+                                            lineHeight: '1.5rem',
+                                            fontWeight: '400',
+                                          }}
+                                        >
+                                          {t('add-new-address')}
+                                        </Typography>
+                                      </Button>
+                                    </Box>
+                                  )}
+                              </NoSsr>
+                            </>
+                          )}
 
-                        {!shouldShowAddAddressButton && (
+                        {!shouldShowAddBillingAddressButton && (
                           <>
                             <AddressForm
                               key={selectedPaymentTypeRadio}
@@ -1381,7 +1419,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                                       ...StandardShippingStepStyle.secondaryButton,
                                     }}
                                     onClick={() => {
-                                      setShouldShowAddAddressButton(true)
+                                      setShouldShowAddBillingAddressButton(true)
                                       setSelectedBillingAddressId(
                                         (checkoutBillingContact?.id ||
                                           defaultBillingAddress?.id) as number
@@ -1412,7 +1450,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                                     {...(!isAddressFormValid && { disabled: true })}
                                   >
                                     <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '400' }}>
-                                      {t('save-billing-address')}
+                                      {t('continue')}
                                     </Typography>
                                   </Button> */}
                                 </Grid>
@@ -1480,7 +1518,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                               },
                             }}
                           >
-                            {t('save-credit-card')}
+                            {t('continue')}
                           </Button>
                         </Stack>
                       </>

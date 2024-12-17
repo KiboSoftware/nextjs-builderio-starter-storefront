@@ -176,6 +176,7 @@ const getPurchaseOrderPaymentMethods = (order: CrOrder) => {
       return {
         purchaseOrderNumber: item?.billingInfo?.purchaseOrder?.purchaseOrderNumber,
         paymentTerms: item?.billingInfo?.purchaseOrder?.paymentTerm?.code,
+        customFields: item?.billingInfo?.purchaseOrder?.customFields,
       }
     })
 }
