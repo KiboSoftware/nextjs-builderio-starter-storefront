@@ -250,7 +250,6 @@ const ProductCardListView = (props: ProductCardListViewProps) => {
                 <KiboImage
                   src={imageUrl || brandImages[brand.toLowerCase()] || placeholderImageUrl}
                   alt={imageUrl ? imageAltText : 'no-image-alt'}
-                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 220px, 220px"
                   objectFit={
                     imageUrl ? 'contain' : brandImages[brand.toLowerCase()] ? 'none' : 'contain'
                   }

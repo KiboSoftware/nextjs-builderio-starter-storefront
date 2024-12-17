@@ -42,7 +42,7 @@ const PlpTextAttributes = (props: any) => {
   return (
     <Box>
       {visibleProperties.map((property, index) => (
-        <Box key={index} sx={{ display: 'flex' }}>
+        <Box key={index} sx={{ display: 'flex', alignItems: 'flex-start' }}>
           <Box
             sx={{
               fontSize: '14px',
@@ -52,6 +52,8 @@ const PlpTextAttributes = (props: any) => {
               fontWeight: '500',
               lineHeight: '22px',
               width: '25%',
+              wordWrap: 'break-word',
+              textAlign: 'left',
             }}
           >
             {property?.name}:
@@ -64,6 +66,9 @@ const PlpTextAttributes = (props: any) => {
               fontStyle: 'normal',
               fontWeight: '400',
               lineHeight: '22px',
+              width: 'calc(75% - 50px)',
+              wordWrap: 'break-word',
+              textAlign: 'left',
             }}
           >
             {property?.values}

@@ -116,7 +116,8 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                   label={t('card-number')}
                   required={true}
                   onChange={(_name, value) => {
-                    handleCardType(field, value)
+                    const sanitizedValue = value.replace(/\s/g, '')
+                    handleCardType(field, sanitizedValue)
                   }}
                   onBlur={field.onBlur}
                   error={!!errors?.cardNumber}
@@ -127,6 +128,7 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                     </Box>
                   }
                   {...(cardValue && { disabled: true })}
+                  inputProps={{ maxLength: 16 }}
                 />
               )}
             />

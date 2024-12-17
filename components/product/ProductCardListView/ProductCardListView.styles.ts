@@ -103,6 +103,7 @@ export const ProductCardStyles = {
     fontWeight: '300',
     lineHeight: 'normal',
     fontFamily: 'Poppins',
+    margin: 0,
   },
   catalogNum: {
     color: 'text.primary',

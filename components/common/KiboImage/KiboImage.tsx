@@ -36,10 +36,10 @@ const KiboImage = (props: KiboImageProps) => {
         objectFit: props.objectFit ?? 'contain',
         ...(props.alt === 'kibo-logo' && { position: 'relative' }),
         ...(mobileRatio && { width: 'inherit', height: 'inherit' }),
-        ...(props.alt === 'cardType' && mobileRatio && { width: '45px', height: '35px' }), // Apply only when mobile is true
+        ...(props.alt.includes('cardType') && mobileRatio && { width: '45px', height: '35px' }), // Apply only when mobile is true
       }}
-      // Only add the "fill" property if the alt is NOT "kibo-logo"
-      fill={props.alt !== 'kibo-logo' && props.alt !== 'cardType'}
+      // Only add the "fill" property if the alt is NOT "kibo-logo" or cardType
+      fill={props.alt !== 'kibo-logo' && !props.alt.includes('cardType')}
     />
   )
 }

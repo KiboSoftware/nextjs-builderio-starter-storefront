@@ -22,6 +22,7 @@ import Link from 'next/link'
 import router from 'next/router'
 import { useTranslation } from 'next-i18next'
 
+import CitationWidget from './CitationWidget'
 import ProductInventoryMessages from './ProductInventoryMessages'
 import ProductSpecifications from './ProductSpecifications'
 import { SortingValues } from '../../../lib/types/B2bTypes'
@@ -71,6 +72,7 @@ import fortis from '@/public/Brand_Logo/fortis-logo.png'
 import ipoc from '@/public/Brand_Logo/ipoc-logo.png'
 import nanocomposix from '@/public/Brand_Logo/nanocomposix-logo.png'
 import vector from '@/public/Brand_Logo/vector-logo.png'
+import GetThemeSettings from '@/src/pages/api/getThemeSettings'
 import theme from '@/styles/theme'
 
 import type {
@@ -81,7 +83,6 @@ import type {
   CrProduct,
   ProductPrice,
   Product,
-  Maybe,
 } from '@/lib/gql/types'
 
 const brandImages: Record<string, string> = {
@@ -210,6 +211,10 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   const [customCTATarget, setcustomTarget] = useState<string | null>('')
   const [stockBehaviour, setStockBehaviourArr] = useState<string | null>('')
   const [minimumStock, setMinimumStock] = useState<number>(0)
+  const [citationCountVariant, setCitationCountVariant] = useState<number>(0)
+  const [citeabProductCode, setCiteabProductCodeAttr] = useState<string | null>('')
+  const [keyVal, setKey] = useState(0)
+  const [citationApiKey, setCitationApiKey] = useState<string | null>('')
   // const [radioProductOptions, setRadioProductOptions] = useState<any>()
 
   const isSubscriptionModeAvailable = subscriptionGetters.isSubscriptionModeAvailable(product)
@@ -555,7 +560,6 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
   )
   const stockAvailable = currentlocationInventory?.data?.[0]?.stockAvailable || 0
   //console.log('currentlocationInventory', currentlocationInventory)
-
   useEffect(() => {
     const fetchDocumentData = async () => {
       const digitalDocRes = await getDocumentListDocuments(
@@ -602,7 +606,24 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       setVariantProductTitle(variantTitle as string)
     }
     mergeProductProperties()
+    forceRender()
   }, [product, currentProduct])
+
+  useEffect(() => {
+    const citationCountVariantAttr =
+      currentProduct?.properties?.find(
+        (data: any) => data?.attributeFQN === 'tenant~citation-count-variant'
+      )?.values?.[0]?.value || null
+    setCitationCountVariant(citationCountVariantAttr ? Number(citationCountVariantAttr) : 0)
+  }, [currentProduct])
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const settings = await GetThemeSettings()
+      setCitationApiKey(settings?.data?.citationsApiKey)
+    }
+    fetchSettings()
+  }, [])
 
   useEffect(() => {
     const skuStatusTextProperty = updatedProduct?.properties?.find(
@@ -632,6 +653,11 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       updatedProduct?.properties?.find((data: any) => data?.attributeFQN === 'tenant~minimum-stock')
         ?.values?.[0]?.value || null
 
+    const citeabProductCodeAttr =
+      updatedProduct?.properties?.find(
+        (data: any) => data?.attributeFQN === 'tenant~citeab-product-code'
+      )?.values?.[0]?.stringValue || null
+
     setSkuStatusText(
       skuStatusTextProperty ? String(skuStatusTextProperty?.values?.[0]?.value) : null
     )
@@ -641,6 +667,8 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     setcustomTarget(customCTATargetAttr ? String(customCTATargetAttr) : null)
     setStockBehaviourArr(stockBehaviourAttr ? String(stockBehaviourAttr) : null)
     setMinimumStock(minimumStockArr ? Number(minimumStockArr) : 0)
+
+    setCiteabProductCodeAttr(citeabProductCodeAttr ? String(citeabProductCodeAttr) : null)
   }, [updatedProduct])
 
   const availabilityMessageArr =
@@ -662,7 +690,11 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
     stockBehaviour?.toLowerCase() === 'denybackorder' &&
     stockAvailable >= minimumStock
       ? stockAvailable - minimumStock
-      : null
+      : undefined
+
+  const forceRender = () => {
+    setKey((prevKey) => prevKey + 1) // Change state to trigger re-render
+  }
 
   return (
     <Grid container>
@@ -1186,6 +1218,24 @@ const ProductDetailTemplate = (props: ProductDetailTemplateProps) => {
       {relatedProducts && relatedProducts.length > 0 ? (
         <RelatedProductsCarousel relatedProducts={relatedProducts} />
       ) : null}
+      
+      {/* Citations */}
+      {citationCountVariant && product?.productType === 'Antibody-Configurable' ? (
+        <Box
+          id="citation-document-section"
+          width={'100%'}
+          display={'flex'}
+          flexDirection={'row'}
+          key={keyVal}
+          marginBottom={'1.25rem'}
+        >
+          <CitationWidget
+            citeabProductCode={citeabProductCode}
+            variantProductName={variantProductName}
+            citationApiKey={citationApiKey}
+          />
+        </Box>
+       ) : null}
     </Grid>
   )
 }

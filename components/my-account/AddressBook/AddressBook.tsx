@@ -78,12 +78,13 @@ const styles = {
   },
 }
 const buildAddressProps = (customerContact: CustomerContact) => {
-  const { firstName, lastNameOrSurname, address } = customerContact
+  const { firstName, lastNameOrSurname, companyOrOrganization, address } = customerContact
   const { address1, address2, cityOrTown, stateOrProvince, postalOrZipCode } = address as CuAddress
   return {
     firstName: firstName as string,
     lastNameOrSurname: lastNameOrSurname as string,
     address1,
+    companyOrOrganization: companyOrOrganization as string,
     address2,
     cityOrTown,
     stateOrProvince,

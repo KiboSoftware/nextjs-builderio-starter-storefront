@@ -21,6 +21,7 @@ const PaymentCard = (props: PaymentCardProps) => {
   const { pageType, title, cardNumberPart, expireMonth, expireYear, cardType } = props
   const { t } = useTranslation('common')
   const cardTypeMemoized = useMemo(() => getCreditCardLogo(cardType as string), [cardType])
+  const alt = `cardType-${cardType as string}`
 
   return (
     <>
@@ -35,8 +36,10 @@ const PaymentCard = (props: PaymentCardProps) => {
             {cardTypeMemoized && (
               <KiboImage
                 src={cardTypeMemoized}
-                alt={cardType as string}
+                alt={alt}
                 style={{ width: '45px', height: '35px' }}
+                width={45}
+                height={35}
               />
             )}
           </Box>
