@@ -519,25 +519,26 @@ const PaymentStep = (props: PaymentStepProps) => {
     if (!tokenizedCardResponse) return
 
     setIsAddingNewPayment(false)
-
-    setCardOptions([
-      ...cardOptions,
-      {
-        cardInfo: {
-          id: tokenizedCardResponse.id,
-          cardNumberPart: tokenizedCardResponse.numberPart,
-          paymentType: PaymentType.CREDITCARD,
-          expireMonth: card.expireMonth,
-          expireYear: card.expireYear,
-          isCardInfoSaved: card.isCardInfoSaved,
-          cardType: card.cardType,
+    if (!isAddingNewPayment) {
+      setCardOptions([
+        ...cardOptions,
+        {
+          cardInfo: {
+            id: tokenizedCardResponse.id,
+            cardNumberPart: tokenizedCardResponse.numberPart,
+            paymentType: PaymentType.CREDITCARD,
+            expireMonth: card.expireMonth,
+            expireYear: card.expireYear,
+            isCardInfoSaved: card.isCardInfoSaved,
+            cardType: card.cardType,
+          },
+          billingAddressInfo: {
+            ...billingFormAddress,
+            isSameBillingShippingAddress: billingFormAddress.isSameBillingShippingAddress,
+          },
         },
-        billingAddressInfo: {
-          ...billingFormAddress,
-          isSameBillingShippingAddress: billingFormAddress.isSameBillingShippingAddress,
-        },
-      },
-    ])
+      ])
+    }
 
     setSelectedCardRadio(tokenizedCardResponse.id as string)
     setValidateForm(false)
@@ -981,6 +982,9 @@ const PaymentStep = (props: PaymentStepProps) => {
         purchaseOrderFormDetails.isPurchaseOrderFormValidated)
     )
   }
+  const uniqueCards = cardOptions.filter(
+    (card, index, self) => index === self.findIndex((c) => c?.cardInfo?.id === card?.cardInfo?.id)
+  )
 
   return (
     <Stack data-testid="checkout-payment">
@@ -1067,7 +1071,7 @@ const PaymentStep = (props: PaymentStepProps) => {
                             <KiboRadio
                               boxSx={{ p: 2 }}
                               sx={{ width: '100% !important' }}
-                              radioOptions={cardOptions?.map((card) => {
+                              radioOptions={uniqueCards?.map((card) => {
                                 const address = addressGetters.getAddress(
                                   card?.billingAddressInfo?.contact.address as CrAddress
                                 )

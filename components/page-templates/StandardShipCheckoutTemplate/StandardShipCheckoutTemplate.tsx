@@ -169,7 +169,8 @@ const StandardShipCheckoutTemplate = (props: StandardShipCheckoutProps) => {
         user?.id as number,
         savedCustomerAddressRes.id
       )
-      await createCustomerCard.mutateAsync(cardParams)
+      // code commented due to error
+      // await createCustomerCard.mutateAsync(cardParams)
     }
 
     router.push(

@@ -39,6 +39,9 @@ const buttonStyle = {
     color: '#FFFFFF',
     border: 0,
   },
+  '&:disabled': {
+    backgroundColor: '#8D8D8D !important',
+  },
 } as SxProps<Theme> | undefined
 
 const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITemplateProps<T>) => {
@@ -117,7 +120,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
             >
               {t('continue') || buttonLabels[activeStep]}
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               color="secondary"
               sx={{ ...buttonStyle, display: 'none' }}
@@ -126,7 +129,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
               disabled={activeStep === shippingStepIndex}
             >
               {t('go-back')}
-            </Button>
+            </Button> */}
           </Stack>
         )}
       </Stack>
@@ -147,7 +150,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
       >
         <OrderSummary {...orderSummaryArgs}></OrderSummary>
 
-        {activeStep === reviewStepIndex && (
+        {/* {activeStep === reviewStepIndex && (
           <OrderReview
             checkout={checkout as CrOrder}
             isMultiShipEnabled={isMultiShipEnabled}
@@ -155,7 +158,7 @@ const CheckoutUITemplate = <T extends CrOrder | Checkout>(props: CheckoutUITempl
             handleRemoveCouponCode={handleRemoveCouponCode}
             promoError={promoError}
           />
-        )}
+        )} */}
       </Box>
     </Stack>
   ) : null

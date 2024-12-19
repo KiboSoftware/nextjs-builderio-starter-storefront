@@ -88,8 +88,8 @@ const styles = {
     fontSize: '16px',
     fontWeight: 500,
     '&:disabled': {
-      color: '#020027 !important',
-      backgroundColor: '#EDEDED !important',
+      color: '#FFFFFF !important',
+      backgroundColor: '#8D8D8D !important',
     },
   },
   goBackButtonStyle: {
@@ -756,16 +756,17 @@ const ReviewStep = (props: ReviewStepProps) => {
         >
           {t('Place Order')}
         </LoadingButton>
-        <Button
+        {/* <Button
           variant="contained"
           color="secondary"
           sx={{
             ...styles.goBackButtonStyle,
+            display: 'none',
           }}
           onClick={() => setStepBack()}
         >
           {t('go-back')}
-        </Button>
+        </Button> */}
       </Stack>
     </Box>
   )
