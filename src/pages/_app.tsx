@@ -80,8 +80,6 @@ const App = (props: KiboAppProps) => {
     (googleReCaptcha as any)?.accountCreationSiteKey
   }`
 
-  console.log('This is pageprops', pageProps)
-
   return (
     <CacheProvider value={emotionCache}>
       <Head>

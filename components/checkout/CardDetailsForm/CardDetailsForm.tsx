@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import Help from '@mui/icons-material/Help'
-import { styled, FormControl, Box, Tooltip, Grid } from '@mui/material'
+import { styled, FormControl, Box, Grid } from '@mui/material'
 import creditCardType from 'credit-card-type'
 import { useTranslation } from 'next-i18next'
 import { useForm, Controller, ControllerRenderProps } from 'react-hook-form'
@@ -144,7 +143,13 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                   value={field.value || ''}
                   label={t('expires-mm-yyyy')}
                   required={true}
-                  onChange={(_name, value) => field.onChange(value)}
+                  onChange={(_name, value) => {
+                    if (value?.length > 1 && value?.length < 3) {
+                      field.onChange(`${value}/`)
+                    } else {
+                      field.onChange(value)
+                    }
+                  }}
                   onBlur={field.onBlur}
                   error={!!errors?.expiryDate}
                   helperText={errors?.expiryDate?.message as unknown as string}

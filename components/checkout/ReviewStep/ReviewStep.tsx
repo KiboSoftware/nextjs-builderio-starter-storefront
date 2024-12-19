@@ -39,7 +39,15 @@ import { useUpdateOrder, useUpdateUserOrder } from '@/hooks'
 import { addressGetters, checkoutGetters, orderGetters, productGetters } from '@/lib/getters'
 import { isPasswordValid } from '@/lib/helpers/validations/validations'
 
-import type { CrOrder, Maybe, Checkout, CrOrderItem, CrProduct, CrContact } from '@/lib/gql/types'
+import type {
+  CrOrder,
+  Maybe,
+  Checkout,
+  CrOrderItem,
+  CrProduct,
+  CrContact,
+  CrPurchaseOrderCustomField,
+} from '@/lib/gql/types'
 
 export interface PersonalDetails {
   email: Maybe<string> | undefined
@@ -80,8 +88,8 @@ const styles = {
     fontSize: '16px',
     fontWeight: 500,
     '&:disabled': {
-      color: '#020027 !important',
-      backgroundColor: '#EDEDED !important',
+      color: '#FFFFFF !important',
+      backgroundColor: '#8D8D8D !important',
     },
   },
   goBackButtonStyle: {
@@ -208,7 +216,7 @@ const ReviewStep = (props: ReviewStepProps) => {
   const showAccountFields: boolean = watch(['showAccountFields']).join('') === 'true'
   const userEnteredPassword: string = watch(['password']).join('')
 
-  const [instructionsValue, setInstructionsValue] = useState('')
+  const [instructionsValue, setInstructionsValue] = useState<string>('')
 
   const handleInstChange = (event: any) => {
     setInstructionsValue(event.target.value)
@@ -542,8 +550,18 @@ const ReviewStep = (props: ReviewStepProps) => {
                 </Box>
               ))}
               {purchaseOrderPaymentMethods?.map((method: any, index: number) => (
-                <Box display={'flex'} key={index}>
-                  <Typography variant="body2">PO Number: {method.purchaseOrderNumber}</Typography>
+                <Box display={'flex'} flexDirection={'column'} key={'po_payment_summary_' + index}>
+                  <Typography variant="body2">{`${t('po-number')} : ${
+                    method.purchaseOrderNumber
+                  }`}</Typography>
+                  {method?.customFields?.map((customField: CrPurchaseOrderCustomField) => {
+                    return (
+                      <Typography
+                        variant="body2"
+                        key={'po_payment_summ_ custom_field_' + customField?.code}
+                      >{`${customField?.label} : ${customField?.value}`}</Typography>
+                    )
+                  })}
                 </Box>
               ))}
             </Grid>
@@ -636,95 +654,94 @@ const ReviewStep = (props: ReviewStepProps) => {
           }
         />
 
-        {/*
-                  <Box>
-                    <FormControl>
-                      <Controller
-                        name="showAccountFields"
-                        control={control}
-                        defaultValue={personalDetails?.showAccountFields}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                inputProps={{
-                                  'aria-label': 'showAccountFields',
-                                }}
-                                data-testid="showAccountFields"
-                                size="medium"
-                                color="primary"
-                                disabled={isAuthenticated}
-                                value={field.value}
-                                onChange={(_name, value) => field.onChange(value)}
-                              />
-                            }
-                            label={t('i-want-to-create-an-account').toString()}
-                          />
-                        )}
-                      />
-                    </FormControl>
-                  </Box>
+        <Box>
+          <FormControl>
+            <Controller
+              name="showAccountFields"
+              control={control}
+              defaultValue={isAuthenticated ? false : personalDetails?.showAccountFields}
+              render={({ field }) => (
+                <FormControlLabel
+                  sx={{ display: isAuthenticated ? 'none' : 'none' }}
+                  control={
+                    <Checkbox
+                      inputProps={{
+                        'aria-label': 'showAccountFields',
+                      }}
+                      data-testid="showAccountFields"
+                      size="medium"
+                      color="primary"
+                      disabled={isAuthenticated}
+                      value={field.value || false}
+                      onChange={(_name, value) => field.onChange(value)}
+                    />
+                  }
+                  label={t('i-want-to-create-an-account').toString()}
+                />
+              )}
+            />
+          </FormControl>
+        </Box>
 
-                  {getValues()?.showAccountFields && (
-                    <FormControl>
-                      <Controller
-                        name="firstName"
-                        control={control}
-                        defaultValue={personalDetails?.firstName || ''}
-                        render={({ field }) => (
-                          <KiboTextBox
-                            value={field.value}
-                            label={t('first-name')}
-                            required
-                            sx={{ ...commonStyle }}
-                            onBlur={field.onBlur}
-                            onChange={(_name, value) => field.onChange(value)}
-                            error={!!errors?.firstName}
-                            helperText={errors?.firstName?.message as string}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="lastNameOrSurname"
-                        control={control}
-                        defaultValue={personalDetails?.lastNameOrSurname || ''}
-                        render={({ field }) => (
-                          <KiboTextBox
-                            value={field.value}
-                            label={t('last-name-or-sur-name')}
-                            required
-                            sx={{ ...commonStyle }}
-                            onBlur={field.onBlur}
-                            onChange={(_name, value) => field.onChange(value)}
-                            error={!!errors?.lastNameOrSurname}
-                            helperText={errors?.lastNameOrSurname?.message as string}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="password"
-                        control={control}
-                        defaultValue={personalDetails?.password || ''}
-                        render={({ field }) => (
-                          <KiboTextBox
-                            value={field.value}
-                            label={t('password')}
-                            required
-                            sx={{ ...commonStyle }}
-                            onBlur={field.onBlur}
-                            onChange={(_name, value) => field.onChange(value)}
-                            error={!!errors?.password}
-                            helperText={errors?.password?.message as string}
-                            type="password"
-                            placeholder="password"
-                          />
-                        )}
-                      />
+        {getValues()?.showAccountFields && (
+          <FormControl>
+            <Controller
+              name="firstName"
+              control={control}
+              defaultValue={personalDetails?.firstName || ''}
+              render={({ field }) => (
+                <KiboTextBox
+                  value={field.value}
+                  label={t('first-name')}
+                  required
+                  sx={{ ...commonStyle }}
+                  onBlur={field.onBlur}
+                  onChange={(_name, value) => field.onChange(value)}
+                  error={!!errors?.firstName}
+                  helperText={errors?.firstName?.message as string}
+                />
+              )}
+            />
+            <Controller
+              name="lastNameOrSurname"
+              control={control}
+              defaultValue={personalDetails?.lastNameOrSurname || ''}
+              render={({ field }) => (
+                <KiboTextBox
+                  value={field.value}
+                  label={t('last-name-or-sur-name')}
+                  required
+                  sx={{ ...commonStyle }}
+                  onBlur={field.onBlur}
+                  onChange={(_name, value) => field.onChange(value)}
+                  error={!!errors?.lastNameOrSurname}
+                  helperText={errors?.lastNameOrSurname?.message as string}
+                />
+              )}
+            />
+            <Controller
+              name="password"
+              control={control}
+              defaultValue={personalDetails?.password || ''}
+              render={({ field }) => (
+                <KiboTextBox
+                  value={field.value}
+                  label={t('password')}
+                  required
+                  sx={{ ...commonStyle }}
+                  onBlur={field.onBlur}
+                  onChange={(_name, value) => field.onChange(value)}
+                  error={!!errors?.password}
+                  helperText={errors?.password?.message as string}
+                  type="password"
+                  placeholder="password"
+                />
+              )}
+            />
 
-                      <PasswordValidation password={userEnteredPassword} />
-                    </FormControl>
-                  )}
-                  */}
+            <PasswordValidation password={userEnteredPassword} />
+          </FormControl>
+        )}
       </Box>
 
       <Stack direction="row" justifyContent="flex-end" alignItems="center">
@@ -739,16 +756,17 @@ const ReviewStep = (props: ReviewStepProps) => {
         >
           {t('Place Order')}
         </LoadingButton>
-        {/*<Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{
-                      ...styles.goBackButtonStyle,
-                    }}
-                    onClick={() => setStepBack()}
-                  >
-                    {t('go-back')}
-                  </Button>*/}
+        {/* <Button
+          variant="contained"
+          color="secondary"
+          sx={{
+            ...styles.goBackButtonStyle,
+            display: 'none',
+          }}
+          onClick={() => setStepBack()}
+        >
+          {t('go-back')}
+        </Button> */}
       </Stack>
     </Box>
   )

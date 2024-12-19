@@ -52,8 +52,6 @@ export const KiboRadio = (props: KiboRadioProps) => {
 
   const renderRadioOption = (radio: KiboRadioProps['radioOptions'][0], index: number) => {
     const isSelected = selected === radio.value
-    console.log('This is radio -->', radio)
-    console.log('This is radio label log -->', radio.label)
     const optionContent = (
       <Box
         key={radio.value + index}

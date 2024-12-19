@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import { AddressCard, KeyValueDisplay, PaymentCard } from '@/components/common'
 import { PageType, PaymentType } from '@/lib/constants'
 
-import { CrPurchaseOrderPaymentTerm } from '@/lib/gql/types'
+import { CrPurchaseOrderCustomField, CrPurchaseOrderPaymentTerm, Maybe } from '@/lib/gql/types'
 
 interface PaymentBillingCardProps {
   showAddress?: boolean
@@ -24,6 +24,7 @@ interface PaymentBillingCardProps {
   purchaseOrderNumber?: string
   paymentTerm?: CrPurchaseOrderPaymentTerm
   paymentType?: string
+  poCustomFields?: Maybe<CrPurchaseOrderCustomField[]>
 }
 
 const PaymentBillingCard = (props: PaymentBillingCardProps) => {
@@ -43,8 +44,8 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
     lastNameOrSurname,
     companyOrOrganization,
     purchaseOrderNumber,
-    paymentTerm,
     paymentType,
+    poCustomFields,
   } = props
   const { t } = useTranslation('common')
 
@@ -89,32 +90,51 @@ const PaymentBillingCard = (props: PaymentBillingCardProps) => {
 
       {paymentType === PaymentType.PURCHASEORDER && (
         <Box data-testid="purchase-order-card">
-          <KeyValueDisplay
-            option={{
-              name: t('po-number'),
-              value: purchaseOrderNumber,
-            }}
-            variant="body1"
-          />
-          <KeyValueDisplay
-            option={{
-              name: t('payment-terms'),
-              value: paymentTerm?.description,
-            }}
-            variant="body1"
-          />
-
-          <AddressCard
-            title={t('billing-address')}
-            variant={'body2'}
-            firstName={firstName}
-            lastNameOrSurname={lastNameOrSurname}
-            address1={address1}
-            address2={address2}
-            cityOrTown={cityOrTown}
-            stateOrProvince={postalOrZipCode}
-            postalOrZipCode={stateOrProvince}
-          />
+          <Box>
+            <KeyValueDisplay
+              variant={'body2'}
+              color="grey.900"
+              fontWeight={'normal'}
+              sx={{ fontSize: '1rem' }}
+              option={{
+                name: t('po-number') + ':',
+                value: purchaseOrderNumber,
+              }}
+            />
+            {poCustomFields?.map((customField) => {
+              return customField?.value ? (
+                <KeyValueDisplay
+                  variant={'body2'}
+                  color="grey.900"
+                  fontWeight={'normal'}
+                  sx={{ fontSize: '1rem' }}
+                  key={customField?.code}
+                  option={{
+                    name: customField?.label + ':',
+                    value: customField?.value,
+                  }}
+                />
+              ) : (
+                <></>
+              )
+            })}
+          </Box>
+          {showAddress && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', pt: 1, ml: 5 }}>
+              <AddressCard
+                title={t('billing-address')}
+                variant={'body2'}
+                firstName={firstName}
+                lastNameOrSurname={lastNameOrSurname}
+                companyOrOrganization={companyOrOrganization}
+                address1={address1}
+                address2={address2}
+                cityOrTown={cityOrTown}
+                stateOrProvince={postalOrZipCode}
+                postalOrZipCode={stateOrProvince}
+              />
+            </Box>
+          )}
         </Box>
       )}
     </Box>
