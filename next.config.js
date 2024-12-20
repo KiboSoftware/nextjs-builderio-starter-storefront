@@ -31,6 +31,7 @@ module.exports = {
       'cdn-tp3.mozu.com',
       'cdn-tp4.mozu.com',
       'cdn-sb.mozu.com',
+      'cdn-stg1.mozu.com',
       'encrypted-tbn0.gstatic.com',
       'images.ctfassets.net',
       'cdn.builder.io',
@@ -338,6 +339,7 @@ module.exports = {
         code: 'WY',
         name: 'Wyoming',
       },
+
     ],
     debounceTimeout: '1000',
     productListing: {

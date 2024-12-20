@@ -81,7 +81,7 @@ const RelatedProductsCarousel = (props: any) => {
         sx={{
           width: '100%',
           maxWidth: '1200px',
-          margin: '30px auto',
+          margin: '0 auto 25px auto',
         }}
       >
         <Typography variant="h3" sx={{ marginBottom: '18px' }}>
@@ -103,6 +103,7 @@ const RelatedProductsCarousel = (props: any) => {
             }}
             onInit={handleSwiperInit}
             onSlideChange={handleSwiperSlideChange}
+            style={{ width: 'auto' }}
           >
             {relatedProducts.map((data: any, index: number) => {
               const productName = data?.title
@@ -122,7 +123,15 @@ const RelatedProductsCarousel = (props: any) => {
 
               return (
                 <SwiperSlide key={index} style={{ width: '260px' }}>
-                  <Link href={productUrl} passHref data-testid="product-card-link">
+                  <Link
+                    href={productUrl}
+                    passHref
+                    data-testid="product-card-link"
+                    style={{
+                      display: isTablet || isMobile ? 'flex' : 'block',
+                      justifyContent: isTablet || isMobile ? 'center' : 'start',
+                    }}
+                  >
                     <Box>
                       <Card
                         sx={{
@@ -196,9 +205,9 @@ const RelatedProductsCarousel = (props: any) => {
                   left: 0,
                   transform: 'translateY(-50%)',
                   zIndex: 10,
-                  backgroundColor: isBeginning ? 'grey.300' : '#fff',
                   pointerEvents: isBeginning ? 'none' : 'auto',
                   color: isBeginning ? 'grey.500' : 'grey.900',
+                  padding: 0,
                 }}
               >
                 <ArrowBackIos />
@@ -211,9 +220,9 @@ const RelatedProductsCarousel = (props: any) => {
                   right: 0,
                   transform: 'translateY(-50%)',
                   zIndex: 10,
-                  backgroundColor: isEnd ? 'grey.300' : '#fff',
                   pointerEvents: isEnd ? 'none' : 'auto',
                   color: isEnd ? 'grey.500' : 'grey.900',
+                  padding: 0,
                 }}
               >
                 <ArrowForwardIos />

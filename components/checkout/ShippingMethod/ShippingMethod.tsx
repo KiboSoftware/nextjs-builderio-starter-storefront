@@ -195,6 +195,49 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
   const { updateUserData } = useUpdateCustomerProfile()
   const { createOrderAttributes } = useCreateOrderAttribute()
   const { updateOrderAttributes } = useUpdateOrderAttributes()
+
+  const updateFortisOrderAttribute = async (orderAttributeFQN: string, value: string) => {
+    // Update order attributes if found
+    const orderAttr = find(
+      checkout?.attributes,
+      (attr) => attr?.fullyQualifiedName === orderAttributeFQN
+    )
+
+    if (orderAttr) {
+      // Updating Order Attribute
+      await updateOrderAttributes.mutateAsync({
+        orderId: checkout?.id as string,
+        orderAttributeInput: [
+          {
+            fullyQualifiedName: orderAttributeFQN,
+            values: [value],
+          },
+        ],
+      })
+    } else {
+      // Adding Order Attribute
+      await createOrderAttributes.mutateAsync({
+        orderId: checkout?.id as string,
+        orderAttributeInput: [
+          {
+            fullyQualifiedName: orderAttributeFQN,
+            values: [value],
+          },
+        ],
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (customerAccount?.companyOrOrganization) {
+      updateFortisOrderAttribute('tenant~b2bAccountName', customerAccount?.companyOrOrganization)
+    }
+
+    if (fedExAccountNumber) {
+      updateFortisOrderAttribute('tenant~customerFedexAccountNumber', fedExAccountNumber)
+    }
+  }, [customerAccount?.companyOrOrganization, fedExAccountNumber])
+
   const handleFexExAccountShipping = async (
     customerAccount: CustomerAccount,
     fedExAccountNumber: string,
@@ -251,61 +294,6 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
           attributes: updatedCustomerAccountAttributes,
         },
       })
-
-      // Update order attributes
-      const fedExAccountNumberAttr = find(
-        checkout?.attributes,
-        (attr) => attr?.fullyQualifiedName === 'tenant~customerFedexAccountNumber'
-      )
-      const b2bAccountNameAttr = find(
-        checkout?.attributes,
-        (attr) => attr?.fullyQualifiedName === 'tenant~b2bAccountName'
-      )
-      if (fedExAccountNumberAttr || b2bAccountNameAttr) {
-        // Updating FedEx Account Number
-        await updateOrderAttributes.mutateAsync({
-          orderId: checkout?.id as string,
-          orderAttributeInput: [
-            {
-              fullyQualifiedName: 'tenant~customerFedexAccountNumber',
-              values: [fedExAccountNumber],
-            },
-          ],
-        })
-
-        // Updating B2B Account Name
-        await updateOrderAttributes.mutateAsync({
-          orderId: checkout?.id as string,
-          orderAttributeInput: [
-            {
-              fullyQualifiedName: 'tenant~b2bAccountName',
-              values: [customerAccount?.companyOrOrganization],
-            },
-          ],
-        })
-      } else {
-        // Adding FedEx Account Number
-        await createOrderAttributes.mutateAsync({
-          orderId: checkout?.id as string,
-          orderAttributeInput: [
-            {
-              fullyQualifiedName: 'tenant~customerFedexAccountNumber',
-              values: [fedExAccountNumber],
-            },
-          ],
-        })
-
-        // Adding B2B Account Name
-        await createOrderAttributes.mutateAsync({
-          orderId: checkout?.id as string,
-          orderAttributeInput: [
-            {
-              fullyQualifiedName: 'tenant~b2bAccountName',
-              values: [customerAccount?.companyOrOrganization],
-            },
-          ],
-        })
-      }
     } catch (error) {
       console.error(error)
     }

@@ -159,6 +159,7 @@ const ProductListingTemplate = (props: ProductListingTemplateProps) => {
       categoryCode !== undefined && seoFriendlyUrl
         ? `/products/${categoryCode}/${seoFriendlyUrl}/${productCode}`
         : `/product/${productCode}`
+    listItemUrl = productType === 'Resources' ? `/product/${productCode}` : listItemUrl
     // Append query parameter if sliceValue is present
     if (product?.sliceValue) {
       const separator = listItemUrl.includes('?') ? '&' : '?' // Check if the URL already has query params
