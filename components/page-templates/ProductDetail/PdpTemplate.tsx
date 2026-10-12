@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
@@ -157,6 +157,9 @@ const PdpTemplate = (props: PdpTemplateProps) => {
   const { user } = useAuthContext()
 
   const [descExpanded, setDescExpanded] = useState(false)
+  const descRef = useRef<HTMLDivElement>(null)
+  const [descFullHeight, setDescFullHeight] = useState(0)
+  const [descOverflows, setDescOverflows] = useState(true)
   const [copied, setCopied] = useState(false)
   const [showAllDocs, setShowAllDocs] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -411,6 +414,19 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     shortDescription ||
     getPropertyValues(findProperty(currentProduct, 'tenant~description-variant'))[0] ||
     getPropertyValues(findProperty(updatedProduct, 'tenant~target-sentence'))[0]
+
+  useEffect(() => {
+    const element = descRef.current
+    if (!element) return
+    const measure = () => {
+      const collapsedHeight = parseFloat(getComputedStyle(element).lineHeight) * 3
+      setDescFullHeight(element.scrollHeight)
+      setDescOverflows(element.scrollHeight > collapsedHeight + 1)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [descriptionHtml])
 
   const handleCopy = async () => {
     if (!catalogNumber) return
@@ -873,17 +889,23 @@ const PdpTemplate = (props: PdpTemplateProps) => {
           <section className={styles.description}>
             <h2 className={styles.heading}>Product Description</h2>
             <div
-              className={`${styles.clamp} ${descExpanded ? styles.clampExpanded : ''}`}
+              ref={descRef}
+              className={`${styles.clamp} ${
+                descExpanded || !descOverflows ? styles.clampExpanded : ''
+              }`}
+              style={descExpanded && descFullHeight ? { maxHeight: descFullHeight } : undefined}
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
-            <button
-              type="button"
-              className={`${styles.seeMore} ${descExpanded ? styles.seeMoreExpanded : ''}`}
-              onClick={() => setDescExpanded(!descExpanded)}
-            >
-              <span>{descExpanded ? 'See less' : 'See more'}</span>
-              <Arrow />
-            </button>
+            {descOverflows ? (
+              <button
+                type="button"
+                className={`${styles.seeMore} ${descExpanded ? styles.seeMoreExpanded : ''}`}
+                onClick={() => setDescExpanded(!descExpanded)}
+              >
+                <span>{descExpanded ? 'See less' : 'See more'}</span>
+                <Arrow />
+              </button>
+            ) : null}
           </section>
         ) : null}
 
