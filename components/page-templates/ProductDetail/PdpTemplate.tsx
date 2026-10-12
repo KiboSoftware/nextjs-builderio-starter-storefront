@@ -305,7 +305,10 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     : Boolean(ousShowPrices)
 
   const discountPercent =
-    productPrice?.special && productPrice?.regular && productPrice.special < productPrice.regular
+    priceVisible &&
+    productPrice?.special &&
+    productPrice?.regular &&
+    productPrice.special < productPrice.regular
       ? Math.round(((productPrice.regular - productPrice.special) / productPrice.regular) * 100)
       : null
 

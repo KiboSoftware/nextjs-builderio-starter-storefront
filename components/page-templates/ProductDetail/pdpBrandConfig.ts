@@ -67,7 +67,7 @@ const DEFAULT_HERO_FACTS: PdpHeroFactConfig[] = [
 
 export const PDP_BRAND_CONFIGS: Record<PdpBrandKey, PdpBrandConfig> = {
   arista: {
-    leftSections: ['description', 'pairing', 'specs', 'documents'],
+    leftSections: ['description', 'pairing', 'specs', 'applications', 'documents'],
     belowSections: DEFAULT_BELOW_SECTIONS,
     mobileBarVariant: 'sample',
     brandCardStars: true,
