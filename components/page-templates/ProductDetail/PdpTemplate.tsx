@@ -589,30 +589,35 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     </>
   )
 
-  const secondaryButtons = (
+  const sampleCtas = brandContent.secondaryCtas.filter((cta) => !cta.bulk)
+  const bulkCtas = brandContent.secondaryCtas.filter((cta) => cta.bulk)
+  const hasBulkButtons = bulkCtas.length > 0 || Boolean(bulkQuoteHref)
+  const showMobileSample = brandConfig.mobileBarVariant === 'sample' && sampleCtas.length > 0
+
+  const sampleButtons = sampleCtas.map((cta) => (
+    <Link
+      key={cta.label}
+      href={cta.href}
+      className={cta.variant === 'filled' ? styles.sampleBtn : styles.bulkBtn}
+    >
+      {cta.label}
+    </Link>
+  ))
+
+  const bulkButtons = (
     <>
-      {brandContent.secondaryCtas.map((cta) =>
-        cta.bulk ? (
-          <Link
-            key={cta.label}
-            href={bulkFormHref ?? cta.href}
-            className={`${styles.bulkBtn} ${bulkTrackingClass}`}
-            data-insights-object-id={variationProductCode}
-            data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
-            data-insights-index="products"
-          >
-            {cta.label}
-          </Link>
-        ) : (
-          <Link
-            key={cta.label}
-            href={cta.href}
-            className={cta.variant === 'filled' ? styles.sampleBtn : styles.bulkBtn}
-          >
-            {cta.label}
-          </Link>
-        )
-      )}
+      {bulkCtas.map((cta) => (
+        <Link
+          key={cta.label}
+          href={bulkFormHref ?? cta.href}
+          className={`${styles.bulkBtn} ${bulkTrackingClass}`}
+          data-insights-object-id={variationProductCode}
+          data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
+          data-insights-index="products"
+        >
+          {cta.label}
+        </Link>
+      ))}
 
       {bulkQuoteHref ? (
         <Link
@@ -628,6 +633,23 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     </>
   )
 
+  const secondaryButtons = (
+    <>
+      {sampleButtons}
+      {bulkButtons}
+    </>
+  )
+
+  const inventoryMessages = (
+    <ProductInventoryMessages
+      product={currentProduct}
+      inventoryInfo={currentlocationInventory}
+      stockAvailable={stockAvailable}
+      availabilityMessageArr={availabilityMessageArr}
+      countryCode={'US'}
+    />
+  )
+
   const buyPanel = (
     <div className={styles.buyPanel}>
       <PdpVariantPicker
@@ -641,15 +663,7 @@ const PdpTemplate = (props: PdpTemplateProps) => {
 
       {isUsVisitor ? (
         <>
-          <div style={{ marginTop: '14px' }}>
-            <ProductInventoryMessages
-              product={currentProduct}
-              inventoryInfo={currentlocationInventory}
-              stockAvailable={stockAvailable}
-              availabilityMessageArr={availabilityMessageArr}
-              countryCode={'US'}
-            />
-          </div>
+          <div style={{ marginTop: '14px' }}>{inventoryMessages}</div>
 
           {skuStatusText === 'CustomCTA' ? (
             <Link
@@ -746,52 +760,55 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     />
   )
 
+  const mediaCodeRow = catalogNumber ? (
+    <div className={styles.mediaCodeRow}>
+      <span className={styles.mediaSku}>{catalogNumber}</span>
+      <button type="button" className={styles.copyChip} onClick={handleCopy}>
+        {copied ? 'Copied' : 'Copy'}
+      </button>
+    </div>
+  ) : null
+
+  const mediaLinkRow =
+    hasDocuments || hasCitations ? (
+      <div className={styles.mediaLinkRow}>
+        {hasDocuments ? (
+          <a
+            href="#document-section"
+            onClick={(event) => {
+              event.preventDefault()
+              scrollToSection('document-section')
+            }}
+          >
+            <DocIcon />
+            <span>
+              {brandConfig.documentsLinkWithCode && catalogNumber
+                ? `Documents (${catalogNumber})`
+                : 'Product Documents'}
+            </span>
+          </a>
+        ) : null}
+        {hasCitations ? (
+          <a
+            href="#citation-document-section"
+            onClick={(event) => {
+              event.preventDefault()
+              scrollToSection('citation-document-section')
+            }}
+          >
+            <DocIcon />
+            <span>Citations ({citationCountVariant})</span>
+          </a>
+        ) : null}
+      </div>
+    ) : null
+
   const mediaCardInner = (
     <>
       <div className={styles.mediaTop}>
         {gallery}
-
-        {catalogNumber ? (
-          <div className={styles.mediaCodeRow}>
-            <span className={styles.mediaSku}>{catalogNumber}</span>
-            <button type="button" className={styles.copyChip} onClick={handleCopy}>
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-          </div>
-        ) : null}
-
-        {hasDocuments || hasCitations ? (
-          <div className={styles.mediaLinkRow}>
-            {hasDocuments ? (
-              <a
-                href="#document-section"
-                onClick={(event) => {
-                  event.preventDefault()
-                  scrollToSection('document-section')
-                }}
-              >
-                <DocIcon />
-                <span>
-                  {brandConfig.documentsLinkWithCode && catalogNumber
-                    ? `Documents (${catalogNumber})`
-                    : 'Product Documents'}
-                </span>
-              </a>
-            ) : null}
-            {hasCitations ? (
-              <a
-                href="#citation-document-section"
-                onClick={(event) => {
-                  event.preventDefault()
-                  scrollToSection('citation-document-section')
-                }}
-              >
-                <DocIcon />
-                <span>Citations ({citationCountVariant})</span>
-              </a>
-            ) : null}
-          </div>
-        ) : null}
+        {mediaCodeRow}
+        {mediaLinkRow}
       </div>
       {buyPanel}
       <div className={styles.supportPanel}>{supportRows}</div>
@@ -1188,7 +1205,18 @@ const PdpTemplate = (props: PdpTemplateProps) => {
             ) : null}
 
             <div className={styles.mobileGalleryMount}>
-              <div className={styles.mediaTop}>{gallery}</div>
+              {brandConfig.mobileMediaDetails ? (
+                <div className={`${styles.mediaTop} ${styles.mobileMediaDetails}`}>
+                  {mediaCodeRow}
+                  {gallery}
+                  {mediaLinkRow}
+                </div>
+              ) : (
+                <div className={styles.mediaTop}>{gallery}</div>
+              )}
+              {isUsVisitor ? (
+                <div className={styles.mobileInventoryMessages}>{inventoryMessages}</div>
+              ) : null}
               {hasExtraOptions ? (
                 <div className={styles.mobileExtraOptions}>{extraOptionControls}</div>
               ) : null}
@@ -1214,14 +1242,18 @@ const PdpTemplate = (props: PdpTemplateProps) => {
         <div className={styles.mobileDrawer}>
           <div className={styles.mobileDrawerScroll}>
             {!isUsVisitor ? <p className={styles.mobileDrawerNote}>{distributorNote}</p> : null}
-            <div className={styles.mobileDrawerCtas}>{secondaryButtons}</div>
+            {hasBulkButtons ? <div className={styles.mobileDrawerCtas}>{bulkButtons}</div> : null}
             <div className={styles.mobileSupportWrap}>
               <div className={styles.supportPanel}>{supportRows}</div>
             </div>
             <div className={styles.mobileBrandWrap}>{brandCard}</div>
           </div>
         </div>
-        <div className={`${styles.mobileBar} ${styles.mobileBarActive}`}>
+        <div
+          className={`${styles.mobileBar} ${styles.mobileBarActive} ${
+            showMobileSample ? styles.mobileBarWithSample : ''
+          }`}
+        >
           <button
             type="button"
             className={styles.mobileDrawerToggle}
@@ -1234,6 +1266,14 @@ const PdpTemplate = (props: PdpTemplateProps) => {
             </svg>
           </button>
 
+          {showMobileSample
+            ? sampleCtas.map((cta) => (
+                <Link key={cta.label} href={cta.href} className={styles.mobileSampleBtn}>
+                  {cta.label}
+                </Link>
+              ))
+            : null}
+
           <PdpMobileSizePicker
             options={variantOptions}
             selected={selectedVariant}
@@ -1245,9 +1285,19 @@ const PdpTemplate = (props: PdpTemplateProps) => {
             <>
               <button
                 type="button"
-                className={styles.mobileCartBtn}
+                className={`${styles.mobileCartBtn} ${
+                  algoliaQueryId ? 'add-to-cart-button-search' : 'add-to-cart-button'
+                }`}
                 onClick={() => handleAddToCart()}
                 disabled={addToCart.isPending}
+                data-insights-object-id={variationProductCode}
+                data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
+                data-insights-object-data={
+                  algoliaObjectData ? JSON.stringify(algoliaObjectData) : undefined
+                }
+                data-insights-product-price={JSON.stringify(addtocartvalue)}
+                data-insights-currency={JSON.stringify('USD')}
+                data-insights-index="products"
               >
                 {t('add-to-cart')}
               </button>
@@ -1274,7 +1324,15 @@ const PdpTemplate = (props: PdpTemplateProps) => {
               </div>
             </>
           ) : skuStatusText === 'CustomCTA' || ousShowDistributorBtn ? (
-            <Link href={ctaHref} className={styles.mobileCartBtn}>
+            <Link
+              href={ctaHref}
+              className={`${styles.mobileCartBtn} ${
+                algoliaQueryId ? 'custom-CTA-button-search' : 'custom-CTA-button'
+              }`}
+              data-insights-object-id={variationProductCode}
+              data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
+              data-insights-index="products"
+            >
               {ousShowDistributorBtn ? t('distributors') : customCTALabel}
             </Link>
           ) : null}
