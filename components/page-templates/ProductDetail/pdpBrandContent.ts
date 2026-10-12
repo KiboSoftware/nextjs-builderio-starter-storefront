@@ -45,6 +45,7 @@ export interface PdpSecondaryCta {
   label: string
   href: string
   variant: 'filled' | 'outline'
+  bulk?: boolean
 }
 
 export interface PdpBrandContent {
@@ -167,7 +168,7 @@ export const PDP_BRAND_CONTENT: Record<PdpBrandKey, PdpBrandContent> = {
     publicationCta: SHARED_PUBLICATION_CTA,
     secondaryCtas: [
       { label: 'Request a Sample', href: '/contact-us', variant: 'filled' },
-      { label: 'Order in Bulk', href: '/bulk-custom-oem', variant: 'outline' },
+      { label: 'Order in Bulk', href: '/bulk-custom-oem', variant: 'outline', bulk: true },
     ],
     relatedCtaLabel: 'View Product',
     services: [
@@ -236,7 +237,9 @@ export const PDP_BRAND_CONTENT: Record<PdpBrandKey, PdpBrandContent> = {
       href: 'https://www.fortislife.com/bethyl-laboratories',
     },
     publicationCta: SHARED_PUBLICATION_CTA,
-    secondaryCtas: [{ label: 'Bulk Request', href: '/bulk-custom-oem', variant: 'outline' }],
+    secondaryCtas: [
+      { label: 'Bulk Request', href: '/bulk-custom-oem', variant: 'outline', bulk: true },
+    ],
     relatedCtaLabel: 'See Product Details',
     services: ANTIBODY_SERVICES,
     resources: ANTIBODY_RESOURCES,
@@ -253,7 +256,9 @@ export const PDP_BRAND_CONTENT: Record<PdpBrandKey, PdpBrandContent> = {
       ],
     },
     publicationCta: SHARED_PUBLICATION_CTA,
-    secondaryCtas: [{ label: 'Bulk Request', href: '/bulk-custom-oem', variant: 'outline' }],
+    secondaryCtas: [
+      { label: 'Bulk Request', href: '/bulk-custom-oem', variant: 'outline', bulk: true },
+    ],
     relatedCtaLabel: 'See Product Details',
     services: ANTIBODY_SERVICES,
     resources: ANTIBODY_RESOURCES,

@@ -311,12 +311,16 @@ const PdpTemplate = (props: PdpTemplateProps) => {
 
   const brandContent = getPdpBrandContent(brandKey)
   const bulkQuoteCode = variationCodeDynamic || variationProductCode
-  const bulkQuoteHref =
-    !brandContent.secondaryCtas.length && sectionTargetUrl && bulkQuoteCode
+  const bulkFormHref =
+    sectionTargetUrl && bulkQuoteCode
       ? `/${String(sectionTargetUrl).replace(/^\//, '')}?Catalog_Num=${encodeURIComponent(
           bulkQuoteCode
         )}`
       : null
+  const bulkQuoteHref = !brandContent.secondaryCtas.length ? bulkFormHref : null
+  const bulkTrackingClass = algoliaQueryId
+    ? 'bulk-and-custom-button-search'
+    : 'bulk-and-custom-button'
   const brandConfig = getPdpBrandConfig(brandKey)
 
   const validationText = getPropertyValues(
@@ -511,8 +515,10 @@ const PdpTemplate = (props: PdpTemplateProps) => {
           </>
         )
 
-        return row.href ? (
-          <Link className={styles.supportRow} key={row.id} href={row.href}>
+        const rowHref = row.id === 'bulk' && bulkFormHref ? bulkFormHref : row.href
+
+        return rowHref ? (
+          <Link className={styles.supportRow} key={row.id} href={rowHref}>
             {rowContent}
           </Link>
         ) : (
@@ -585,22 +591,33 @@ const PdpTemplate = (props: PdpTemplateProps) => {
 
   const secondaryButtons = (
     <>
-      {brandContent.secondaryCtas.map((cta) => (
-        <Link
-          key={cta.label}
-          href={cta.href}
-          className={cta.variant === 'filled' ? styles.sampleBtn : styles.bulkBtn}
-        >
-          {cta.label}
-        </Link>
-      ))}
+      {brandContent.secondaryCtas.map((cta) =>
+        cta.bulk ? (
+          <Link
+            key={cta.label}
+            href={bulkFormHref ?? cta.href}
+            className={`${styles.bulkBtn} ${bulkTrackingClass}`}
+            data-insights-object-id={variationProductCode}
+            data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
+            data-insights-index="products"
+          >
+            {cta.label}
+          </Link>
+        ) : (
+          <Link
+            key={cta.label}
+            href={cta.href}
+            className={cta.variant === 'filled' ? styles.sampleBtn : styles.bulkBtn}
+          >
+            {cta.label}
+          </Link>
+        )
+      )}
 
       {bulkQuoteHref ? (
         <Link
           href={bulkQuoteHref}
-          className={`${styles.bulkBtn} ${
-            algoliaQueryId ? 'bulk-and-custom-button-search' : 'bulk-and-custom-button'
-          }`}
+          className={`${styles.bulkBtn} ${bulkTrackingClass}`}
           data-insights-object-id={variationProductCode}
           data-insights-query-id={algoliaQueryId ? algoliaQueryId : undefined}
           data-insights-index="products"
