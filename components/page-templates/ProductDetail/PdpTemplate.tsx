@@ -1147,7 +1147,7 @@ const PdpTemplate = (props: PdpTemplateProps) => {
               <article className={styles.resourceCard} key={resource.id}>
                 <img className={styles.resourceIcon} src={resource.icon} alt="" />
                 <h3>{resource.title}</h3>
-                <Link href={resource.href}>
+                <Link href={resource.href} target={resource.newTab ? '_blank' : undefined}>
                   <span>{resource.ctaLabel}</span>
                   <Arrow />
                 </Link>

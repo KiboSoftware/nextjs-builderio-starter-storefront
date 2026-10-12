@@ -32,6 +32,7 @@ export interface PdpResourceCard {
   ctaLabel: string
   href: string
   icon: string
+  newTab?: boolean
 }
 
 export interface PdpPublicationCta {
@@ -199,25 +200,28 @@ export const PDP_BRAND_CONTENT: Record<PdpBrandKey, PdpBrandContent> = {
     ],
     resources: [
       {
-        id: 'fertility-webinar',
-        title: 'Reagent Selection For Fertility Rapid Tests',
-        ctaLabel: 'Watch the Webinar',
-        href: '/resources',
-        icon: '/pdp/resources/video-on.svg',
-      },
-      {
-        id: 'matched-pairs',
-        title: 'Matched Pairs For Rapid Test Development',
-        ctaLabel: 'Read the White Paper',
-        href: '/resources',
-        icon: '/pdp/resources/file-02.svg',
-      },
-      {
         id: 'control-line-systems',
         title: 'Control Line Systems for Lateral Flow Assays',
         ctaLabel: 'Read the Article',
         href: '/resources/antibody-resources/control-line-systems-for-lateral-flow-assays',
         icon: '/pdp/resources/file-05.svg',
+      },
+      {
+        id: 'lfa-development-guide',
+        title: 'Lateral Flow Assay Development Guide',
+        ctaLabel: 'Read the Guide',
+        href: 'https://nanocomposix.com/pages/lateral-flow-assay-development-guide',
+        icon: '/pdp/resources/file-02.svg',
+        newTab: true,
+      },
+      {
+        id: 'gold-nanoshells-sensitivity',
+        title:
+          'Enhancing Sensitivity in Lateral Flow Assays Using Passively Conjugated Gold Nanoshells',
+        ctaLabel: 'Read the Article',
+        href: 'https://nanocomposix.com/pages/enhancing-sensitivity-with-passively-conjugated-gold-nanoshells',
+        icon: '/pdp/resources/file-check-02.svg',
+        newTab: true,
       },
     ],
   },
