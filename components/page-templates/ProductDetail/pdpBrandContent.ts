@@ -216,7 +216,7 @@ export const PDP_BRAND_CONTENT: Record<PdpBrandKey, PdpBrandContent> = {
         id: 'control-line-systems',
         title: 'Control Line Systems for Lateral Flow Assays',
         ctaLabel: 'Read the Article',
-        href: '/resources',
+        href: '/resources/antibody-resources/control-line-systems-for-lateral-flow-assays',
         icon: '/pdp/resources/file-05.svg',
       },
     ],
