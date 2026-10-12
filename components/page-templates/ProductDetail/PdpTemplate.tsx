@@ -367,12 +367,17 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     if (label) chips.push({ label, variant: 'outline' })
   })
 
+  const formatVariantPrice = (price: any): string | null => {
+    const amount = price?.salePrice ?? price?.price
+    return amount != null ? `$${amount.toFixed(2)}` : null
+  }
+
   const toVariantOptions = (option: any): PdpVariantOption[] =>
     (option?.values ?? []).map((value: any) => ({
       value: value?.value,
       label: value?.stringValue || value?.value,
       sku: value?.variationProductCode,
-      price: value?.price?.price != null ? `$${value.price.price.toFixed(2)}` : null,
+      price: formatVariantPrice(value?.price),
       disabled: !value?.isEnabled,
       isNew:
         isNewVariant &&
