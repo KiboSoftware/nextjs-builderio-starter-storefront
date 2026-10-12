@@ -9,7 +9,7 @@ import { getPdpBrandConfig } from './pdpBrandConfig'
 import { getPdpBrandContent } from './pdpBrandContent'
 import PdpGallery from './PdpGallery'
 import { findProperty, getPropertyValues } from './pdpProperties'
-import { getSpecGroups } from './pdpSpecGroups'
+import { getSpecGroups, hasMarkup } from './pdpSpecGroups'
 import PdpVariantPicker, { PdpMobileSizePicker } from './PdpVariantPicker'
 import ProductInventoryMessages from './ProductInventoryMessages'
 import { usePdpViewModel } from './usePdpViewModel'
@@ -923,7 +923,9 @@ const PdpTemplate = (props: PdpTemplateProps) => {
                   <div className={styles.specRow} key={row.key}>
                     <span
                       className={`${styles.specLabel} ${
-                        row.config.render === 'list' || row.config.render === 'html'
+                        row.config.render === 'list' ||
+                        row.config.render === 'html' ||
+                        hasMarkup(row.value)
                           ? styles.specLabelTop
                           : ''
                       }`}
@@ -943,7 +945,7 @@ const PdpTemplate = (props: PdpTemplateProps) => {
                       <div className={`${styles.specValue} ${styles.specRowAlt}`}>
                         {row.items.join('  •  ')}
                       </div>
-                    ) : row.config.render === 'html' ? (
+                    ) : row.config.render === 'html' || hasMarkup(row.value) ? (
                       <div
                         className={`${styles.specValue} ${styles.specRowAlt}`}
                         dangerouslySetInnerHTML={{ __html: row.value }}
