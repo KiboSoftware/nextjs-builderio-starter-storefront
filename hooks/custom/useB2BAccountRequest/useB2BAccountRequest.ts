@@ -3,13 +3,26 @@ import { useEffect, useRef, useState } from 'react'
 import builder from '@builder.io/react'
 
 import { useCreateCustomerB2bAccountMutation } from '@/hooks/mutations/b2b/accountHierarchy/useCreateCustomerB2bAccount/useCreateCustomerB2bAccount'
+import { makeGraphQLClient } from '@/lib/gql/client'
+import { getCheckoutQuery } from '@/lib/gql/queries'
 import { buildCreateCustomerB2bAccountParams } from '@/lib/helpers/buildCreateCustomerB2bAccountParams'
 import { CreateCustomerB2bAccountParams } from '@/lib/types'
+
+import type { CrOrder } from '@/lib/gql/types'
 
 export interface B2BAccountRequestCallbacks {
   onExistingUser: () => void
   onSuccess: () => void
   onError: (error: unknown) => void
+}
+
+export interface AccountAtCheckoutResult {
+  status: 'created' | 'exists' | 'guest' | 'failed'
+  checkoutId?: string
+  checkout?: CrOrder
+  account?: any
+  customerAccount?: any
+  behaviors?: number[]
 }
 
 const B2B_ACCOUNT_MAPPING_ENTITY_LIST = 'B2BAccountMapping@fortis'
@@ -71,6 +84,28 @@ export const useB2BAccountRequest = () => {
     })
   }
 
+  const sendToPardot = async (account: any) => {
+    if (!pardotFormUrl) return
+    const user = account?.users?.[0]
+    await fetch(pardotFormUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Access-Control-Allow-Origin': '*',
+      },
+      mode: 'no-cors',
+      body: new URLSearchParams({
+        userFirstName: user?.firstName,
+        userLastName: user?.lastName,
+        companyName: account?.companyOrOrganization,
+        userEmail: user?.emailAddress,
+        customerID: user?.userId,
+        accountID: account?.id,
+        marketing_optin: user?.acceptsMarketing,
+      }),
+    }).catch(() => undefined)
+  }
+
   const finalizeAccount = async (accountId: number, entityResult: any) => {
     const purchaseOrderPayLoad = { accountId }
 
@@ -82,26 +117,7 @@ export const useB2BAccountRequest = () => {
     })
     if (activeAccountDetails?.success !== true) return
 
-    if (pardotFormUrl) {
-      const user = activeAccountDetails?.data?.users?.[0]
-      await fetch(pardotFormUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Access-Control-Allow-Origin': '*',
-        },
-        mode: 'no-cors',
-        body: new URLSearchParams({
-          userFirstName: user?.firstName,
-          userLastName: user?.lastName,
-          companyName: activeAccountDetails?.data?.companyOrOrganization,
-          userEmail: user?.emailAddress,
-          customerID: user?.userId,
-          accountID: activeAccountDetails?.data?.id,
-          marketing_optin: user?.acceptsMarketing,
-        }),
-      }).catch(() => undefined)
-    }
+    await sendToPardot(activeAccountDetails?.data)
 
     const creditLine = entityResult?.entityDetails?.creditLine
     if (creditLine === 'true' || creditLine === true) {
@@ -169,5 +185,31 @@ export const useB2BAccountRequest = () => {
     }
   }
 
-  return { submitAccountRequest, isSubmitting, isReady }
+  const createAccountAtCheckout = async (checkoutId: string): Promise<AccountAtCheckoutResult> => {
+    try {
+      const reCaptchaResult = await validateReCaptcha()
+      const result: AccountAtCheckoutResult = await postJson('/api/user/createAccountAtCheckout', {
+        checkoutId,
+        reCaptchaScore: reCaptchaResult?.success ? reCaptchaResult?.score : undefined,
+      })
+      if (!result?.status) return { status: 'failed' }
+      if (result.status === 'created') {
+        sendToPardot(result.account)
+      }
+      if (result.checkoutId) {
+        const response = await makeGraphQLClient().request({
+          document: getCheckoutQuery,
+          variables: { checkoutId: result.checkoutId },
+        })
+        if (!response?.checkout) return { status: 'failed' }
+        result.checkout = response.checkout
+      }
+      return result
+    } catch (error) {
+      console.error('Account creation at checkout error:', error)
+      return { status: 'failed' }
+    }
+  }
+
+  return { submitAccountRequest, createAccountAtCheckout, isSubmitting, isReady }
 }
