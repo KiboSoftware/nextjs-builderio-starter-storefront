@@ -11,7 +11,7 @@ import { useTranslation } from 'next-i18next'
 import { useReactToPrint } from 'react-to-print'
 
 import { OrderPrice } from '@/components/common'
-import { useProductCardActions } from '@/hooks'
+import { useB2BAccountRequest, useProductCardActions } from '@/hooks'
 import { OrderStatus } from '@/lib/constants'
 import { orderGetters, productGetters } from '@/lib/getters'
 
@@ -130,6 +130,42 @@ const OrderConfirmation = ({ order }: { order: CrOrder }) => {
       localStorage.removeItem('wantsAccountCreation')
     }
   }, [])
+
+  const { submitAccountRequest, isReady: isAccountRequestReady } = useB2BAccountRequest()
+  const [accountStatus, setAccountStatus] = useState<
+    'idle' | 'creating' | 'created' | 'exists' | 'failed'
+  >('idle')
+  const hasRequestedAccount = useRef(false)
+  useEffect(() => {
+    if (!createAccountQuery?.company || !isAccountRequestReady || hasRequestedAccount.current) {
+      return
+    }
+    hasRequestedAccount.current = true
+    setAccountStatus('creating')
+    submitAccountRequest(
+      {
+        firstName: createAccountQuery.firstName,
+        lastName: createAccountQuery.lastName,
+        companyOrOrganization: createAccountQuery.company,
+        emailAddress: createAccountQuery.email,
+      },
+      {
+        onExistingUser: () => setAccountStatus('exists'),
+        onSuccess: () => setAccountStatus('created'),
+        onError: () => setAccountStatus('failed'),
+      }
+    )
+  }, [createAccountQuery, isAccountRequestReady])
+
+  const showCreateAccountButton =
+    !!createAccountQuery && (accountStatus === 'idle' || accountStatus === 'failed')
+  const accountStatusMessage = {
+    idle: '',
+    creating: t('creating-your-account'),
+    created: t('account-created-check-email', { email: createAccountQuery?.email }),
+    exists: t('account-already-exists-for-email'),
+    failed: t('account-creation-failed-try-again'),
+  }[accountStatus]
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -386,8 +422,23 @@ const OrderConfirmation = ({ order }: { order: CrOrder }) => {
         </Stack>
       </Box>
 
+      {accountStatusMessage && (
+        <Box
+          sx={{
+            backgroundColor: accountStatus === 'failed' ? '#FDECEA' : '#EEEFFC',
+            borderRadius: '12px',
+            p: 3,
+            mb: 3,
+          }}
+        >
+          <Typography sx={{ fontSize: '15px', color: colors.accent }}>
+            {accountStatusMessage}
+          </Typography>
+        </Box>
+      )}
+
       <Stack direction={{ xs: 'column', sm: 'row' }} gap={2}>
-        {createAccountQuery ? (
+        {showCreateAccountButton ? (
           <Button
             component={Link}
             href={`/create-account?${new URLSearchParams(createAccountQuery).toString()}`}
