@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { LoadingButton } from '@mui/lab'
 import {
   Box,
@@ -19,11 +21,11 @@ import { useTranslation } from 'next-i18next'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
-import { KiboTextBox } from '@/components/common'
-import { B2BAccountFormDialog } from '@/components/dialogs'
-import { ExistingUserDialog, LoginDialog } from '@/components/layout'
+import { KiboTextBox, PasswordValidation } from '@/components/common'
+import { LoginDialog } from '@/components/layout'
+import { useAuthContext } from '@/context'
 import { useModalContext } from '@/context/ModalContext'
-import { useB2BAccountRequest } from '@/hooks'
+import { isPasswordValid } from '@/lib/helpers/validations/validations'
 
 export interface CreateAccountPrefill {
   firstName?: string
@@ -37,6 +39,7 @@ interface CreateAccountFormData {
   lastNameOrSurname: string
   companyOrOrganization: string
   email: string
+  password: string
   acceptsMarketing: boolean
   termsAccepted: boolean
 }
@@ -71,6 +74,10 @@ const useCreateAccountSchema = () => {
       .string()
       .email(t('please-enter-a-valid-email-address'))
       .required(t('this-field-is-required')),
+    password: yup
+      .string()
+      .required(t('this-field-is-required'))
+      .test((value = '') => isPasswordValid(value)),
     acceptsMarketing: yup.boolean(),
     termsAccepted: yup.boolean().oneOf([true], t('please-agree-to-terms')),
   })
@@ -79,13 +86,17 @@ const useCreateAccountSchema = () => {
 const CreateAccountTemplate = ({ prefill }: { prefill?: CreateAccountPrefill }) => {
   const { t } = useTranslation('common')
   const router = useRouter()
-  const { showModal, closeModal } = useModalContext()
-  const { submitAccountRequest, isSubmitting } = useB2BAccountRequest()
+  const { createAccount } = useAuthContext()
+  const { showModal } = useModalContext()
+  const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const schema = useCreateAccountSchema()
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitted },
   } = useForm<CreateAccountFormData>({
     mode: 'onChange',
@@ -95,6 +106,7 @@ const CreateAccountTemplate = ({ prefill }: { prefill?: CreateAccountPrefill }) 
       lastNameOrSurname: prefill?.lastNameOrSurname ?? '',
       companyOrOrganization: prefill?.companyOrOrganization ?? '',
       email: prefill?.email ?? '',
+      password: '',
       acceptsMarketing: false,
       termsAccepted: false,
     },
@@ -103,31 +115,34 @@ const CreateAccountTemplate = ({ prefill }: { prefill?: CreateAccountPrefill }) 
   })
 
   const openLoginModal = () => showModal({ Component: LoginDialog })
+  const passwordValue = watch('password')
 
-  const onSubmit = (formData: CreateAccountFormData) =>
-    submitAccountRequest(
-      {
-        firstName: formData.firstName,
-        lastName: formData.lastNameOrSurname,
-        companyOrOrganization: formData.companyOrOrganization,
-        emailAddress: formData.email,
-        acceptsMarketing: formData.acceptsMarketing,
-      },
-      {
-        onExistingUser: () => showModal({ Component: ExistingUserDialog }),
-        onSuccess: () => router.push({ pathname: '/account-success' }),
-        onError: () =>
-          showModal({
-            Component: B2BAccountFormDialog,
-            props: {
-              primaryButtonText: t('contact-us'),
-              formTitle: t('b2b-account-request'),
-              isAccountCreationError: true,
-              onClose: () => closeModal(),
-            },
-          }),
-      }
-    )
+  const onSubmit = async (formData: CreateAccountFormData) => {
+    setIsSubmitting(true)
+    setSubmitError('')
+    try {
+      await new Promise<void>((resolve, reject) => {
+        createAccount(
+          {
+            email: formData.email,
+            firstName: formData.firstName,
+            lastNameOrSurname: formData.lastNameOrSurname,
+            password: formData.password,
+            companyOrOrganization: formData.companyOrOrganization,
+            acceptsMarketing: formData.acceptsMarketing,
+          },
+          () => resolve(),
+          (error) => reject(error)
+        )
+      })
+      router.push('/my-account')
+    } catch (error) {
+      console.error(error)
+      setSubmitError(t('something-went-wrong'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <Container maxWidth="lg">
@@ -209,6 +224,26 @@ const CreateAccountTemplate = ({ prefill }: { prefill?: CreateAccountPrefill }) 
                   />
                 )}
               />
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <KiboTextBox
+                    {...field}
+                    value={field.value}
+                    label={t('password')}
+                    required
+                    onChange={(_name, value) => field.onChange(value)}
+                    onBlur={field.onBlur}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    type={showPassword ? 'text' : 'password'}
+                    icon={showPassword ? <Visibility /> : <VisibilityOff />}
+                    onIconClick={() => setShowPassword(!showPassword)}
+                  />
+                )}
+              />
+              {passwordValue && <PasswordValidation password={passwordValue} />}
             </Stack>
           </Grid>
 
@@ -289,6 +324,12 @@ const CreateAccountTemplate = ({ prefill }: { prefill?: CreateAccountPrefill }) 
             )}
           </Grid>
         </Grid>
+
+        {submitError && (
+          <Typography sx={{ color: 'error.main', fontSize: '14px', mt: 2 }}>
+            {submitError}
+          </Typography>
+        )}
 
         <Divider sx={{ my: 3 }} />
 

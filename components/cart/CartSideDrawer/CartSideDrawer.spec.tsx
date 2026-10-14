@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { QueryClient, QueryClientProvider, useIsMutating } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
@@ -10,25 +10,18 @@ import { MemoryRouterProvider } from 'next-router-mock/MemoryRouterProvider'
 
 import CartSideDrawer from './CartSideDrawer'
 import { HeaderContextProvider, useHeaderContext } from '@/context/HeaderContext'
-import { cartKeys, checkoutKeys, checkoutSyncKeys } from '@/lib/react-query/queryKeys'
+import { cartKeys, checkoutKeys } from '@/lib/react-query/queryKeys'
 
 const mockDeleteCartItem = jest.fn()
-const mockDeleteCartItemAsync = jest.fn()
 const mockUpdateCartItemQuantity = jest.fn()
-const mockUpdateCartItemQuantityAsync = jest.fn()
 const mockInitiateOrder = jest.fn()
 let mockCart: any
 
 jest.mock('@/hooks', () => ({
   useGetCart: () => ({ data: mockCart }),
-  useDeleteCartItem: () => ({
-    deleteCartItem: { mutate: mockDeleteCartItem, mutateAsync: mockDeleteCartItemAsync },
-  }),
+  useDeleteCartItem: () => ({ deleteCartItem: { mutate: mockDeleteCartItem } }),
   useUpdateCartItemQuantity: () => ({
-    updateCartItemQuantity: {
-      mutate: mockUpdateCartItemQuantity,
-      mutateAsync: mockUpdateCartItemQuantityAsync,
-    },
+    updateCartItemQuantity: { mutate: mockUpdateCartItemQuantity },
   }),
   useInitiateOrder: () => ({
     initiateOrder: { mutateAsync: mockInitiateOrder, isPending: false },
@@ -66,11 +59,6 @@ const OpenDrawer = () => {
   return null
 }
 
-const SyncIndicator = () => {
-  const isSyncing = useIsMutating({ mutationKey: checkoutSyncKeys.all }) > 0
-  return isSyncing ? <span data-testid="checkout-syncing" /> : null
-}
-
 const setup = ({ checkout }: { checkout?: any } = {}) => {
   const user = userEvent.setup()
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -79,31 +67,29 @@ const setup = ({ checkout }: { checkout?: any } = {}) => {
   const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
 
   const settleCartMutation =
-    (applyToCart: (items: any[], variables: any) => any[]) => (variables: any) => {
+    (applyToCart: (items: any[], variables: any) => any[]) =>
+    (variables: any, options?: { onSettled?: () => void }) => {
       queryClient.setQueryData(cartKeys.all, (old: any) => ({
         ...old,
         items: applyToCart(old.items, variables),
       }))
-      return Promise.resolve(true)
+      options?.onSettled?.()
     }
 
-  const removeItem = settleCartMutation((items, { cartItemId }) =>
-    items.filter((item) => item.id !== cartItemId)
+  mockDeleteCartItem.mockImplementation(
+    settleCartMutation((items, { cartItemId }) => items.filter((item) => item.id !== cartItemId))
   )
-  const changeQuantity = settleCartMutation((items, { cartItemId, quantity }) =>
-    items.map((item) => (item.id === cartItemId ? { ...item, quantity } : item))
+  mockUpdateCartItemQuantity.mockImplementation(
+    settleCartMutation((items, { cartItemId, quantity }) =>
+      items.map((item) => (item.id === cartItemId ? { ...item, quantity } : item))
+    )
   )
-  mockDeleteCartItem.mockImplementation(removeItem)
-  mockDeleteCartItemAsync.mockImplementation(removeItem)
-  mockUpdateCartItemQuantity.mockImplementation(changeQuantity)
-  mockUpdateCartItemQuantityAsync.mockImplementation(changeQuantity)
 
   render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouterProvider>
         <HeaderContextProvider>
           <OpenDrawer />
-          <SyncIndicator />
           <CartSideDrawer />
         </HeaderContextProvider>
       </MemoryRouterProvider>
@@ -140,36 +126,11 @@ describe('[component] CartSideDrawer', () => {
     const [firstIncreaseButton] = await screen.findAllByRole('button', { name: 'increase' })
     await user.click(firstIncreaseButton)
 
-    expect(mockUpdateCartItemQuantityAsync).toHaveBeenCalledWith({
-      cartItemId: 'item-1',
-      quantity: 2,
-    })
+    expect(mockUpdateCartItemQuantity).toHaveBeenCalledWith(
+      { cartItemId: 'item-1', quantity: 2 },
+      expect.anything()
+    )
     await waitFor(() => expect(mockInitiateOrder).toHaveBeenCalledWith({ cartId: 'cart-1' }))
-  })
-
-  it('flags the checkout as syncing until the order is re-synced', async () => {
-    mockRouter.setCurrentUrl('/checkout/checkout-1')
-    let resolveOrder: (value: { id: string }) => void = () => undefined
-    mockInitiateOrder.mockReturnValue(new Promise((resolve) => (resolveOrder = resolve)))
-    const { user } = setup({ checkout: { id: 'checkout-1' } })
-
-    const [firstRemoveButton] = await screen.findAllByRole('button', { name: 'remove' })
-    await user.click(firstRemoveButton)
-
-    expect(await screen.findByTestId('checkout-syncing')).toBeInTheDocument()
-    resolveOrder({ id: 'checkout-1' })
-    await waitFor(() => expect(screen.queryByTestId('checkout-syncing')).not.toBeInTheDocument())
-  })
-
-  it('does not flag the checkout as syncing when the cart changes outside checkout', async () => {
-    mockRouter.setCurrentUrl('/')
-    const { user } = setup()
-
-    const [firstRemoveButton] = await screen.findAllByRole('button', { name: 'remove' })
-    await user.click(firstRemoveButton)
-
-    expect(mockDeleteCartItem).toHaveBeenCalledWith({ cartItemId: 'item-1' })
-    expect(screen.queryByTestId('checkout-syncing')).not.toBeInTheDocument()
   })
 
   it('moves to the re-synced checkout when the order id changes', async () => {
@@ -201,7 +162,7 @@ describe('[component] CartSideDrawer', () => {
     const [firstRemoveButton] = await screen.findAllByRole('button', { name: 'remove' })
     await user.click(firstRemoveButton)
 
-    expect(mockDeleteCartItemAsync).toHaveBeenCalled()
+    expect(mockDeleteCartItem).toHaveBeenCalled()
     expect(mockInitiateOrder).not.toHaveBeenCalled()
   })
 
