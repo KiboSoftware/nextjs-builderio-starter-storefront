@@ -77,10 +77,16 @@ export default async function graphQLHandler(req: NextApiRequestWithLogger, res:
     res.status(200).json(response)
   } catch (error: any) {
     if (error instanceof GraphQLError) {
-      req.logger.error(error.dumpErrors(), error.toJson())
+      req.logger.error('GraphQL error', error.toJson())
     } else {
-      req.logger.error(error)
+      req.logger.error('Error in GraphQL handler', { message: error?.message, code: error?.code })
     }
-    res.status(error?.code).json({ message: error?.message })
+    const statusCode = Number(error?.code)
+    const isValidHttpStatus = Number.isInteger(statusCode) && statusCode >= 400 && statusCode <= 599
+
+    res.status(isValidHttpStatus ? statusCode : 500).json({
+      message: error?.message,
+      code: error?.code,
+    })
   }
 }

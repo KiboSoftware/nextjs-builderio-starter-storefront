@@ -41,6 +41,7 @@ export enum PageType {
 const currentYear = new Date().getFullYear()
 export const FacetListForHistory = [
   { label: 'last-30-days', filterValue: 'M-1', isApplied: false, isDisplayed: true, count: 0 },
+  { label: 'last-3-months', filterValue: 'M-3', isApplied: false, isDisplayed: true, count: 0 },
   { label: 'last-6-months', filterValue: 'M-6', isApplied: false, isDisplayed: true, count: 0 },
   {
     label: `${currentYear}`,
@@ -223,3 +224,5 @@ export const KIBO_HEADERS = {
   TENANT: 'x-vol-tenant',
   SITE: 'x-vol-site',
 }
+
+export const DIGITAL_ASSETS_LIST = 'digitalassets@Fortis'
