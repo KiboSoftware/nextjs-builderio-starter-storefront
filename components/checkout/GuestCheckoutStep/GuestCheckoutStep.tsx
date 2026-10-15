@@ -64,11 +64,9 @@ const GuestCheckoutStep = (props: GuestCheckoutStepProps) => {
   const { initiateOrder } = useInitiateOrder()
   const router = useRouter()
   const accountResultRef = useRef<AccountAtCheckoutResult>()
-
   // Payment is the last step of guest checkout (no separate Review step) - it places
   // the order itself, so its state lives here rather than behind the shared step context.
   const [phase, setPhase] = useState<'shipping' | 'payment'>('shipping')
-
   const [cardFormData, setCardFormData] = useState<CardForm>({})
   const [isCardFormValid, setIsCardFormValid] = useState(false)
   const [cardholderName, setCardholderName] = useState('')
