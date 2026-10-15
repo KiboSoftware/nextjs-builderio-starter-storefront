@@ -459,6 +459,11 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
     }
 
     if (isPurchaseOrder) {
+      if (!agreePOAuthorization) {
+        setPlaceOrderError(t('please-complete-billing-information'))
+        return false
+      }
+
       const isPoNumberMissing = !poNumber.trim()
       const nameError = getAuthorizerNameError(authorizerName)
       const phoneError = getAuthorizerPhoneError(authorizerPhone)
