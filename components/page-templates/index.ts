@@ -1,5 +1,6 @@
 export { default as ProductListingTemplate } from './ProductListingTemplate/ProductListingTemplate'
 export { default as ProductDetailTemplate } from './ProductDetail/ProductDetailTemplate'
+export { default as PdpTemplate } from './ProductDetail/PdpTemplate'
 export { default as ProductDetailSkeleton } from './ProductDetail/ProductDetailSkeleton'
 export { default as CartTemplate } from './CartTemplate/CartTemplate'
 export { default as WishlistTemplate } from './WishlistTemplate/WishlistTemplate'
@@ -8,6 +9,7 @@ export { default as StandardShipCheckoutTemplate } from './StandardShipCheckoutT
 export { default as MultiShipCheckoutTemplate } from './MultiShipCheckoutTemplate/MultiShipCheckoutTemplate'
 export { default as CheckoutUITemplate } from '../checkout/CheckoutUITemplate/CheckoutUITemplate'
 export { default as ResetPasswordConfirmationTemplate } from './ResetPasswordConfirmationTemplate/ResetPasswordConfirmationTemplate'
+export { default as CreateAccountTemplate } from './CreateAccountTemplate/CreateAccountTemplate'
 
 export { default as AccountInformationTemplate } from './MyAccount/AccountInformationTemplate/AccountInformationTemplate'
 export { default as ShippingAddressTemplate } from './MyAccount/ShippingAddressTemplate/ShippingAddressTemplate'

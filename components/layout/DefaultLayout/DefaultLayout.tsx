@@ -7,8 +7,10 @@ import { HydrationBoundary } from '@tanstack/react-query'
 import creditCardType from 'credit-card-type'
 import Router, { useRouter } from 'next/router'
 
+import { CartSideDrawer } from '@/components/cart'
 import { AnnouncementBar, GlobalFetchingIndicator } from '@/components/common'
-import { Footer, FortisHeader, KiboHeader } from '@/components/layout'
+import { Footer, FortisHeader } from '@/components/layout'
+import { isTransparentPagePath } from '@/components/layout/AppHeader/transparentPages'
 import {
   AuthContextProvider,
   ModalContextProvider,
@@ -26,16 +28,7 @@ creditCardType.updateCard('american-express', {
   niceType: 'AMEX',
 })
 
-const TRANSPARENT_PAGES = [
-  '/',
-  '/new-home-page',
-  '/new-about',
-  '/about',
-  '/our-company',
-  '/new-services-page',
-  '/fortis-grant-2026-abnano-vhh-discovery',
-  '/data-in-focus',
-]
+const FULL_WIDTH_PAGES = ['/product/[productCode]']
 
 const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: ReactElement }) => {
   const router = useRouter()
@@ -45,7 +38,8 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
   const isTransparentPage =
     typeof builderTransparent === 'boolean'
       ? builderTransparent
-      : TRANSPARENT_PAGES.includes(router.asPath.split('?')[0])
+      : isTransparentPagePath(router.asPath)
+  const isFullWidthPage = FULL_WIDTH_PAGES.includes(router.pathname)
 
   useEffect(() => {
     const el = headerRef.current
@@ -109,21 +103,8 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
           <AuthContextProvider>
             <HeaderContextProvider>
               <GlobalFetchingIndicator />
+              <CartSideDrawer />
               <Stack sx={{ minHeight: '100vh', width: '100%' }}>
-                {/* <KiboHeader
-                  navLinks={[
-                    {
-                      link: '/order-status',
-                      text: 'order-status',
-                    },
-                    {
-                      link: '/wishlist',
-                      text: 'wishlist',
-                    },
-                  ]}
-                  categoriesTree={pageProps.categoriesTree || []}
-                  isSticky={true}
-                /> */}
                 <Stack
                   ref={headerRef}
                   id="fixed-header-wrapper"
@@ -161,12 +142,12 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
                     pt: isTransparentPage ? 0 : `${headerHeight}px`,
                   }}
                 >
-                  {isTransparentPage ? (
+                  {isTransparentPage || isFullWidthPage ? (
                     children
                   ) : (
                     <Container
                       disableGutters
-                      sx={{ maxWidth: '1200px !important', mx: 'auto', px: { xs: 2, md: 0 } }}
+                      sx={{ maxWidth: '1300px !important', mx: 'auto', px: { xs: 2, md: 0 } }}
                     >
                       {children}
                     </Container>
