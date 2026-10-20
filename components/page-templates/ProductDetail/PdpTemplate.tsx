@@ -1190,6 +1190,18 @@ const PdpTemplate = (props: PdpTemplateProps) => {
 
       <div className={`${styles.mobilePurchase} ${drawerOpen ? styles.mobileOpen : ''}`}>
         <div className={styles.mobileDrawer}>
+          <button
+            type="button"
+            className={`${styles.mobileDrawerToggle} ${styles.mobileDrawerClose}`}
+            onClick={() => setDrawerOpen(false)}
+            aria-expanded={drawerOpen}
+            tabIndex={drawerOpen ? 0 : -1}
+          >
+            <span className={styles.mobileSupportLabel}>See Support</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 15l6-6 6 6" />
+            </svg>
+          </button>
           <div className={styles.mobileDrawerScroll}>
             {!isUsVisitor ? <p className={styles.mobileDrawerNote}>{distributorNote}</p> : null}
             <div className={styles.mobileDrawerCtas}>{secondaryButtons}</div>
@@ -1202,7 +1214,7 @@ const PdpTemplate = (props: PdpTemplateProps) => {
         <div className={`${styles.mobileBar} ${styles.mobileBarActive}`}>
           <button
             type="button"
-            className={styles.mobileDrawerToggle}
+            className={`${styles.mobileDrawerToggle} ${styles.mobileBarToggle}`}
             onClick={() => setDrawerOpen(!drawerOpen)}
             aria-expanded={drawerOpen}
           >
