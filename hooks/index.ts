@@ -27,6 +27,7 @@ export * from './queries/multishipCheckout/useGetDestinations/useGetDestinations
 export * from './queries/product/useGetProducts/useGetProducts'
 export * from './queries/product/useGetProductInventory/useGetProductInventory'
 export * from './queries/product/useGetProductPrice/useGetProductPrice'
+export * from './queries/product/useGetVariationPrices/useGetVariationPrices'
 
 //returns
 export * from './queries/returns/useGetReturnReasons/useGetReturnReasons'
@@ -72,6 +73,7 @@ export * from './custom/useProductCardActions/useProductCardActions'
 export * from './custom/usePriceRangeFormatter/usePriceRangeFormatter'
 export * from './custom/useCardContactActions/useCardContactActions'
 export * from './custom/useCartActions/useCartActions'
+export * from './custom/useB2BAccountRequest/useB2BAccountRequest'
 export * from './custom/useB2BQuote/useB2BQuote'
 export * from './custom/useGetB2BUsersEmailAndId/useGetB2BUsersEmailAndId'
 export * from './custom/useCustomerAttribute/useCustomerAttribute'

@@ -54,10 +54,13 @@ const createEmptyRow = (): ReorderRow => ({
   quantity: 1,
 })
 
+const hasPrice = (price?: { price?: number | null; salePrice?: number | null } | null) =>
+  Boolean(price?.salePrice || price?.price)
+
 const styles = {
   searchWrapper: {
     position: 'relative',
-    maxWidth: '26rem',
+    maxWidth: '32rem',
     marginBottom: '1.5rem',
   },
   suggestions: {
@@ -71,12 +74,13 @@ const styles = {
     borderRadius: '0.5rem',
   },
   searchField: {
-    maxWidth: '26rem',
+    maxWidth: '32rem',
     '& .MuiOutlinedInput-root': {
       borderRadius: '2rem',
       backgroundColor: 'grey.100',
     },
     '& fieldset': { border: 'none' },
+    '& .MuiInputBase-input::placeholder': { textOverflow: 'ellipsis' },
   },
   headerRow: {
     ...accountType.body,
@@ -102,6 +106,10 @@ const styles = {
   placeholderText: {
     typography: 'body2',
     color: 'text.secondary',
+  },
+  notFoundText: {
+    typography: 'body2',
+    color: 'error.main',
   },
   unitPrice: {
     ...accountType.body,
@@ -162,12 +170,21 @@ const ReorderTemplate = () => {
     const term = debouncedLookup.trim().toLowerCase()
     return hit.sku?.toLowerCase() === term || hit.catalogNumber?.toLowerCase() === term
   })
-  const { data: searchResult, isLoading: isProductLoading } = useGetSearchedProducts({
+  const {
+    data: searchResult,
+    isLoading: isProductLoading,
+    isFetching: isProductFetching,
+  } = useGetSearchedProducts({
     search: isLookupHitsLoading ? '' : exactHit?.parentId || debouncedLookup,
     pageSize: publicRuntimeConfig?.b2bProductSearchPageSize,
   })
 
   const isLoading = isProductLoading || isLookupHitsLoading
+  const isLookupSettled =
+    Boolean(lookupTerm.trim()) &&
+    lookupTerm === debouncedLookup &&
+    !isLookupHitsLoading &&
+    !isProductFetching
 
   const queryClient = useQueryClient()
   const { addItemsToCurrentCart } = useAddItemsToCurrentCart()
@@ -208,7 +225,12 @@ const ReorderTemplate = () => {
 
   const handleCatalogNumberBlur = (key: string, value: string) => {
     const product = resolveProduct(value)
-    if (product) updateRow(key, { product })
+    if (!product) return
+
+    // Keep an already resolved (priced) product; blur must not overwrite it with the raw search item
+    setRows((current) =>
+      current.map((row) => (row.key === key && !row.product ? { ...row, product } : row))
+    )
   }
 
   const handleSelectSearchHit = (hit: AlgoliaProductHit) => {
@@ -280,7 +302,7 @@ const ReorderTemplate = () => {
                     isPriceResolved: true,
                     product: {
                       ...product,
-                      price: priced?.price ?? product.price,
+                      price: hasPrice(priced?.price) ? priced?.price : product.price,
                       options: priced?.options?.length ? priced.options : product.options,
                     } as Product,
                   }
@@ -442,8 +464,17 @@ const ReorderTemplate = () => {
       {visibleRows.map((row) => {
         const price = row.product ? productGetters.getPrice(row.product) : undefined
         const unitPrice = price?.special || price?.regular || 0
+        const isNotFound =
+          isLookupSettled &&
+          activeRowKey === row.key &&
+          row.catalogNumber === lookupTerm &&
+          Boolean(row.catalogNumber.trim()) &&
+          !row.product
         const isLookingUp =
-          isLoading && activeRowKey === row.key && Boolean(row.catalogNumber.trim())
+          !isNotFound &&
+          (isLoading || lookupTerm !== debouncedLookup) &&
+          activeRowKey === row.key &&
+          Boolean(row.catalogNumber.trim())
 
         return (
           <Grid container key={row.key} sx={{ ...styles.row }}>
@@ -493,7 +524,12 @@ const ReorderTemplate = () => {
                   )}
                 </>
               )}
-              {!isLookingUp && !row.product && (
+              {isNotFound && (
+                <Typography component="p" role="alert" sx={{ ...styles.notFoundText }}>
+                  {t('product-not-found')}
+                </Typography>
+              )}
+              {!isLookingUp && !isNotFound && !row.product && (
                 <Typography component="p" sx={{ ...styles.placeholderText }}>
                   {t('product-name-appears-here')}
                 </Typography>
