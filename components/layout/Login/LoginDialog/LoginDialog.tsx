@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import builder from '@builder.io/react'
 import { Stack, Typography, Link, styled } from '@mui/material'
+import Alert from '@mui/material/Alert'
 import router from 'next/router'
 import { useTranslation } from 'next-i18next'
 
@@ -49,7 +50,7 @@ const LoginFooter = (props: LoginFooterProps) => {
 const LoginDialog = (props: any) => {
   const { t } = useTranslation('common')
 
-  const { isCartCheckout, onLoginSuccess } = props
+  const { isCartCheckout, onLoginSuccess, sessionExpired } = props
   const { login } = useAuthContext()
   const { toggleCartDrawer } = useHeaderContext()
   const { showModal, closeModal } = useModalContext()
@@ -390,11 +391,18 @@ const LoginDialog = (props: any) => {
       Actions={''}
       Title={t('log-in')}
       Content={
-        <LoginContent
-          onLogin={handleLogin}
-          onForgotPasswordClick={onForgotPassword}
-          onRegisterNow={onRegisterClick}
-        />
+        <>
+          {sessionExpired && (
+            <Alert severity="info" sx={{ mb: 2 }} data-testid="session-expired-alert">
+              {t('session-expired-login')}
+            </Alert>
+          )}
+          <LoginContent
+            onLogin={handleLogin}
+            onForgotPasswordClick={onForgotPassword}
+            onRegisterNow={onRegisterClick}
+          />
+        </>
       }
       customMaxWidth="600px"
       onClose={closeModal}
