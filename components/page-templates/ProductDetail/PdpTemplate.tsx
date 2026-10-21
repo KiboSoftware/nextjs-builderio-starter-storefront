@@ -158,7 +158,7 @@ const PdpTemplate = (props: PdpTemplateProps) => {
 
   const [descExpanded, setDescExpanded] = useState(false)
   const descRef = useRef<HTMLDivElement>(null)
-  const [descFullHeight, setDescFullHeight] = useState(0)
+  const [descMaxHeight, setDescMaxHeight] = useState<number | 'none'>()
   const [descOverflows, setDescOverflows] = useState(true)
   const [copied, setCopied] = useState(false)
   const [showAllDocs, setShowAllDocs] = useState(false)
@@ -420,14 +420,28 @@ const PdpTemplate = (props: PdpTemplateProps) => {
     const element = descRef.current
     if (!element) return
     const measure = () => {
-      const collapsedHeight = parseFloat(getComputedStyle(element).lineHeight) * 3
-      setDescFullHeight(element.scrollHeight)
-      setDescOverflows(element.scrollHeight > collapsedHeight + 1)
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight)
+      setDescOverflows(element.scrollHeight > lineHeight * 4 + 1)
     }
     measure()
+    document.fonts?.ready.then(measure)
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
   }, [descriptionHtml])
+
+  const toggleDescription = () => {
+    const element = descRef.current
+    if (!element) return
+    if (descExpanded) {
+      element.style.maxHeight = `${element.scrollHeight}px`
+      void element.offsetHeight
+      setDescMaxHeight(undefined)
+      setDescExpanded(false)
+    } else {
+      setDescMaxHeight(element.scrollHeight)
+      setDescExpanded(true)
+    }
+  }
 
   const handleCopy = async () => {
     if (!catalogNumber) return
@@ -894,14 +908,17 @@ const PdpTemplate = (props: PdpTemplateProps) => {
               className={`${styles.clamp} ${
                 descExpanded || !descOverflows ? styles.clampExpanded : ''
               }`}
-              style={descExpanded && descFullHeight ? { maxHeight: descFullHeight } : undefined}
+              style={descMaxHeight !== undefined ? { maxHeight: descMaxHeight } : undefined}
+              onTransitionEnd={(event) => {
+                if (event.propertyName === 'max-height' && descExpanded) setDescMaxHeight('none')
+              }}
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
             {descOverflows ? (
               <button
                 type="button"
                 className={`${styles.seeMore} ${descExpanded ? styles.seeMoreExpanded : ''}`}
-                onClick={() => setDescExpanded(!descExpanded)}
+                onClick={toggleDescription}
               >
                 <span>{descExpanded ? 'See less' : 'See more'}</span>
                 <Arrow />
