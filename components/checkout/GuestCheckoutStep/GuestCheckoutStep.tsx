@@ -485,7 +485,7 @@ const GuestCheckoutStep = (props: GuestCheckoutStepProps) => {
                 color="primary"
                 loading={isPlacingOrder}
                 onClick={handlePlaceOrder}
-                aria-disabled={!canPlaceOrder}
+                disabled={!canPlaceOrder}
                 sx={{ ...checkoutPrimaryButtonSx, opacity: canPlaceOrder ? 1 : 0.5 }}
               >
                 {t('Place Order')}
