@@ -96,11 +96,11 @@ const KiboTextBox = React.forwardRef<HTMLInputElement, KiboTextBoxProps>((props,
           borderRadius: '8px',
           boxShadow: '0px 1px 2px rgba(10, 13, 18, 0.05)',
           fontSize: { xs: '14px !important', md: '14px !important' },
-          ...sx,
           // A fixed height only makes sense for single-line inputs - forcing it on a
           // multiline field crushes/clips the textarea instead of letting it grow.
           ...(!multiline && { height: '42px' }),
           backgroundColor: rest.readOnly ? '#F7F7F7' : '#fff',
+          ...sx,
         }}
         value={value}
         id={label}
