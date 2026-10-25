@@ -508,6 +508,7 @@
   "account-name": "Account Name",
   "add-item-to-quote": "Add Item to Quote",
   "list-added-to-cart": "List added to cart",
+  "reorder-replaced-cart": "Your cart was replaced with the items from this order",
   "summary": "Summary",
   "special-instructions": "Special Instructions",
   "duty-total": "Duty Total",
