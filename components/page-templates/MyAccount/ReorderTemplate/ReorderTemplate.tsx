@@ -202,7 +202,7 @@ const ReorderTemplate = () => {
   const { showSnackbar } = useSnackbarContext()
   const { user } = useAuthContext()
 
-  const resolveProduct = (catalogNumber: string): Product | undefined => {
+  const findProductMatch = (catalogNumber: string): Product | undefined => {
     const term = catalogNumber.trim().toLowerCase()
     if (!term) return undefined
 
@@ -222,6 +222,19 @@ const ReorderTemplate = () => {
     return sku && !productGetters.getVariationProductCode(match)
       ? ({ ...match, variationProductCode: sku } as Product)
       : match
+  }
+
+  const isMissingVariant = (product: Product) =>
+    product.productUsage === 'Configurable' && !productGetters.getVariationProductCode(product)
+
+  const resolveProduct = (catalogNumber: string): Product | undefined => {
+    const match = findProductMatch(catalogNumber)
+    return match && !isMissingVariant(match) ? match : undefined
+  }
+
+  const isGenericCatalogNumber = (catalogNumber: string) => {
+    const match = findProductMatch(catalogNumber)
+    return Boolean(match && isMissingVariant(match))
   }
 
   const updateRow = (key: string, changes: Partial<ReorderRow>) => {
@@ -538,7 +551,9 @@ const ReorderTemplate = () => {
               )}
               {isNotFound && (
                 <Typography component="p" role="alert" sx={{ ...styles.notFoundText }}>
-                  {t('product-not-found')}
+                  {isGenericCatalogNumber(row.catalogNumber)
+                    ? t('enter-full-catalog-number')
+                    : t('product-not-found')}
                 </Typography>
               )}
               {!isLookingUp && !isNotFound && !row.product && (
