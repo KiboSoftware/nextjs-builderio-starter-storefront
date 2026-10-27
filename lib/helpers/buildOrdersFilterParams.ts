@@ -14,6 +14,7 @@ export const buildOrdersFilterParams = (params: {
   pageSize?: number
   orderNumber?: string
   billingEmail?: string
+  searchTerm?: string
   status?: string
   sortBy?: string
 }): {
@@ -62,6 +63,17 @@ export const buildOrdersFilterParams = (params: {
       ? variables.filter.concat(` and ${orderNumberFilter}`)
       : orderNumberFilter
   }
+  const searchTerm = params.searchTerm?.replace(/[^\w\s.-]/g, '').trim()
+  if (searchTerm) {
+    const productCodeFilter = `items.productCode cont '${searchTerm}'`
+    const searchFilter = /^\d+$/.test(searchTerm)
+      ? `(orderNumber eq ${searchTerm} or ${productCodeFilter})`
+      : productCodeFilter
+    variables.filter = variables.filter
+      ? variables.filter.concat(` and ${searchFilter}`)
+      : searchFilter
+  }
+
   const defaultQuery = `status ne ${OrderStatus.ABANDONED}`
   variables.filter = variables.filter
     ? variables.filter.concat(` and ${defaultQuery}`)

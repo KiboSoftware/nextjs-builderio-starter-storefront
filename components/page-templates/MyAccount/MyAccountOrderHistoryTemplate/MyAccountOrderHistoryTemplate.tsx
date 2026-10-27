@@ -11,13 +11,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useRouter } from 'next/router'
+import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
 
 import OrderHistoryCard from './OrderHistoryCard'
 import { AccountPageHeader, accountActionButton, accountType } from '@/components/my-account/common'
 import { useAuthContext, useSnackbarContext } from '@/context'
-import { useGetCustomerOrders, useProductCardActions } from '@/hooks'
+import { useDebounce, useGetCustomerOrders, useProductCardActions } from '@/hooks'
 import { useAddItemsToCurrentCart } from '@/hooks/mutations/cart/useAddItemsToCurrentCart/useAddItemsToCurrentCart'
 import { FacetListForHistory } from '@/lib/constants'
 import { orderGetters, userGetters } from '@/lib/getters'
@@ -99,14 +99,14 @@ const styles = {
 const MyAccountOrderHistoryTemplate = (props: OrderHistoryTemplateProps) => {
   const { user, queryFilters } = props
   const { t } = useTranslation('common')
-  const router = useRouter()
 
   const [timeFilter, setTimeFilter] = useState<string>(queryFilters?.[0] ?? DEFAULT_TIME_FILTER)
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [sortBy, setSortBy] = useState<string>('submittedDate desc')
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [submittedSearch, setSubmittedSearch] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZE)
+  const { publicRuntimeConfig } = getConfig()
+  const debouncedSearch = useDebounce(searchTerm.trim(), publicRuntimeConfig.debounceTimeout)
 
   const { data: orderCollection, isFetching } = useGetCustomerOrders({
     filters: [timeFilter],
@@ -114,7 +114,7 @@ const MyAccountOrderHistoryTemplate = (props: OrderHistoryTemplateProps) => {
     sortBy,
     pageSize,
     startIndex: 0,
-    orderNumber: submittedSearch || undefined,
+    searchTerm: debouncedSearch || undefined,
     isRefetching: true,
   })
 
@@ -134,7 +134,6 @@ const MyAccountOrderHistoryTemplate = (props: OrderHistoryTemplateProps) => {
     setStatusFilter('')
     setSortBy('submittedDate desc')
     setSearchTerm('')
-    setSubmittedSearch('')
     setPageSize(PAGE_SIZE)
   }
 
@@ -146,14 +145,12 @@ const MyAccountOrderHistoryTemplate = (props: OrderHistoryTemplateProps) => {
       const response = await addItemsToCurrentCart.mutateAsync({ items: orderItems })
 
       if (response) {
-        showSnackbar(t('list-added-to-cart'), 'success')
+        showSnackbar(t('reorder-replaced-cart'), 'success')
         const mappedGTMProducts = mapCartItemsToGAEvent(orderItems)
         const valueOfCart = getValueOfItemList(mappedGTMProducts)
 
         addToCartGTM(authUser?.userId, valueOfCart, mappedGTMProducts)
       }
-
-      router.push('/cart')
     } catch (error) {
       console.error('Error: reorder from order history', error)
     }
@@ -186,10 +183,6 @@ const MyAccountOrderHistoryTemplate = (props: OrderHistoryTemplateProps) => {
         placeholder={String(t('search-orders-placeholder'))}
         value={searchTerm}
         onChange={(event) => setSearchTerm(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') setSubmittedSearch(searchTerm.trim())
-        }}
-        onBlur={() => setSubmittedSearch(searchTerm.trim())}
         sx={{ ...styles.searchField }}
         InputProps={{
           startAdornment: (
