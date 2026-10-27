@@ -29,7 +29,12 @@ import { useAlgoliaProductSearch, useDebounce, useGetSearchedProducts } from '@/
 import { useAddItemsToCurrentCart } from '@/hooks/mutations/cart/useAddItemsToCurrentCart/useAddItemsToCurrentCart'
 import { productGetters } from '@/lib/getters'
 import { makeGraphQLClient } from '@/lib/gql/client'
-import { getProductPriceQuery, getProductVariationQuery } from '@/lib/gql/queries'
+import {
+  getProductLocationInventoryQuery,
+  getProductPriceQuery,
+  getProductVariationQuery,
+} from '@/lib/gql/queries'
+import { inventoryKeys } from '@/lib/react-query/queryKeys'
 import type { ProductCustom } from '@/lib/types'
 import {
   addToCartGTM,
@@ -38,7 +43,8 @@ import {
 } from '@/lib/utils/google-tag-manager'
 
 import type { AlgoliaProductHit } from '@/hooks'
-import type { CrOrderItem, Product } from '@/lib/gql/types'
+import type { CrOrderItem, LocationInventory, Product } from '@/lib/gql/types'
+import type { Theme } from '@mui/material'
 
 interface ReorderRow {
   key: string
@@ -46,6 +52,7 @@ interface ReorderRow {
   quantity: number
   product?: Product
   isPriceResolved?: boolean
+  maxQuantity?: number
 }
 
 const createEmptyRow = (): ReorderRow => ({
@@ -56,6 +63,36 @@ const createEmptyRow = (): ReorderRow => ({
 
 const hasPrice = (price?: { price?: number | null; salePrice?: number | null } | null) =>
   Boolean(price?.salePrice || price?.price)
+
+const INVENTORY_LOCATION_CODE = 'BETHYL'
+
+const getPropertyValue = (properties: Product['properties'], attributeFQN: string) => {
+  const value = properties?.find((property) => property?.attributeFQN === attributeFQN)?.values?.[0]
+  return value?.stringValue ?? value?.value ?? null
+}
+
+const getMaxQuantity = (
+  parent: Product,
+  variant: Product | undefined,
+  stockAvailable: number
+): number | undefined => {
+  const findValue = (attributeFQN: string) =>
+    getPropertyValue(variant?.properties, attributeFQN) ??
+    getPropertyValue(parent.properties, attributeFQN)
+
+  const skuStatusText = findValue('tenant~sku-status-text')
+  const stockBehaviour = findValue('tenant~stock-behavior-option')
+  const minimumStock = Number(findValue('tenant~minimum-stock')) || 0
+
+  return String(skuStatusText).toLowerCase() === 'active' &&
+    String(stockBehaviour).toLowerCase() === 'denybackorder' &&
+    stockAvailable >= minimumStock
+    ? stockAvailable - minimumStock
+    : undefined
+}
+
+const clampQuantity = (quantity: number, maxQuantity?: number) =>
+  maxQuantity === undefined ? quantity : Math.min(quantity, maxQuantity)
 
 const styles = {
   searchWrapper: {
@@ -78,8 +115,10 @@ const styles = {
     '& .MuiOutlinedInput-root': {
       borderRadius: '2rem',
       backgroundColor: 'grey.100',
+      paddingRight: '1rem',
     },
     '& fieldset': { border: 'none' },
+    '& .MuiInputBase-input': { fontSize: '0.875rem' },
     '& .MuiInputBase-input::placeholder': { textOverflow: 'ellipsis' },
   },
   headerRow: {
@@ -143,7 +182,15 @@ const styles = {
     color: 'text.secondary',
     marginLeft: 'auto',
   },
-  actionButton: accountActionButton,
+  actionButton: {
+    ...accountActionButton,
+    '&.MuiButton-contained.Mui-disabled': {
+      backgroundColor: (theme: Theme) => `${theme.palette.grey[300]} !important`,
+      color: (theme: Theme) => `${theme.palette.grey[600]} !important`,
+      cursor: 'not-allowed',
+      pointerEvents: 'auto',
+    },
+  },
 }
 
 const ReorderTemplate = () => {
@@ -191,7 +238,7 @@ const ReorderTemplate = () => {
   const { showSnackbar } = useSnackbarContext()
   const { user } = useAuthContext()
 
-  const resolveProduct = (catalogNumber: string): Product | undefined => {
+  const findProductMatch = (catalogNumber: string): Product | undefined => {
     const term = catalogNumber.trim().toLowerCase()
     if (!term) return undefined
 
@@ -213,12 +260,30 @@ const ReorderTemplate = () => {
       : match
   }
 
+  const isMissingVariant = (product: Product) =>
+    product.productUsage === 'Configurable' && !productGetters.getVariationProductCode(product)
+
+  const resolveProduct = (catalogNumber: string): Product | undefined => {
+    const match = findProductMatch(catalogNumber)
+    return match && !isMissingVariant(match) ? match : undefined
+  }
+
+  const isGenericCatalogNumber = (catalogNumber: string) => {
+    const match = findProductMatch(catalogNumber)
+    return Boolean(match && isMissingVariant(match))
+  }
+
   const updateRow = (key: string, changes: Partial<ReorderRow>) => {
     setRows((current) => current.map((row) => (row.key === key ? { ...row, ...changes } : row)))
   }
 
   const handleCatalogNumberChange = (key: string, value: string) => {
-    updateRow(key, { catalogNumber: value, product: undefined, isPriceResolved: false })
+    updateRow(key, {
+      catalogNumber: value,
+      product: undefined,
+      isPriceResolved: false,
+      maxQuantity: undefined,
+    })
     setActiveRowKey(key)
     setLookupTerm(value)
   }
@@ -278,6 +343,27 @@ const ReorderTemplate = () => {
         const variationCode = productGetters.getVariationProductCode(product)
 
         try {
+          const inventoryCode = variationCode || productCode
+          const inventoryRequest = queryClient
+            .fetchQuery({
+              queryKey: inventoryKeys.inventoryParams(inventoryCode, INVENTORY_LOCATION_CODE),
+              queryFn: async () => {
+                const response = await makeGraphQLClient().request({
+                  document: getProductLocationInventoryQuery,
+                  variables: {
+                    productCode: inventoryCode,
+                    locationCodes: INVENTORY_LOCATION_CODE,
+                  },
+                })
+                return (response?.productLocationInventory?.items ?? []) as LocationInventory[]
+              },
+              staleTime: 60 * 1000,
+            })
+            .catch((error) => {
+              console.error('Error: reorder inventory lookup', error)
+              return [] as LocationInventory[]
+            })
+
           const priced = await queryClient.fetchQuery({
             queryKey: ['reorderProductPrice', productCode, variationCode],
             queryFn: async () => {
@@ -294,12 +380,17 @@ const ReorderTemplate = () => {
             staleTime: 60 * 1000,
           })
 
+          const inventory = await inventoryRequest
+          const maxQuantity = getMaxQuantity(product, priced, inventory?.[0]?.stockAvailable || 0)
+
           setRows((current) =>
             current.map((item) =>
               item.key === row.key && item.product === row.product
                 ? {
                     ...item,
                     isPriceResolved: true,
+                    maxQuantity,
+                    quantity: clampQuantity(item.quantity, maxQuantity),
                     product: {
                       ...product,
                       price: hasPrice(priced?.price) ? priced?.price : product.price,
@@ -311,6 +402,13 @@ const ReorderTemplate = () => {
           )
         } catch (error) {
           console.error('Error: reorder price lookup', error)
+          setRows((current) =>
+            current.map((item) =>
+              item.key === row.key && item.product === row.product
+                ? { ...item, isPriceResolved: true }
+                : item
+            )
+          )
         }
       })
   }, [rows, queryClient])
@@ -321,12 +419,19 @@ const ReorderTemplate = () => {
     if (!hasEmptyRow) setRows((current) => [...current, createEmptyRow()])
   }, [rows])
 
-  const filledRows = rows.filter((row) => row.product && row.quantity > 0)
+  const getUnitPrice = (product?: Product) => {
+    const price = product ? productGetters.getPrice(product) : undefined
+    return price?.special || price?.regular || 0
+  }
 
-  const subtotal = filledRows.reduce((sum, row) => {
-    const price = productGetters.getPrice(row.product as Product)
-    return sum + (price?.special || price?.regular || 0) * row.quantity
-  }, 0)
+  const filledRows = rows.filter(
+    (row) => row.product && row.isPriceResolved && getUnitPrice(row.product) > 0 && row.quantity > 0
+  )
+
+  const subtotal = filledRows.reduce(
+    (sum, row) => sum + getUnitPrice(row.product) * row.quantity,
+    0
+  )
 
   const totalItems = filledRows.reduce((sum, row) => sum + row.quantity, 0)
 
@@ -462,8 +567,8 @@ const ReorderTemplate = () => {
       </Grid>
 
       {visibleRows.map((row) => {
-        const price = row.product ? productGetters.getPrice(row.product) : undefined
-        const unitPrice = price?.special || price?.regular || 0
+        const unitPrice = getUnitPrice(row.product)
+        const isPriceLoading = Boolean(row.product) && !row.isPriceResolved
         const isNotFound =
           isLookupSettled &&
           activeRowKey === row.key &&
@@ -495,13 +600,17 @@ const ReorderTemplate = () => {
                 size="small"
                 fullWidth
                 type="number"
+                disabled={!row.product || !row.isPriceResolved}
                 value={row.quantity || ''}
                 onChange={(event) =>
                   updateRow(row.key, {
-                    quantity: Math.max(0, Math.floor(Number(event.target.value))),
+                    quantity: clampQuantity(
+                      Math.max(0, Math.floor(Number(event.target.value))),
+                      row.maxQuantity
+                    ),
                   })
                 }
-                inputProps={{ min: 0, 'aria-label': String(t('qty')) }}
+                inputProps={{ min: 0, max: row.maxQuantity, 'aria-label': String(t('qty')) }}
               />
             </Grid>
 
@@ -526,7 +635,9 @@ const ReorderTemplate = () => {
               )}
               {isNotFound && (
                 <Typography component="p" role="alert" sx={{ ...styles.notFoundText }}>
-                  {t('product-not-found')}
+                  {isGenericCatalogNumber(row.catalogNumber)
+                    ? t('enter-full-catalog-number')
+                    : t('product-not-found')}
                 </Typography>
               )}
               {!isLookingUp && !isNotFound && !row.product && (
@@ -539,10 +650,14 @@ const ReorderTemplate = () => {
             <Grid item xs={2} sm={2}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
                 <Box>
-                  <Typography component="p" sx={{ ...styles.unitPrice }}>
-                    {row.product ? t('currency', { val: unitPrice }) : '–'}
-                  </Typography>
-                  {row.product && row.quantity > 0 && (
+                  {isPriceLoading ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    <Typography component="p" sx={{ ...styles.unitPrice }}>
+                      {row.product ? t('currency', { val: unitPrice }) : '–'}
+                    </Typography>
+                  )}
+                  {!isPriceLoading && row.product && row.quantity > 0 && (
                     <Typography component="p" sx={{ ...styles.lineTotal }}>
                       {t('currency', { val: unitPrice * row.quantity })}
                     </Typography>
