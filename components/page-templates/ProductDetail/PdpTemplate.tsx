@@ -157,16 +157,16 @@ const PdpTemplate = (props: PdpTemplateProps) => {
   const { user } = useAuthContext()
 
   const [descExpanded, setDescExpanded] = useState(false)
-  const [relatedExpanded, setRelatedExpanded] = useState(false)
-  const [relatedHeights, setRelatedHeights] = useState<{ collapsed: number; full: number } | null>(
-    null
-  )
-  const relatedGridRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [showAllDocs, setShowAllDocs] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [validationOpen, setValidationOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [relatedExpanded, setRelatedExpanded] = useState(false)
+  const [relatedHeights, setRelatedHeights] = useState<{ collapsed: number; full: number } | null>(
+    null
+  )
+  const relatedGridRef = useRef<HTMLDivElement>(null)
 
   const {
     updatedProduct,
