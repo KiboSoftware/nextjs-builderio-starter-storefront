@@ -23,6 +23,7 @@ export interface CardDetailsFormProps {
   showCvv?: boolean
   fullWidth?: boolean
   showCardTypeIcon?: boolean
+  validationRequest?: number
   onSaveCardData: (cardData: CardForm) => void
   onFormStatusChange?: (status: boolean, formData?: CardForm) => void
 }
@@ -67,6 +68,7 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
     showCvv = true,
     fullWidth = false,
     showCardTypeIcon = true,
+    validationRequest,
     onSaveCardData,
     onFormStatusChange,
     cardValue,
@@ -79,6 +81,7 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
     formState: { errors, isValid },
     control,
     handleSubmit,
+    trigger,
   } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -117,6 +120,10 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
       handleSubmit(onValid)()
     }
   }, [isValid, validateForm, watchedFormData])
+
+  useEffect(() => {
+    if (validationRequest) trigger()
+  }, [validationRequest, trigger])
 
   return (
     <StyledCardDiv data-testid="card-details" fullWidth={fullWidth} sx={{ ml: 0, pl: 0 }}>
