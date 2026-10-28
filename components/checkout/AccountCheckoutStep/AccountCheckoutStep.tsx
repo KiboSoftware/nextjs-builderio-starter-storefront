@@ -1094,6 +1094,7 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
                         label={t('state-or-province')}
                         value={billingAddressOverride.stateOrProvince}
                         options={provinces}
+                        required
                         onChange={(_name, value) =>
                           setBillingAddressOverride((prev) => ({
                             ...prev,
