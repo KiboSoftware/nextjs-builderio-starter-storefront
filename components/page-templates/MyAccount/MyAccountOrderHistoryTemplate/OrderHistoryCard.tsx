@@ -5,11 +5,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Chip, Divider, Grid, Typography } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 
+import { Price } from '@/components/common'
 import { AccountItemMenu, accountType } from '@/components/my-account/common'
 import type { AccountItemMenuAction } from '@/components/my-account/common'
-import { orderGetters } from '@/lib/getters'
+import { orderGetters, productGetters } from '@/lib/getters'
 
-import type { CrAddress, CrOrder, CrOrderItem } from '@/lib/gql/types'
+import type { CrAddress, CrOrder, CrOrderItem, CrProduct } from '@/lib/gql/types'
 
 interface OrderHistoryCardProps {
   order: CrOrder
@@ -241,8 +242,17 @@ const OrderHistoryCard = (props: OrderHistoryCardProps) => {
                   {item?.product?.name}
                 </Typography>
                 <Typography component="p" sx={{ ...styles.itemMeta }}>
-                  {item?.product?.productCode} · {t('quantity')}:{item?.quantity}
+                  {item?.product?.variationProductCode || item?.product?.productCode} ·{' '}
+                  {t('quantity')}:{item?.quantity}
                 </Typography>
+                {Boolean(item?.product?.options?.length) && (
+                  <Typography component="p" sx={{ ...styles.itemMeta }}>
+                    {(item?.product?.options ?? [])
+                      .map((option) => option?.value)
+                      .filter(Boolean)
+                      .join(', ')}
+                  </Typography>
+                )}
                 {item?.expectedDeliveryDate && (
                   <Chip
                     label={`${t('ships')} ${orderGetters.getExpectedDeliveryDate([item])}`}
@@ -252,9 +262,19 @@ const OrderHistoryCard = (props: OrderHistoryCardProps) => {
                   />
                 )}
               </Box>
-              <Typography component="span" sx={{ ...styles.fieldValue, fontWeight: 700 }}>
-                {t('currency', { val: item?.total ?? 0 })}
-              </Typography>
+              <Price
+                variant="body2"
+                price={t('currency', {
+                  val: productGetters.getPrice(item?.product as CrProduct).regular,
+                })}
+                salePrice={
+                  productGetters.getPrice(item?.product as CrProduct).special
+                    ? t('currency', {
+                        val: productGetters.getPrice(item?.product as CrProduct).special,
+                      })
+                    : undefined
+                }
+              />
             </Box>
           ))}
         </>
