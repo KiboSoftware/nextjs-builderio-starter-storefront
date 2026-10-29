@@ -20,6 +20,7 @@ interface OrderSummaryProps<T extends CrCart | CrOrder | Checkout> extends Order
   children?: ReactNode
   editHref?: string
   showItems?: boolean
+  isLoading?: boolean
 }
 
 const styles = {
@@ -146,6 +147,7 @@ const OrderSummary = <T extends CrCart | CrOrder | Checkout>(props: OrderSummary
     // Off by default: consumers like the order-history detail page already render their own
     // item list and an "edit" link back to the cart wouldn't make sense there. Checkout opts in.
     showItems = false,
+    isLoading = false,
   } = props
   const { t } = useTranslation('common')
   const { toggleCartDrawer } = useHeaderContext()
@@ -160,6 +162,7 @@ const OrderSummary = <T extends CrCart | CrOrder | Checkout>(props: OrderSummary
     promoComponent,
     isShippingTaxIncluded,
     orderDetails,
+    isLoading,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -168,7 +171,10 @@ const OrderSummary = <T extends CrCart | CrOrder | Checkout>(props: OrderSummary
 
   return (
     <Card
+      data-testid="order-summary-card"
+      aria-busy={isLoading}
       sx={{
+        position: 'relative',
         bgcolor: '#FFFFFF',
         width: '100%',
         maxWidth: {

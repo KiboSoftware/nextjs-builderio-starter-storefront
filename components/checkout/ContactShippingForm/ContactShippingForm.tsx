@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { yupResolver } from '@hookform/resolvers/yup'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
@@ -15,7 +15,7 @@ import * as yup from 'yup'
 
 import { ChoiceCard, ShippingMethod } from '@/components/checkout'
 import { checkoutColors } from '@/components/checkout/checkoutStyles'
-import { KiboPhoneInput, KiboSelect, KiboTextBox } from '@/components/common'
+import { KiboPhoneInput, KiboSelect, KiboStateSelect,KiboSkeleton, KiboTextBox } from '@/components/common'
 import { toE164PhoneNumber } from '@/components/common/KiboPhoneInput/KiboPhoneInput'
 import { useUpdateOrderShippingInfo, useGetShippingMethods } from '@/hooks'
 import { AddressType, CountryCode, DefaultId } from '@/lib/constants'
@@ -46,11 +46,6 @@ interface ContactShippingFormData {
 }
 
 interface Country {
-  name: string
-  code: string
-}
-
-interface Province {
   name: string
   code: string
 }
@@ -176,6 +171,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
   // (valid before and after, so `isValid` never flips) still trigger a fresh save.
   const lastSavedContactSignatureRef = useRef<string | null>(null)
   const shippingMethodSaveQueueRef = useRef<Promise<boolean>>(Promise.resolve(true))
+  const shippingMethodSectionRef = useRef<HTMLDivElement>(null)
 
   // Primary sorted first, deduped by address content.
   const savedShippingAddresses = uniqBy(
@@ -187,15 +183,28 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
 
   const orderShippingContact = checkout?.fulfillmentInfo?.fulfillmentContact
   const hasOrderShippingAddress = Boolean(orderShippingContact?.address?.address1)
-  const initialContact = hasOrderShippingAddress ? orderShippingContact : defaultContact
+  const matchedSavedAddress = hasOrderShippingAddress
+    ? savedShippingAddresses.find(
+        (address) => getAddressDedupeKey(address) === getAddressDedupeKey(orderShippingContact)
+      )
+    : undefined
+  const initialContact = useMemo(
+    () =>
+      hasOrderShippingAddress
+        ? {
+            ...orderShippingContact,
+            phoneNumbers: {
+              home:
+                orderShippingContact?.phoneNumbers?.home || matchedSavedAddress?.phoneNumbers?.home,
+            },
+          }
+        : defaultContact,
+    [hasOrderShippingAddress, orderShippingContact, matchedSavedAddress]
+  )
 
   const getInitialAddressId = () => {
     if (hasOrderShippingAddress) {
-      const orderAddressKey = getAddressDedupeKey(orderShippingContact)
-      const orderSavedAddress = savedShippingAddresses.find(
-        (address) => getAddressDedupeKey(address) === orderAddressKey
-      )
-      return orderSavedAddress ? String(orderSavedAddress.id) : NEW_ADDRESS_OPTION
+      return matchedSavedAddress ? String(matchedSavedAddress.id) : NEW_ADDRESS_OPTION
     }
     return savedShippingAddresses?.length
       ? String(savedShippingAddresses[0].id)
@@ -225,6 +234,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
     reset,
     setValue,
     getValues,
+    setFocus,
     formState: { errors, isValid, isDirty },
   } = useForm<ContactShippingFormData>({
     mode: 'onChange',
@@ -379,25 +389,62 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
     return shippingMethodSaveQueueRef.current
   }
 
+  // A shipping method is only choosable (and thus only required) when the order actually has
+  // ship items - a pickup-only order has nothing to select and shouldn't be blocked on it.
+  const needsShippingMethod = shipItems.length > 0
+  const hasShippingMethod = !needsShippingMethod || !!checkoutShippingMethodCode
+  // `checkoutShippingMethodCode` only updates once the shipping-info save round-trips to the
+  // server - while that save is in flight (e.g. right after switching methods), it still holds
+  // the previous method's code, which would otherwise let Continue through on a stale value.
+  const isSavingShippingInfo = updateOrderShippingInfo.isPending
+  const canContinue = isValid && hasShippingMethod && !isSavingShippingInfo
+
   const handleContinue = async () => {
-    if (isValidatingShipping) return
+    // A shipping-info save still in flight means `checkoutShippingMethodCode` (and therefore
+    // `hasShippingMethod` below) is stale - wait for it to settle rather than letting the click
+    // through on an outdated value.
+    if (isValidatingShipping || isSavingShippingInfo) return
     setIsValidatingShipping(true)
     try {
       // Force-validate on submit (mode: 'onChange' skips untouched fields otherwise). Only
       // validate the "Add New Address" fields when that's the active mode - they stay mounted
       // but hidden when a saved address is selected instead.
-      const isFormValid =
+      const fieldsToValidate =
         selectedAddressId === NEW_ADDRESS_OPTION
-          ? await trigger()
-          : await trigger(['firstName', 'lastNameOrSurname', 'workEmail', 'phoneNumbers.home'])
+          ? ([
+              'firstName',
+              'lastNameOrSurname',
+              'workEmail',
+              'phoneNumbers.home',
+              'companyOrOrganization',
+              'address.address1',
+              'address.cityOrTown',
+              'address.stateOrProvince',
+              'address.postalOrZipCode',
+              'address.countryCode',
+            ] as const)
+          : (['firstName', 'lastNameOrSurname', 'workEmail', 'phoneNumbers.home'] as const)
+      const isFormValid = await trigger(fieldsToValidate as any)
 
-      // A shipping method is only choosable (and thus only required) when the order actually
-      // has ship items - a pickup-only order has nothing to select and shouldn't be blocked on it.
-      const needsShippingMethod = shipItems.length > 0
-      const hasShippingMethod = !needsShippingMethod || !!checkoutShippingMethodCode
       setShippingMethodError(hasShippingMethod ? '' : t('please-select-shipping-method'))
 
-      if (isFormValid && hasShippingMethod) onContinue()
+      if (!isFormValid) {
+        for (const name of fieldsToValidate) {
+          // eslint-disable-next-line no-await-in-loop
+          const fieldIsValid = await trigger(name as any)
+          if (!fieldIsValid) {
+            setFocus(name as any)
+            break
+          }
+        }
+        return
+      }
+
+      if (hasShippingMethod) {
+        onContinue()
+      } else {
+        shippingMethodSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
     } finally {
       setIsValidatingShipping(false)
     }
@@ -433,6 +480,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                   onChange={(_name: string, value: string) => field.onChange(value)}
                   onBlur={field.onBlur}
                   required
+                  autoComplete="new-first-name"
                 />
               )}
             />
@@ -451,6 +499,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                   onChange={(_name: string, value: string) => field.onChange(value)}
                   onBlur={field.onBlur}
                   required
+                  autoComplete="new-last-name"
                 />
               )}
             />
@@ -469,6 +518,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                   onChange={(_name: string, value: string) => field.onChange(value)}
                   onBlur={field.onBlur}
                   required
+                  autoComplete="new-work-email"
                 />
               )}
             />
@@ -553,6 +603,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                     onChange={(_name: string, value: string) => field.onChange(value)}
                     onBlur={field.onBlur}
                     required
+                    autoComplete="new-company"
                   />
                 )}
               />
@@ -571,6 +622,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                     onChange={(_name: string, value: string) => field.onChange(value)}
                     onBlur={field.onBlur}
                     required
+                    autoComplete="new-address1"
                   />
                 )}
               />
@@ -588,6 +640,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                     helperText={errors?.address?.address2?.message}
                     onChange={(_name: string, value: string) => field.onChange(value)}
                     onBlur={field.onBlur}
+                    autoComplete="new-address2"
                   />
                 )}
               />
@@ -621,22 +674,17 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                 name="address.stateOrProvince"
                 control={control}
                 render={({ field }) => (
-                  <KiboSelect
+                  <KiboStateSelect
                     name="state-or-province"
                     label={t('state-or-province')}
                     value={field.value}
+                    options={provinces}
                     error={!!errors?.address?.stateOrProvince}
                     helperText={errors?.address?.stateOrProvince?.message}
                     onChange={(_name: string, value: string) => field.onChange(value)}
                     onBlur={field.onBlur}
                     required
-                  >
-                    {provinces?.map((province: Province) => (
-                      <MenuItem key={province.code} value={province.code}>
-                        {province.name}
-                      </MenuItem>
-                    ))}
-                  </KiboSelect>
+                  />
                 )}
               />
             </Grid>
@@ -654,6 +702,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                     onChange={(_name: string, value: string) => field.onChange(value)}
                     onBlur={field.onBlur}
                     required
+                    autoComplete="new-city"
                   />
                 )}
               />
@@ -674,6 +723,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
                     }}
                     onBlur={field.onBlur}
                     required
+                    autoComplete="new-postal-code"
                     inputProps={{ minLength: 5, maxLength: 10 }}
                   />
                 )}
@@ -684,14 +734,12 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
       </Stack>
 
       {shipItems.length > 0 && hasDestinationAddress && (
-        <Stack gap={1.5}>
+        <Stack gap={1.5} ref={shippingMethodSectionRef}>
           <Typography sx={{ fontWeight: 600, fontSize: '18px', color: checkoutColors.subtitle }}>
             {t('shipping-method')}
           </Typography>
           {isLoadingShippingMethods ? (
-            <Typography sx={{ fontSize: '14px', color: checkoutColors.placeholder }}>
-              {t('loading-shipping-methods')}
-            </Typography>
+            <KiboSkeleton variant="rounded" height={64} count={2} gap={1.5} />
           ) : shippingMethods?.length > 0 ? (
             <ShippingMethod
               checkout={checkout}
@@ -719,8 +767,9 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
         <LoadingButton
           variant="contained"
           color="primary"
-          loading={isValidatingShipping}
+          loading={isValidatingShipping || isSavingShippingInfo}
           onClick={handleContinue}
+          aria-disabled={!canContinue}
           sx={{
             borderRadius: '0px 26px',
             padding: '12px 30px',
@@ -732,6 +781,7 @@ const ContactShippingForm = (props: ContactShippingFormProps) => {
             letterSpacing: 'normal',
             textTransform: 'capitalize',
             cursor: 'pointer',
+            opacity: canContinue ? 1 : 0.5,
             '&.Mui-disabled': { cursor: 'not-allowed' },
           }}
         >

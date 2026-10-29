@@ -155,6 +155,20 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
   const [isUpsAccountUpdated, setIsUpsAccountUpdated] = useState<boolean>(false)
   const [localUpsError, setLocalUpsError] = useState('')
 
+  const [localSelectedShippingMethodCode, setLocalSelectedShippingMethodCode] = useState<
+    string | undefined
+  >(selectedShippingMethodCode)
+
+  useEffect(() => {
+    if (
+      requestedShippingMethodCodeRef.current !== undefined &&
+      (selectedShippingMethodCode || '') !== requestedShippingMethodCodeRef.current
+    ) {
+      return
+    }
+    setLocalSelectedShippingMethodCode(selectedShippingMethodCode)
+  }, [selectedShippingMethodCode])
+
   const requestedShippingMethodCodeRef = useRef<string>()
   const lastOrderAttrsRef = useRef({
     b2bAccountName: '',
@@ -430,9 +444,11 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
 
   const saveShippingMethod = (value: string, name?: string) => {
     requestedShippingMethodCodeRef.current = value
+    setLocalSelectedShippingMethodCode(value)
     Promise.resolve(onShippingMethodChange && onShippingMethodChange(value, name)).then((saved) => {
       if (saved === false && requestedShippingMethodCodeRef.current === value) {
         requestedShippingMethodCodeRef.current = undefined
+        setLocalSelectedShippingMethodCode(selectedShippingMethodCode)
       }
     })
   }
@@ -756,6 +772,10 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
           )
         }
       } else {
+        // Selecting this option with no (or an incomplete) account number already on file
+        // wouldn't otherwise show an error until the shopper types into the field themselves -
+        // surface it immediately so Continue doing nothing isn't a silent dead end.
+        setLocalError(t('fedex-account-number-invalid'))
         handleShippingMethodSelectChange('', '')
       }
     } else if (method === 'ups') {
@@ -774,6 +794,9 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
           )
         }
       } else {
+        // Same as the FedEx case above - show the error immediately on selection, not only
+        // after the shopper types into the account number field.
+        setLocalUpsError(t('ups-account-number-invalid'))
         handleShippingMethodSelectChange('', '')
       }
     }
@@ -800,14 +823,20 @@ const ShipItemList = (shipProps: ShipItemListProps) => {
                       fontWeight="600"
                       color="rgba(0, 0, 0, 0.8)"
                       sx={{ fontFamily: 'Poppins', fontSize: '15px', letterSpacing: '-0.005em' }}
-                      price={`${t('fortis-shipping')} (${item?.shippingMethodName})`}
+                      price={
+                        item?.shippingMethodName?.toLowerCase().startsWith('fortis shipping')
+                          ? item.shippingMethodName
+                          : `${t('fortis-shipping')} (${item?.shippingMethodName})`
+                      }
                     />
                   </MenuItem>
                 ),
               })) ?? []
             }
             selected={
-              isOtherShippingMethod && selectedShippingMethodCode ? selectedShippingMethodCode : ''
+              isOtherShippingMethod && localSelectedShippingMethodCode
+                ? localSelectedShippingMethodCode
+                : ''
             }
             align="center"
             boxSx={shippingMethodCardSx}
