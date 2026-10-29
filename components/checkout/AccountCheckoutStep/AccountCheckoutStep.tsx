@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import CreditCardIcon from '@mui/icons-material/CreditCard'
 import RequestQuoteOutlinedIcon from '@mui/icons-material/RequestQuoteOutlined'
@@ -27,6 +27,7 @@ import {
   ContactShippingSummary,
   PaymentOptionCard,
   SavedCardPicker,
+  scrollToFirstFieldError,
 } from '@/components/checkout'
 import {
   checkoutColors,
@@ -279,6 +280,9 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
   const [referenceNumber, setReferenceNumber] = useState('')
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [placeOrderError, setPlaceOrderError] = useState('')
+  const [showPlaceOrderIssues, setShowPlaceOrderIssues] = useState(false)
+  const stepRef = useRef<HTMLDivElement>(null)
+  const [cardValidationRequest, setCardValidationRequest] = useState(0)
 
   const countries = publicRuntimeConfig.countries
   const provinces = publicRuntimeConfig.provinces
@@ -362,6 +366,12 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
     setCvv('')
     setCvvError('')
     setPlaceOrderError('')
+    setShowPlaceOrderIssues(false)
+  }
+
+  const handleSelectOption = (option: string) => {
+    setSelectedOption(option)
+    setShowPlaceOrderIssues(false)
   }
 
   const buildPurchaseOrderPaymentAction = (): PaymentActionInput => {
@@ -496,8 +506,34 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
     }
   }
 
+  const isCardholderNameMissing = !cardholderName.trim()
+  const isSavedCardCvvValid = /^\d{3,4}$/.test(cvv)
+
+  const getPlaceOrderIssues = () => {
+    if (isPurchaseOrder) return []
+    const issues: string[] = agreeWithTerms ? [] : [t('please-agree-to-terms')]
+    if (selectedSavedCard) {
+      if (!isSavedCardCvvValid) issues.push(t('please-complete-card-details'))
+    } else {
+      if (isCardholderNameMissing || !isCardFormValid) {
+        issues.push(t('please-complete-card-details'))
+      }
+      if (!billingSameAsShipping && !isBillingFormValid) {
+        issues.push(t('please-complete-billing-information'))
+      }
+    }
+    return issues
+  }
+  const placeOrderIssues = getPlaceOrderIssues()
+
   const validateBeforePlacingOrder = () => {
-    if (!agreeWithTerms) {
+    const isReady = isReadyToPlaceOrder()
+    if (!isReady) scrollToFirstFieldError(stepRef.current)
+    return isReady
+  }
+
+  const isReadyToPlaceOrder = () => {
+    if (isPurchaseOrder && !agreeWithTerms) {
       setPlaceOrderError(t('please-agree-to-terms'))
       return false
     }
@@ -557,21 +593,14 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
       return true
     }
 
-    if (selectedSavedCard) {
-      if (!/^\d{3,4}$/.test(cvv)) {
-        setCvvError(cvv ? t('invalid-cvv') : t('cvv-is-required'))
-        setPlaceOrderError(t('please-complete-card-details'))
-        return false
+    if (placeOrderIssues.length) {
+      setShowPlaceOrderIssues(true)
+      setPlaceOrderError('')
+      if (selectedSavedCard) {
+        if (!isSavedCardCvvValid) setCvvError(cvv ? t('invalid-cvv') : t('cvv-is-required'))
+      } else {
+        setCardValidationRequest((count) => count + 1)
       }
-      return true
-    }
-
-    if (!isCardFormValid) {
-      setPlaceOrderError(t('please-complete-card-details'))
-      return false
-    }
-    if (!billingSameAsShipping && !isBillingFormValid) {
-      setPlaceOrderError(t('please-complete-billing-information'))
       return false
     }
     return true
@@ -670,7 +699,7 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
   }
 
   return (
-    <Stack gap={5} data-testid="account-checkout-step">
+    <Stack ref={stepRef} gap={5} data-testid="account-checkout-step">
       {isB2BUser && (
         <Stack gap={1.5}>
           <Typography sx={{ fontWeight: 600, fontSize: '18px', color: checkoutColors.subtitle }}>
@@ -682,7 +711,7 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
               title={t('credit-card')}
               description={t('card-payment-description')}
               selected={!isPurchaseOrder}
-              onClick={() => setSelectedOption(PaymentType.CREDITCARD)}
+              onClick={() => handleSelectOption(PaymentType.CREDITCARD)}
             />
             <PaymentOptionCard
               icon={<RequestQuoteOutlinedIcon />}
@@ -691,7 +720,9 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
               selected={isPurchaseOrder}
               disabled={!isPOEnabled}
               tooltip={isPOEnabled ? undefined : t('po-not-enabled-tooltip')}
-              onClick={isPOEnabled ? () => setSelectedOption(PaymentType.PURCHASEORDER) : undefined}
+              onClick={
+                isPOEnabled ? () => handleSelectOption(PaymentType.PURCHASEORDER) : undefined
+              }
             />
           </Stack>
         </Stack>
@@ -1192,12 +1223,20 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
                     <KiboTextBox
                       value={cardholderName}
                       label={t('cardholder-name')}
+                      required
+                      error={showPlaceOrderIssues && isCardholderNameMissing}
+                      helperText={
+                        showPlaceOrderIssues && isCardholderNameMissing
+                          ? t('cardholder-name-required')
+                          : ''
+                      }
                       onChange={(_name, value) => setCardholderName(value)}
                     />
                     <CardDetailsForm
                       validateForm={false}
                       fullWidth
                       showCardTypeIcon={false}
+                      validationRequest={cardValidationRequest}
                       onSaveCardData={(cardData) => setCardFormData(cardData)}
                       onFormStatusChange={(isValid, cardData) => {
                         setIsCardFormValid(isValid)
@@ -1329,6 +1368,12 @@ const AccountCheckoutStep = (props: AccountCheckoutStepProps) => {
             )}
           </Stack>
 
+          {showPlaceOrderIssues &&
+            placeOrderIssues.map((issue) => (
+              <Typography key={issue} sx={{ color: 'error.main', fontSize: '14px' }}>
+                {issue}
+              </Typography>
+            ))}
           {placeOrderError && (
             <Typography sx={{ color: 'error.main', fontSize: '14px' }}>
               {placeOrderError}
