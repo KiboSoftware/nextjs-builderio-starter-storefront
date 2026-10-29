@@ -98,14 +98,14 @@ const csp = [
   `img-src 'self' data: blob: https:`,
   `media-src 'self' https://cdn.builder.io https://*.builder.io`,
   `font-src 'self' data: https://fonts.gstatic.com https://cdn.builder.io https://*.builder.io https://script.hotjar.com  https://*.hotjar.com`,
-  `connect-src 'self' https://*.mozu.com https://*.kibocommerce.com https://cdn.builder.io https://*.builder.io https://www.google.com https://www.google.co.in https://analytics.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.algolia.net https://*.algolianet.com https://go.bethyl.com https://www.fortislife.com https://insights.algolia.io https://api-prod.secureprivacy.ai https://*.secureprivacy.ai https://track.hubspot.com https://*.hsforms.com https://forms.hscollectedforms.net https://*.clarity.ms https://*.snitcher.com https://radar.snitcher.com https://*.hubspotusercontent-na1.net https://*.hotjar.com https://*.hotjar.in https://vc.hotjar.io wss://ws.hotjar.com https://content.hotjar.io/ https://metrics.hotjar.io https://surveystats.hotjar.io https://www.googleadservices.com https://pixel-config.reddit.com/ https://googleads.g.doubleclick.net https://help.hotjar.com https://uper.pl https://support.google.com https://px.ads.linkedin.com https://embed.typeform.com https://*.citeab.com`,
+  `connect-src 'self' https://*.mozu.com https://*.kibocommerce.com https://cdn.builder.io https://*.builder.io https://www.google.com https://www.google.co.in https://analytics.google.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.algolia.net https://*.algolianet.com https://go.bethyl.com https://www.fortislife.com https://insights.algolia.io https://api-prod.secureprivacy.ai https://*.secureprivacy.ai https://track.hubspot.com https://*.hsforms.com https://forms.hscollectedforms.net https://*.clarity.ms https://*.snitcher.com https://radar.snitcher.com https://*.hubspotusercontent-na1.net https://*.hotjar.com https://*.hotjar.in https://vc.hotjar.io wss://ws.hotjar.com https://content.hotjar.io/ https://metrics.hotjar.io https://surveystats.hotjar.io https://www.googleadservices.com https://pixel-config.reddit.com/ https://googleads.g.doubleclick.net https://help.hotjar.com https://uper.pl https://support.google.com https://px.ads.linkedin.com https://embed.typeform.com https://*.citeab.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://stats.g.doubleclick.net https://google.com`,
 
   `frame-src 'self' https://*.builder.io https://www.google.com https://recaptcha.google.com https://pmts.mozu.com https://go.fortislife.com https://*.hsforms.com https://*.mozu.com https://*.citeab.com https://js.hsforms.net https://embed.typeform.com`,
   `frame-ancestors 'self'`,
   `worker-src 'self' blob:`,
   `object-src 'none'`,
   `base-uri 'self'`,
-  `form-action 'self' https://*.mozu.com`,
+  `form-action 'self' https://*.mozu.com https://forms.hsforms.com https://*.hsforms.com`,
   `upgrade-insecure-requests`,
 ].join('; ')
 function applySecurityHeaders(response: NextResponse) {
@@ -172,7 +172,6 @@ export async function middleware(request: NextRequest) {
     if (cachedRedirects && cachedRedirectsTimestamp) {
       const currentTime = Date.now()
       if (currentTime - cachedRedirectsTimestamp < CACHE_EXPIRATION_TIME * 1000) {
-        console.log('Using cached redirects')
         return handleRedirects(request, cachedRedirects)
       } else {
         // Cache is stale but within stale-while-revalidate window, serve stale data and re-fetch
@@ -180,7 +179,6 @@ export async function middleware(request: NextRequest) {
           currentTime - cachedRedirectsTimestamp <
           (CACHE_EXPIRATION_TIME + STALE_WHILE_REVALIDATE_TIME) * 1000
         ) {
-          console.log('Serving stale redirects while revalidating')
           // Serve the stale cached redirects while fetching fresh data in the background
           fetchEdgeConfigRedirects()
           return handleRedirects(request, cachedRedirects)
@@ -188,8 +186,6 @@ export async function middleware(request: NextRequest) {
       }
     } else {
       const edgeRedirects = await fetchEdgeConfigRedirects()
-
-      console.log('edgeRedirects in middlware function:', edgeRedirects)
 
       if (!Array.isArray(edgeRedirects)) {
         console.error('Error: Edge Config data is not an array')
@@ -199,7 +195,6 @@ export async function middleware(request: NextRequest) {
       const customEdgeRedirect = edgeRedirects.find((entry) => entry.source === pathname)
 
       if (customEdgeRedirect) {
-        console.log('Match found customEdgeRedirect:', customEdgeRedirect)
         const finalUrl = new URL(customEdgeRedirect.destination, request.url)
 
         return applySecurityHeaders(
@@ -209,10 +204,9 @@ export async function middleware(request: NextRequest) {
       return applySecurityHeaders(NextResponse.next())
     }
   }
-  if (
-    request.nextUrl.pathname.startsWith('/my-account') ||
-    request.nextUrl.pathname.startsWith('/checkout')
-  ) {
+  // /checkout intentionally allows guest (unauthenticated) access here - guest checkout
+  // is a supported flow. Only /my-account requires a signed-in session.
+  if (request.nextUrl.pathname.startsWith('/my-account')) {
     if (checkIsAuthenticated(request)) {
       return applySecurityHeaders(NextResponse.next())
     } else if (request.nextUrl.pathname.startsWith('/checkout')) {
@@ -307,10 +301,6 @@ async function handleRedirects(
   const customCachedEdgeRedirect = redirectsCached.find((entry) => entry.source === pathname)
 
   if (customCachedEdgeRedirect) {
-    console.log(
-      'Match found customCachedEdgeRedirect in handlredirects method:',
-      customCachedEdgeRedirect
-    )
     const finalUrl = new URL(customCachedEdgeRedirect.destination, request.url)
     return applySecurityHeaders(
       NextResponse.redirect(finalUrl, customCachedEdgeRedirect.permanent ? 308 : 307)
@@ -331,7 +321,6 @@ async function fetchEdgeConfigRedirects(): Promise<
       // Cache the redirects for subsequent requests
       cachedRedirects = edgeRedirectsFromApi
       cachedRedirectsTimestamp = Date.now()
-      console.log('Fetched edgeRedirectsFromApi from Edge Config:', edgeRedirectsFromApi)
       return edgeRedirectsFromApi
     } else {
       console.error('Error: Edge Config data is not a valid array or is empty')

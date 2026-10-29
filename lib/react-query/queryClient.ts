@@ -1,12 +1,22 @@
 import { QueryClient, MutationCache, QueryCache } from '@tanstack/react-query'
 
-const getErrorMessage = (code: string, message: string) => {
-  const messages: any = {
-    GRAPHQL_VALIDATION_FAILED: 'Something went wrong',
-    UNAUTHENTICATED: 'Invalid Credentials',
-  }
+const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.'
 
-  return message || messages[code]
+const KNOWN_ERROR_MESSAGES: Record<string, string> = {
+  GRAPHQL_VALIDATION_FAILED: GENERIC_ERROR_MESSAGE,
+  UNAUTHENTICATED: 'Invalid Credentials',
+}
+
+const PAYMENT_ERROR_MESSAGE = 'Error on payment. Please check billing details and try again.'
+
+const DISPLAYABLE_ERROR_MESSAGES: Record<string, string> = {
+  'Validation Error: Unable to adjust payments to match order total.': PAYMENT_ERROR_MESSAGE,
+}
+
+const getErrorMessage = (code: string, message: string) => {
+  if (KNOWN_ERROR_MESSAGES[code]) return KNOWN_ERROR_MESSAGES[code]
+
+  return DISPLAYABLE_ERROR_MESSAGES[message] || GENERIC_ERROR_MESSAGE
 }
 
 const parseGraphQLError = (errorString: any) => {
@@ -31,11 +41,24 @@ const parseGraphQLError = (errorString: any) => {
   }
 }
 
+const DEFAULT_QUERY_RETRY_COUNT = 3
+const SESSION_EXPIRED_CODE = 'SESSION_EXPIRED'
+const SESSION_EXPIRED_EVENT = 'kibo:session-expired'
+
+const isSessionExpiredError = (error: any) =>
+  (error?.response?.code ?? parseGraphQLError(error)?.response?.code) === SESSION_EXPIRED_CODE
+
 const queryClientHandler = (error: any, showSnackbar: any) => {
+  const parsedError = parseGraphQLError(error)
+
+  if (isSessionExpiredError(error)) {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT))
+    return
+  }
+
   if (!showSnackbar) return
   const status = 'error'
 
-  const parsedError = parseGraphQLError(error)
   const statusCode = error?.response?.status
     ? error?.response?.status
     : parsedError?.response?.status
@@ -54,7 +77,7 @@ const queryClientHandler = (error: any, showSnackbar: any) => {
 
   if (parsedError?.response?.message && parsedError.response.message.includes('Auth declined')) {
     showSnackbar(
-      'Auth Declined, Error in payment! Please check billing details and try again!',
+      'Auth Declined, Error on payment. Please check billing details and try again.',
       status
     )
   } else if (
@@ -62,7 +85,7 @@ const queryClientHandler = (error: any, showSnackbar: any) => {
     'Validation Error: Auth declined: GatewayResponse: 2 This transaction has been declined.'
   ) {
     showSnackbar(
-      'Auth Declined, Error in payment! Please check billing details and try again!',
+      'Auth Declined, Error on payment. Please check billing details and try again.',
       status
     )
   } else if (
@@ -70,14 +93,14 @@ const queryClientHandler = (error: any, showSnackbar: any) => {
     parsedError.response.message.includes('This transaction has been declined')
   ) {
     showSnackbar(
-      'Auth Declined, Error in payment! Please check billing details and try again!',
+      'Auth Declined, Error on payment. Please check billing details and try again.',
       status
     )
   } else if (
     parsedError?.response?.message ===
     'Validation Error: Unable to adjust payments to match order total.'
   ) {
-    showSnackbar('Error in payment! Please check billing details and try again!', status)
+    showSnackbar('Error on payment. Please check billing details and try again.', status)
   }
 
   if (error instanceof SyntaxError && error.message.includes('Unexpected token')) {
@@ -101,14 +124,26 @@ const queryClientHandler = (error: any, showSnackbar: any) => {
 
 export const generateQueryClient = (showSnackbar?: any): QueryClient => {
   const mutationCache = new MutationCache({
-    onError: (error) => queryClientHandler(error, showSnackbar),
+    onError: (error, _variables, _context, mutation) => {
+      if (mutation.meta?.suppressErrorSnackbar) return
+      queryClientHandler(error, showSnackbar)
+    },
   })
 
   const queryCache = new QueryCache({
     onError: (error) => queryClientHandler(error, showSnackbar),
   })
 
-  return new QueryClient({ mutationCache, queryCache })
+  return new QueryClient({
+    mutationCache,
+    queryCache,
+    defaultOptions: {
+      queries: {
+        retry: (failureCount, error) =>
+          !isSessionExpiredError(error) && failureCount < DEFAULT_QUERY_RETRY_COUNT,
+      },
+    },
+  })
 }
 
 export const queryClient = generateQueryClient()

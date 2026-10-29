@@ -6,6 +6,10 @@ import { getProductSearchVariationsQuery, getProductVariationQuery } from '@/lib
 
 import { FilteredProduct, Price, Value } from '@/lib/gql/types'
 
+export type FilteredVariationProduct = FilteredProduct & {
+  isNewVariant: boolean
+}
+
 interface Product {
   variationProductCode: string
   options: Option[]
@@ -23,7 +27,31 @@ interface Property {
 }
 
 interface PropertyValue {
-  value: string | number
+  value?: string | number | boolean
+  stringValue?: string
+}
+
+const getPropertyValue = (properties: Property[] = [], attributeFQN: string) => {
+  const property = properties.find(
+    (prop) => prop?.attributeFQN?.toLowerCase() === attributeFQN.toLowerCase()
+  )
+  return property?.values?.[0]?.value ?? property?.values?.[0]?.stringValue
+}
+
+const getBooleanPropertyValue = (properties: Property[] = [], attributeFQN: string): boolean => {
+  const rawValue = getPropertyValue(properties, attributeFQN)
+  if (typeof rawValue === 'boolean') return rawValue
+  if (typeof rawValue === 'number') return rawValue === 1
+  if (typeof rawValue === 'string') {
+    return ['true', 'yes', '1'].includes(rawValue.trim().toLowerCase())
+  }
+
+  return false
+}
+
+const hasPropertyValue = (properties: Property[] = [], attributeFQN: string): boolean => {
+  const value = getPropertyValue(properties, attributeFQN)
+  return value !== undefined && value !== null
 }
 
 export default async function getProductSearchVariations(
@@ -42,7 +70,7 @@ export default async function getProductSearchVariations(
   const products: Product[] = response.data?.products?.items || []
 
   // Transform and filter the product items as required
-  let result: FilteredProduct[]
+  let result: FilteredVariationProduct[]
 
   if (variantCodes && products.length === variantCodes.length) {
     // Existing flow
@@ -63,38 +91,87 @@ export default async function getProductSearchVariations(
         price: product.price,
         childPriority: childPriorityProperty ? Number(childPriorityProperty.values[0].value) : null,
         inventoryInfo: (product as any).inventoryInfo ?? null,
+        isNewVariant: getBooleanPropertyValue(product.properties, 'tenant~new-product-variant'),
       }
     })
 
+    const missingNewVariantFlags = products.filter(
+      (product) => !hasPropertyValue(product.properties, 'tenant~new-product-variant')
+    )
+    const newVariantFlagLookups = await Promise.all(
+      missingNewVariantFlags.map(async (product) => {
+        try {
+          const variationResponse = await fetcher(
+            {
+              query: getProductVariationQuery,
+              variables: { productCode, variationProductCode: product.variationProductCode },
+            },
+            { headers }
+          )
+          const variationProduct = variationResponse.data?.product
+
+          return variationProduct
+            ? {
+                variationProductCode: product.variationProductCode,
+                isNewVariant: getBooleanPropertyValue(
+                  variationProduct.properties,
+                  'tenant~new-product-variant'
+                ),
+              }
+            : null
+        } catch (error) {
+          console.error(
+            `Failed to load new-variant flag for ${product.variationProductCode}`,
+            error
+          )
+          return null
+        }
+      })
+    )
+
+    for (const flag of newVariantFlagLookups) {
+      if (!flag) continue
+      const variant = result.find(
+        (entry) => entry.variationProductCode === flag.variationProductCode
+      )
+      if (variant) variant.isNewVariant = flag.isNewVariant
+    }
+
     // productSearch inventory is stale — always verify with live individual queries when stock <= 0.
     // Trust productSearch only when it explicitly shows stock > 0 (InStock is safe to use as-is).
-    const inventoryFallbacks = result
-      .filter((v) => {
-        if (!v.inventoryInfo) return true
-        const inv = v.inventoryInfo as any
-        if (inv.onlineStockAvailable == null) return true
-        return (inv.onlineStockAvailable ?? 0) <= 0
-      })
-      .map((v) =>
-        fetcher(
+
+    for (const variant of result) {
+      try {
+        const variationResponse = await fetcher(
           {
             query: getProductVariationQuery,
-            variables: { productCode, variationProductCode: v.variationProductCode },
+            variables: {
+              productCode,
+              variationProductCode: variant.variationProductCode,
+            },
           },
           { headers }
         )
-          .then((res) => ({
-            variationProductCode: v.variationProductCode,
-            inventoryInfo: res.data?.product?.inventoryInfo ?? null,
-          }))
-          .catch(() => null)
-      )
 
-    const inventoryResults = await Promise.all(inventoryFallbacks)
-    for (const inv of inventoryResults) {
-      if (!inv) continue
-      const variant = result.find((v) => v.variationProductCode === inv.variationProductCode)
-      if (variant && inv.inventoryInfo != null) variant.inventoryInfo = inv.inventoryInfo
+        const variationProduct = variationResponse.data?.product
+
+        const isNewVariant = getBooleanPropertyValue(
+          variationProduct?.properties ?? [],
+          'tenant~new-product-variant'
+        )
+
+        const newVariantProperty = variationProduct?.properties?.find(
+          (prop: any) => prop?.attributeFQN?.toLowerCase() === 'tenant~new-product-variant'
+        )
+
+        if (variationProduct) {
+          variant.inventoryInfo = variationProduct.inventoryInfo ?? variant.inventoryInfo
+
+          variant.isNewVariant = isNewVariant
+        }
+      } catch (error) {
+        console.error('Error fetching variant:', variant.variationProductCode, error)
+      }
     }
   } else {
     console.log('Entered else statement')
@@ -135,6 +212,10 @@ export default async function getProductSearchVariations(
             ? Number(childPriorityProperty.values[0].value)
             : null,
           inventoryInfo: (variationProduct as any).inventoryInfo ?? null,
+          isNewVariant: getBooleanPropertyValue(
+            variationProduct.properties,
+            'tenant~new-product-variant'
+          ),
         })
       }
     }

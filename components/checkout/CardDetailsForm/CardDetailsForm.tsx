@@ -14,6 +14,7 @@ import {
   isCardNumberValid,
   isCardTypeValid,
   getCreditCardLogo,
+  getCvvLength,
 } from '@/lib/helpers/credit-card'
 import type { CardForm } from '@/lib/types'
 
@@ -21,14 +22,34 @@ export interface CardDetailsFormProps {
   cardValue?: CardForm
   validateForm: boolean
   showCvv?: boolean
+  fullWidth?: boolean
+  showCardTypeIcon?: boolean
+  validationRequest?: number
   onSaveCardData: (cardData: CardForm) => void
   onFormStatusChange?: (status: boolean, formData?: CardForm) => void
 }
 
-const StyledCardDiv = styled('div')(() => ({
-  maxWidth: '26.313rem',
+const StyledCardDiv = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'fullWidth',
+})<{ fullWidth?: boolean }>(({ fullWidth }) => ({
+  maxWidth: fullWidth ? '100%' : '26.313rem',
   paddingLeft: '0.5rem',
 }))
+
+const cardInputSx = {
+  height: '44px',
+  borderRadius: '8px',
+  borderColor: '#C9C8D9',
+  transition: 'border-color 0.2s, box-shadow 0.2s',
+  '&:hover': { borderColor: '#30299A' },
+  '&.MuiInputBase-root:focus-within': {
+    borderColor: '#30299A',
+    boxShadow: '0 0 0 3px rgba(48, 41, 154, 0.15)',
+  },
+  '&.Mui-error': { borderColor: 'error.main' },
+  '& .MuiInputBase-input': { padding: '0 14px', letterSpacing: '0.02em' },
+  '& .MuiInputBase-input::placeholder': { color: '#8C8BA3', opacity: 1 },
+}
 
 const useCardSchema = (showCvv: boolean) => {
   const { t } = useTranslation('common')
@@ -52,7 +73,16 @@ const useCardSchema = (showCvv: boolean) => {
       .test('expiry-date', t('invalid-expiry-date'), (value) => validateExpiryDate(value)),
     cvv: yup.string().when('$isEdit', (isEdit, schema) => {
       if (!isEdit && showCvv) {
-        return schema.required(t('cvv-is-required')).matches(/^\d{3,4}$/g, t('invalid-cvv'))
+        return schema
+          .required(t('cvv-is-required'))
+          .matches(/^\d{3,4}$/g, t('invalid-cvv'))
+          .test('cvv-length', function (this: yup.TestContext, value?: string) {
+            const expectedLength = getCvvLength(this.parent.cardNumber)
+            if (!value || !expectedLength || value.length === expectedLength) return true
+            return this.createError({
+              message: t('invalid-cvv-length', { count: expectedLength }),
+            })
+          })
       }
     }),
   })
@@ -61,6 +91,9 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
   const {
     validateForm = false,
     showCvv = true,
+    fullWidth = false,
+    showCardTypeIcon = true,
+    validationRequest,
     onSaveCardData,
     onFormStatusChange,
     cardValue,
@@ -73,6 +106,8 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
     formState: { errors, isValid },
     control,
     handleSubmit,
+    getValues,
+    trigger,
   } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -112,10 +147,14 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
     }
   }, [isValid, validateForm, watchedFormData])
 
+  useEffect(() => {
+    if (validationRequest) trigger()
+  }, [validationRequest, trigger])
+
   return (
-    <StyledCardDiv data-testid="card-details" sx={{ ml: 0, pl: 0 }}>
+    <StyledCardDiv data-testid="card-details" fullWidth={fullWidth} sx={{ ml: 0, pl: 0 }}>
       <FormControl sx={{ width: '100%' }}>
-        <Grid container columnGap={4}>
+        <Grid container columnGap={4} rowGap={2}>
           <Grid item xs={12}>
             <Controller
               name="cardNumber"
@@ -126,25 +165,35 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                   value={field.value || ''}
                   label={t('card-number')}
                   required={true}
+                  sx={cardInputSx}
                   onChange={(_name, value) => {
-                    const sanitizedValue = value.replace(/\s/g, '')
+                    const sanitizedValue = value.replace(/\D/g, '').substring(0, 19)
                     handleCardType(field, sanitizedValue)
                   }}
-                  onBlur={field.onBlur}
+                  onBlur={() => {
+                    field.onBlur()
+                    if (getValues('cvv')) trigger('cvv')
+                  }}
                   error={!!errors?.cardNumber}
                   helperText={errors?.cardNumber?.message as unknown as string}
-                  icon={
-                    <Box pr={1} mt={1}>
-                      <KiboImage src={cardTypeLogo.src} alt={'cardType'} width={45} height={24} />
-                    </Box>
-                  }
+                  {...(showCardTypeIcon && {
+                    icon: (
+                      <Box pr={1.5} display="flex" alignItems="center">
+                        <KiboImage src={cardTypeLogo.src} alt={'cardType'} width={32} height={20} />
+                      </Box>
+                    ),
+                  })}
                   {...(cardValue && { disabled: true })}
-                  inputProps={{ maxLength: 16 }}
                 />
               )}
             />
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid
+            item
+            xs={12}
+            md
+            sx={{ flexBasis: { md: 'calc(50% - 16px)' }, maxWidth: { md: 'calc(50% - 16px)' } }}
+          >
             <Controller
               name="expiryDate"
               control={control}
@@ -153,15 +202,45 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                 <KiboTextBox
                   value={field.value || ''}
                   label={t('expires-mm-yyyy')}
+                  placeholder={t('expiry-date-placeholder')}
+                  sx={cardInputSx}
                   required={true}
                   onChange={(_name, value) => {
-                    const formattedValue = value
-                      .replace(/\D/g, '')
-                      .replace(/^(\d{2})(\d)/g, '$1/$2')
-                      .substring(0, 7)
+                    const previous = field.value || ''
+                    const isDeleting = value.length < previous.length
+                    const slashIndex = value.indexOf('/')
+
+                    let month: string
+                    let year: string
+                    if (slashIndex !== -1) {
+                      month = value.substring(0, slashIndex).replace(/\D/g, '').substring(0, 2)
+                      year = value
+                        .substring(slashIndex + 1)
+                        .replace(/\D/g, '')
+                        .substring(0, 4)
+                    } else {
+                      const digits = value.replace(/\D/g, '').substring(0, 6)
+                      month = digits.substring(0, 2)
+                      year = digits.substring(2)
+                    }
+
+                    const formattedValue =
+                      slashIndex !== -1 || (month.length === 2 && !isDeleting)
+                        ? `${month}/${year}`
+                        : month
+
                     field.onChange(formattedValue)
                   }}
-                  onBlur={field.onBlur}
+                  onBlur={() => {
+                    const current = field.value || ''
+                    if (current.includes('/')) {
+                      let [month, year] = current.split('/')
+                      if (month.length === 1) month = `0${month}`
+                      if (year.length === 2) year = `20${year}`
+                      field.onChange(`${month}/${year}`)
+                    }
+                    field.onBlur()
+                  }}
                   error={!!errors?.expiryDate}
                   helperText={errors?.expiryDate?.message as unknown as string}
                 />
@@ -170,7 +249,12 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
           </Grid>
           {showCvv && (
             <>
-              <Grid item xs={8} md={3}>
+              <Grid
+                item
+                xs={12}
+                md
+                sx={{ flexBasis: { md: 'calc(50% - 16px)' }, maxWidth: { md: 'calc(50% - 16px)' } }}
+              >
                 <Controller
                   name="cvv"
                   control={control}
@@ -181,7 +265,9 @@ const CardDetailsForm = (props: CardDetailsFormProps) => {
                         type="password"
                         value={field.value || ''}
                         label={t('cvv-code')}
+                        placeholder={t('cvv-placeholder')}
                         required={true}
+                        sx={cardInputSx}
                         onChange={(_name, value) => {
                           const sanitizedValue = value.replace(/\D/g, '').substring(0, 4)
                           field.onChange(sanitizedValue)

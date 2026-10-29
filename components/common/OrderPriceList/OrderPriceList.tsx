@@ -4,6 +4,7 @@ import { Typography, Box, ListItem, ListItemText, List } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { useTranslation } from 'next-i18next'
 
+import KiboSkeleton from '../KiboSkeleton/KiboSkeleton'
 import Price from '../Price/Price'
 
 interface OrderPriceListProps {
@@ -13,6 +14,9 @@ interface OrderPriceListProps {
   taxTotal?: number
   discountedSubtotal?: number
   discounts?: any[]
+  // While true, shows placeholder bars instead of the label/amount - for a row whose figure
+  // (e.g. tax) is still being calculated/fetched, rather than flashing a stale/zero value.
+  isLoading?: boolean
 }
 
 const styles = {
@@ -20,12 +24,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '0 19px',
-    marginBottom: '5px',
-    px: {
-      xs: 0,
-      md: 0,
-    },
+    padding: 0,
+    marginBottom: '10px',
     width: {
       xs: '100%',
       md: '100%',
@@ -34,7 +34,7 @@ const styles = {
 }
 
 const OrderPriceList = (props: OrderPriceListProps) => {
-  const { title, total, subTotal, taxTotal, discountedSubtotal, discounts } = props
+  const { title, total, subTotal, taxTotal, discountedSubtotal, discounts, isLoading } = props
 
   const { t } = useTranslation('common')
 
@@ -51,23 +51,42 @@ const OrderPriceList = (props: OrderPriceListProps) => {
         >
           <ListItemText
             primary={
-              <Typography
-                variant="body2"
-                component="h4"
-                color="grey.900"
-                sx={{ fontSize: '1.375rem' }}
-              >
-                {t(title)}
-              </Typography>
+              isLoading ? (
+                <KiboSkeleton variant="text" width={100} height={22} />
+              ) : (
+                <Typography
+                  component="h4"
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 400,
+                    fontSize: '15px',
+                    lineHeight: '150%',
+                    letterSpacing: '-0.005em',
+                    color: '#454545',
+                  }}
+                >
+                  {t(title)}
+                </Typography>
+              )
             }
           />
-          <Price
-            fontWeight={Number(subTotal) < 0 ? '400' : '300'}
-            color={Number(subTotal) < 0 ? 'red.900' : 'grey.900'}
-            price={t('currency', {
-              val: discountedSubtotal ? discountedSubtotal : subTotal,
-            })}
-          />
+          {isLoading ? (
+            <KiboSkeleton variant="text" width={60} height={22} />
+          ) : (
+            <Price
+              fontWeight="600"
+              color={Number(subTotal) < 0 ? 'error.main' : 'rgba(1, 1, 1, 0.74)'}
+              sx={{
+                fontFamily: 'Poppins',
+                fontSize: '15px',
+                lineHeight: '150%',
+                letterSpacing: '-0.005em',
+              }}
+              price={t('currency', {
+                val: discountedSubtotal ? discountedSubtotal : subTotal,
+              })}
+            />
+          )}
         </ListItem>
       </List>
     </Box>

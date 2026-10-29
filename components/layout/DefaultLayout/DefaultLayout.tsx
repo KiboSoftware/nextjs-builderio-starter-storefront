@@ -7,9 +7,11 @@ import { HydrationBoundary } from '@tanstack/react-query'
 import creditCardType from 'credit-card-type'
 import Router, { useRouter } from 'next/router'
 
+import { CartSideDrawer } from '@/components/cart'
 import { AnnouncementBar, GlobalFetchingIndicator } from '@/components/common'
+import SessionExpiredHandler from '@/components/common/SessionExpiredHandler/SessionExpiredHandler'
 import { Footer, FortisHeader } from '@/components/layout'
-import { TRANSPARENT_PAGES } from '@/components/layout/AppHeader/transparentPages'
+import { isTransparentPagePath } from '@/components/layout/AppHeader/transparentPages'
 import {
   AuthContextProvider,
   ModalContextProvider,
@@ -27,6 +29,8 @@ creditCardType.updateCard('american-express', {
   niceType: 'AMEX',
 })
 
+const FULL_WIDTH_PAGES = ['/product/[productCode]']
+
 const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: ReactElement }) => {
   const router = useRouter()
   const headerRef = useRef<HTMLDivElement>(null)
@@ -35,7 +39,8 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
   const isTransparentPage =
     typeof builderTransparent === 'boolean'
       ? builderTransparent
-      : TRANSPARENT_PAGES.includes(router.asPath.split('?')[0])
+      : isTransparentPagePath(router.asPath)
+  const isFullWidthPage = FULL_WIDTH_PAGES.includes(router.pathname)
 
   useEffect(() => {
     const el = headerRef.current
@@ -98,7 +103,9 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
         <ModalContextProvider>
           <AuthContextProvider>
             <HeaderContextProvider>
+              <SessionExpiredHandler />
               <GlobalFetchingIndicator />
+              <CartSideDrawer />
               <Stack sx={{ minHeight: '100vh', width: '100%' }}>
                 <Stack
                   ref={headerRef}
@@ -137,12 +144,12 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
                     pt: isTransparentPage ? 0 : `${headerHeight}px`,
                   }}
                 >
-                  {isTransparentPage ? (
+                  {isTransparentPage || isFullWidthPage ? (
                     children
                   ) : (
                     <Container
                       disableGutters
-                      sx={{ maxWidth: '1200px !important', mx: 'auto', px: { xs: 2, md: 0 } }}
+                      sx={{ maxWidth: '1300px !important', mx: 'auto', px: { xs: 2, md: 0 } }}
                     >
                       {children}
                     </Container>

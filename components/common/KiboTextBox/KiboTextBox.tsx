@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { FormControl, FormHelperText, IconButton, InputBase, InputLabel } from '@mui/material'
-import { alpha, styled } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 
 export interface KiboTextBoxProps {
   label?: string
@@ -21,29 +21,30 @@ export interface KiboTextBoxProps {
 }
 
 const KiboInput = styled(InputBase)(({ theme, error }) => ({
-  'label + &': {
-    marginTop: theme.spacing(3),
-  },
   '&.MuiInputBase-root:focus-within': {
-    boxShadow: `${alpha(error ? theme.palette.error.main : '#020027', 0.25)} 0 0 0 0.2rem`,
+    borderColor: error ? theme.palette.error.main : theme.palette.primary.main,
+    boxShadow: `0 0 0 1px ${error ? theme.palette.error.main : theme.palette.primary.main}`,
   },
   '& .MuiInputBase-input': {
     position: 'relative',
-    padding: '4.5px 12px',
+    padding: '10px 14px',
+    fontFamily: 'Poppins',
+    fontSize: '14px',
+    lineHeight: '140%',
+    color: '#454545',
     transition: theme.transitions.create(['border-color', 'background-color', 'box-shadow']),
-    '& :focus': {
-      '& .MuiInputBase-root': {
-        border: 'none',
-        boxShadow: `${alpha(
-          error ? theme.palette.error.main : theme.palette.primary.main,
-          0.25
-        )} 0 0 0 0.2rem`,
-      },
+    '&::placeholder': {
+      color: '#8A8A8A',
+      opacity: 1,
     },
   },
 }))
 
-const KiboTextBox = (props: KiboTextBoxProps) => {
+// Forwards its ref to the actual focusable <input> (not just the wrapping FormControl) - react
+// -hook-form's Controller spreads `field.ref` onto this component so RHF's setFocus()/validation
+// -triggered focus can find a real DOM node to call .focus() on. Without forwardRef here, React
+// silently drops that ref before it ever reaches this component, and setFocus becomes a no-op.
+const KiboTextBox = React.forwardRef<HTMLInputElement, KiboTextBoxProps>((props, ref) => {
   const {
     label,
     required = false,
@@ -59,6 +60,7 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
     onIconClick,
     onInput,
     name,
+    multiline = false,
     ...rest
   } = props
 
@@ -66,14 +68,19 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
     <FormControl variant="standard" error={error} required={required} {...rest} fullWidth>
       <InputLabel
         sx={{
-          // Override default styles for the KiboTextBox component
-          color: '#020027',
+          // MUI floats InputLabel absolutely by default (built for the overlap-then-shrink
+          // pattern). We always render shrunk, so take it out of that flow entirely and lay
+          // it out as a normal block above the input, spaced by marginBottom.
+          position: 'static',
+          transform: 'none',
+          color: '#3B3B3B',
           fontFamily: 'Poppins',
-          fontSize: '16px',
+          fontSize: '15px',
           fontStyle: 'normal',
-          fontWeight: '300',
-          lineHeight: '25px',
-          transform: 'translate(0, -1.5px) scale(1)',
+          fontWeight: '400',
+          lineHeight: '150%',
+          letterSpacing: '-0.005em',
+          marginBottom: '6px',
         }}
         shrink
         htmlFor={label}
@@ -81,20 +88,25 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
         {label}
       </InputLabel>
       <KiboInput
+        ref={ref}
         sx={{
-          borderColor: error ? 'error.main' : '#020027',
+          borderColor: error ? 'error.main' : '#D3D7D9',
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderRadius: '5px',
-          fontSize: { xs: '14px !important', md: '16px !important' },
+          borderRadius: '8px',
+          boxShadow: '0px 1px 2px rgba(10, 13, 18, 0.05)',
+          fontSize: { xs: '14px !important', md: '14px !important' },
+          // A fixed height only makes sense for single-line inputs - forcing it on a
+          // multiline field crushes/clips the textarea instead of letting it grow.
+          ...(!multiline && { height: '42px' }),
+          backgroundColor: rest.readOnly ? '#F7F7F7' : '#fff',
           ...sx,
-          height: '32px',
-          backgroundColor: '#fff',
         }}
         value={value}
         id={label}
         size="small"
         error={error}
+        multiline={multiline}
         inputProps={{
           'aria-invalid': error,
           'aria-label': label || (name as string),
@@ -118,19 +130,33 @@ const KiboTextBox = (props: KiboTextBoxProps) => {
         {...rest}
       />
 
-      <FormHelperText
-        id="helper-text"
-        aria-errormessage={helperText}
-        dangerouslySetInnerHTML={{ __html: helperText || '&nbsp;' }}
-        sx={{
-          fontSize: '16px',
-          fontFamily: 'poppins',
-          fontWeight: '400',
-          lineHeight: '25px',
-        }}
-      />
+      {/* Only reserve space for this when there's actually something to say - an always-on
+          empty helper row was eating an extra ~20px on every field. */}
+      {helperText && (
+        <FormHelperText
+          id="helper-text"
+          aria-errormessage={helperText}
+          dangerouslySetInnerHTML={{ __html: helperText }}
+          sx={{
+            fontSize: '12px',
+            fontFamily: 'Poppins',
+            fontWeight: '400',
+            lineHeight: '16px',
+            margin: '4px 0 0',
+          }}
+        />
+      )}
     </FormControl>
   )
-}
+})
 
-export default KiboTextBox
+KiboTextBox.displayName = 'KiboTextBox'
+
+// Exporting the raw forwardRef value makes TS resolve consumers' JSX props through
+// `ForwardRefExoticComponent`, which drops contextual typing for inline callback props like
+// `onChange={(name, value) => ...}` - every call site then has to annotate the params itself
+// (TS7006 implicit-any, repo-wide). Casting to a plain function-component signature restores
+// normal contextual typing while the underlying value (and its ref forwarding) is unchanged.
+export default KiboTextBox as unknown as (
+  props: KiboTextBoxProps & { ref?: React.Ref<HTMLInputElement> }
+) => React.ReactElement | null

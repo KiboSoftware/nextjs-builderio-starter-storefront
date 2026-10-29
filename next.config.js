@@ -93,7 +93,7 @@ module.exports = {
       reCaptchaSecret: process.env.RECAPTCHA_SECRET,
       reCaptchaThreshold: process.env.RECAPTCHA_THRESHOLD,
     },
-    allowInvalidAddresses: true,
+    allowInvalidAddresses: false,
     customerAddressesPageSize: 50,
     shippingAddressPageSize: 5,
     billingAddressPageSize: 5,
@@ -429,7 +429,7 @@ module.exports = {
     },
     ratingAttrFQN: `tenant~rating`,
     userCookieKey: process.env.KIBO_USER_COOKIE_KEY || 'kibo_at',
-    maxCookieAge: 5 * 24 * 60 * 60 * 1000, //5 days
+    maxCookieAge: 5 * 24 * 60 * 60, //5 days
     fulfillmentOptions: [
       {
         value: 'DirectShip',
@@ -525,6 +525,9 @@ module.exports = {
         PDPCustomAndBulkDisplaySection: 'pdp-custom-and-bulk-display-section',
         emptyProductSearchResults: 'empty-product-search-results',
         announcementBar: 'announcement-bar',
+        distributorModel: 'distributor',
+        distributorsHeroSection: 'distributors-hero',
+        distributorsBecomeSection: 'distributors-become',
       },
     },
     inventorySettings: {

@@ -24,6 +24,7 @@ export enum OrderStatus {
   COMPLETED = 'Completed',
   CREATED = 'Created',
   CANCELED = 'Cancelled',
+  ERRORED = 'Errored',
 }
 
 export enum ReturnStatus {
@@ -40,6 +41,7 @@ export enum PageType {
 const currentYear = new Date().getFullYear()
 export const FacetListForHistory = [
   { label: 'last-30-days', filterValue: 'M-1', isApplied: false, isDisplayed: true, count: 0 },
+  { label: 'last-3-months', filterValue: 'M-3', isApplied: false, isDisplayed: true, count: 0 },
   { label: 'last-6-months', filterValue: 'M-6', isApplied: false, isDisplayed: true, count: 0 },
   {
     label: `${currentYear}`,
@@ -217,8 +219,16 @@ export const CountryCode = {
   CA: 'CA',
 }
 
+export const SESSION_EXPIRED = {
+  CODE: 'SESSION_EXPIRED',
+  EVENT: 'kibo:session-expired',
+  COOKIE: 'session_expired',
+}
+
 export const KIBO_HEADERS = {
   CORRELATION_ID: 'x-vol-correlation',
   TENANT: 'x-vol-tenant',
   SITE: 'x-vol-site',
 }
+
+export const DIGITAL_ASSETS_LIST = 'digitalassets@Fortis'

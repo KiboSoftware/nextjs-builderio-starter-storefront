@@ -8,9 +8,10 @@ import MenuItem from '@mui/material/MenuItem'
 import getConfig from 'next/config'
 import { useTranslation } from 'next-i18next'
 import { useForm, Controller } from 'react-hook-form'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 import * as yup from 'yup'
 
-import { KiboSelect, KiboTextBox } from '@/components/common'
+import { KiboPhoneInput, KiboSelect, KiboStateSelect, KiboTextBox } from '@/components/common'
 import { CountryCode } from '@/lib/constants'
 import type { Address, ContactForm } from '@/lib/types'
 
@@ -23,6 +24,7 @@ interface AddressFormProps {
   setAutoFocus?: boolean
   validateForm: boolean
   showDefaultPaymentMethodCheckbox?: boolean
+  internationalPhoneInput?: boolean
   onSaveAddress: (data: Address) => void
   onFormStatusChange?: (status: boolean) => void
   onDefaultPaymentChange?: (value: boolean) => void
@@ -33,12 +35,7 @@ interface Country {
   code: string
 }
 
-interface Province {
-  name: string
-  code: string
-}
-
-export const useFormSchema = () => {
+export const useFormSchema = (internationalPhoneInput = false) => {
   const { t } = useTranslation('common')
   return yup.object().shape({
     firstName: yup.string().required(t('this-field-is-required')),
@@ -68,10 +65,17 @@ export const useFormSchema = () => {
       countryCode: yup.string().required(t('this-field-is-required')),
     }),
     phoneNumbers: yup.object().shape({
-      home: yup
-        .string()
-        .required(t('this-field-is-required'))
-        .matches(/^[0-9\s\-()+]{10,}$/, t('enter-valid-phone-number')),
+      home: internationalPhoneInput
+        ? yup
+            .string()
+            .required(t('this-field-is-required'))
+            .test('is-valid-phone-number', t('enter-valid-phone-number'), (value) =>
+              value ? isValidPhoneNumber(value) : false
+            )
+        : yup
+            .string()
+            .required(t('this-field-is-required'))
+            .matches(/^[0-9\s\-()+]{10,}$/, t('enter-valid-phone-number')),
     }),
   })
 }
@@ -89,6 +93,7 @@ const AddressForm = (props: AddressFormProps) => {
     setAutoFocus = false,
     validateForm = false,
     showDefaultPaymentMethodCheckbox = false,
+    internationalPhoneInput = false,
     onSaveAddress,
     onFormStatusChange,
     onDefaultPaymentChange,
@@ -96,7 +101,7 @@ const AddressForm = (props: AddressFormProps) => {
 
   const provinces = publicRuntimeConfig.provinces
 
-  const addressSchema = useFormSchema()
+  const addressSchema = useFormSchema(internationalPhoneInput)
   // Define Variables and States
   const {
     control,
@@ -124,15 +129,6 @@ const AddressForm = (props: AddressFormProps) => {
       )
     })
   }
-
-  const generateProvincesOptions = () =>
-    provinces?.map((province: Province) => {
-      return (
-        <MenuItem key={province.name} value={province.code}>
-          {province.name}
-        </MenuItem>
-      )
-    })
 
   const onValid = async (formData: ContactForm) =>
     onSaveAddress({ contact: formData, isDataUpdated: true })
@@ -230,25 +226,39 @@ const AddressForm = (props: AddressFormProps) => {
             name="phoneNumbers.home"
             control={control}
             defaultValue={contact?.phoneNumbers?.home}
-            render={({ field }) => (
-              <KiboTextBox
-                {...field}
-                value={field.value || ''}
-                label={t('phone-number-home')}
-                ref={null}
-                error={!!errors?.phoneNumbers?.home}
-                helperText={errors?.phoneNumbers?.home?.message}
-                onChange={(_name: string, value: string) => {
-                  const filteredValue = value.replace(/[^0-9]/g, '')
-                  field.onChange(filteredValue)
-                }}
-                onBlur={field.onBlur}
-                required={true}
-                inputProps={{
-                  maxLength: 10,
-                }}
-              />
-            )}
+            render={({ field }) =>
+              internationalPhoneInput ? (
+                <KiboPhoneInput
+                  {...field}
+                  value={field.value || ''}
+                  label={t('phone-number-home')}
+                  ref={null}
+                  error={!!errors?.phoneNumbers?.home}
+                  helperText={errors?.phoneNumbers?.home?.message}
+                  onChange={(_name: string, value: string) => field.onChange(value)}
+                  onBlur={field.onBlur}
+                  required={true}
+                />
+              ) : (
+                <KiboTextBox
+                  {...field}
+                  value={field.value || ''}
+                  label={t('phone-number-home')}
+                  ref={null}
+                  error={!!errors?.phoneNumbers?.home}
+                  helperText={errors?.phoneNumbers?.home?.message}
+                  onChange={(_name: string, value: string) => {
+                    const filteredValue = value.replace(/[^0-9]/g, '')
+                    field.onChange(filteredValue)
+                  }}
+                  onBlur={field.onBlur}
+                  required={true}
+                  inputProps={{
+                    maxLength: 10,
+                  }}
+                />
+              )
+            }
           />
         </Grid>
 
@@ -345,18 +355,17 @@ const AddressForm = (props: AddressFormProps) => {
             defaultValue={contact?.address?.stateOrProvince}
             render={({ field }) => (
               <Box>
-                <KiboSelect
+                <KiboStateSelect
                   name="state-or-province"
                   label={t('state-or-province')}
                   value={field.value}
+                  options={provinces}
                   error={!!errors?.address?.stateOrProvince}
                   helperText={errors?.address?.stateOrProvince?.message}
                   onChange={(_name: string, value: string) => field.onChange(value)}
                   onBlur={field.onBlur}
                   required={true}
-                >
-                  {generateProvincesOptions()}
-                </KiboSelect>
+                />
               </Box>
             )}
           />
